@@ -260,15 +260,15 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run build:release",
-    "build:debug": "npm run build:extension:debug && npm run build:webview:debug",
-    "build:release": "npm run build:extension:release && npm run build:webview:release && npm run verify-build",
+    "vscode:prepublish": "bun run build:release",
+    "build:debug": "bun run build:extension:debug && bun run build:webview:debug",
+    "build:release": "bun run build:extension:release && bun run build:webview:release && bun run verify-build",
     "verify-build": "node scripts/verify-build.js",
     "build:extension:debug": "node scripts/build-extension.js",
     "build:extension:release": "node scripts/build-extension.js --prod --no-sourcemap",
     "build:webview:debug": "node scripts/build-webview.js",
     "build:webview:release": "node scripts/build-webview.js --prod --no-sourcemap",
-    "watch:debug": "concurrently \"npm run watch:extension:debug\" \"npm run watch:webview:debug\"",
+    "watch:debug": "concurrently \"bun run watch:extension:debug\" \"bun run watch:webview:debug\"",
     "watch:extension:debug": "node scripts/build-extension.js --watch",
     "watch:webview:debug": "node scripts/build-webview.js --watch",
     "lint": "eslint src --ext ts --max-warnings 0",
@@ -276,11 +276,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "precommit": "npm run lint && npm run test",
-    "validate": "npm run lint && npm run test && npm run build:debug",
+    "precommit": "bun run lint && bun run test",
+    "validate": "bun run lint && bun run test && bun run build:debug",
     "package:release": "vsce package",
     "publish:release": "vsce publish",
-    "publish:ovsx:release": "npm run build:release && ovsx publish",
+    "publish:ovsx:release": "bun run build:release && ovsx publish",
     "install-hooks": "bash ./scripts/install-git-hooks.sh"
   },
   "devDependencies": {
@@ -323,5 +323,9 @@
     "markdown-it": "^14.0.0",
     "mermaid": "^11.16.0",
     "turndown": "^7.1.2"
-  }
+  },
+  "trustedDependencies": [
+    "@vscode/vsce-sign",
+    "unrs-resolver"
+  ]
 }

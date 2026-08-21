@@ -320,4 +320,46 @@ describe('Audit Document Feature', () => {
     await pickPromise;
     expect(resolvedPath).toBe('./images/new-image.png');
   });
+
+  it('disarms the pick-file safety-net timer once the extension responds', async () => {
+    const { requestFilePickerForIssue } = await import('../../webview/features/auditDocument');
+
+    jest.useFakeTimers();
+    try {
+      const pickPromise = requestFilePickerForIssue('image');
+
+      // The request arms a 5-minute safety-net timeout.
+      expect(jest.getTimerCount()).toBe(1);
+
+      const requestId = (mockVscodeApi.postMessage.mock.calls[0][0] as any).requestId as string;
+      handleAuditPickFileResult(requestId, './images/new-image.png');
+
+      // Responding must cancel that timer, not leave it armed for 5 minutes.
+      expect(jest.getTimerCount()).toBe(0);
+      await expect(pickPromise).resolves.toBe('./images/new-image.png');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('cancelPendingFilePickerRequests resolves in-flight picks and clears their timers', async () => {
+    const { requestFilePickerForIssue, cancelPendingFilePickerRequests } =
+      await import('../../webview/features/auditDocument');
+
+    jest.useFakeTimers();
+    try {
+      const first = requestFilePickerForIssue('image');
+      const second = requestFilePickerForIssue('any');
+
+      expect(jest.getTimerCount()).toBe(2);
+
+      cancelPendingFilePickerRequests();
+
+      expect(jest.getTimerCount()).toBe(0);
+      await expect(first).resolves.toBeNull();
+      await expect(second).resolves.toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });

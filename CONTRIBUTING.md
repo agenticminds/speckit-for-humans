@@ -27,13 +27,13 @@ git clone https://github.com/concretios/markdown-for-humans.git
 cd markdown-for-humans
 
 # Install dependencies
-npm install
+bun install
 
 # Build the extension (debug mode)
-npm run build:debug
+bun run build:debug
 
 # Start watch mode (auto-rebuild on changes)
-npm run watch:debug
+bun run watch:debug
 
 # In VS Code: Press F5 to launch Extension Development Host
 ```
@@ -65,17 +65,17 @@ code --version   # Should be 1.85+
 ```bash
 git clone https://github.com/concretios/markdown-for-humans.git
 cd markdown-for-humans
-npm install
+bun install
 ```
 
 ### 2. Build the Extension
 
 ```bash
 # One-time build (debug mode)
-npm run build:debug
+bun run build:debug
 
 # Or watch mode (recommended for development)
-npm run watch:debug
+bun run watch:debug
 ```
 
 ### 3. Launch Extension Development Host
@@ -163,7 +163,7 @@ VS Code TextDocument updated
 - Press `Ctrl+Shift+F5` (Cmd+Shift+F5 on Mac) to restart
 
 **Webview code** (`src/webview/*`):
-- With `npm run watch:debug`, changes auto-compile
+- With `bun run watch:debug`, changes auto-compile
 - Reload the webview: close and reopen the markdown file, or run command `Developer: Reload Webview`
 
 ### Adding a New Feature
@@ -193,13 +193,13 @@ VS Code TextDocument updated
 
 ```bash
 # Run all tests
-npm test
+bun run test
 
 # Watch mode (re-run on changes)
-npm run test:watch
+bun run test:watch
 
 # With coverage report
-npm test -- --coverage
+bun run test -- --coverage
 ```
 
 ### Test Structure
@@ -237,19 +237,19 @@ describe('Feature', () => {
 
 ```bash
 # Development build (debug mode - sourcemaps, console logs)
-npm run build:debug
+bun run build:debug
 
 # Release build (minified, no logs, verified)
-npm run build:release
+bun run build:release
 
 # Verify build integrity (checks critical features)
-npm run verify-build
+bun run verify-build
 
 # Package as .vsix file (for marketplace)
-npm run package:release
+bun run package:release
 
 # Full release build + package
-npm run build:release && npm run package:release
+bun run build:release && bun run package:release
 ```
 
 ### Install Local Package
@@ -270,7 +270,7 @@ code --install-extension markdown-for-humans-0.1.0.vsix
 
 ### Build Verification
 
-The `npm run verify-build` command checks that critical features weren't tree-shaken during bundling:
+The `bun run verify-build` command checks that critical features weren't tree-shaken during bundling:
 
 ```
 🔍 Verifying build outputs...
@@ -297,17 +297,17 @@ See [docs/BUILD.md](./docs/BUILD.md) for complete build documentation.
 ### Formatting & Linting
 
 **Automatic Linting:**
-- Pre-commit hook automatically runs `npm run lint:fix` before each commit
+- Pre-commit hook automatically runs `bun run lint:fix` before each commit
 - If linting fails, the commit is blocked (you'll see helpful error messages)
 - To skip (not recommended): `git commit --no-verify`
 
 **Manual Commands:**
 ```bash
 # Fix linting issues
-npm run lint:fix
+bun run lint:fix
 
 # Check for linting issues
-npm run lint
+bun run lint
 
 # Prettier runs automatically on save (VS Code)
 ```
@@ -395,8 +395,8 @@ See [roadmap/README.md](./roadmap/README.md) for detailed planning workflow.
 3. **Plan first** (recommended): Create a plan using [`roadmap/task-plan-template.md`](./roadmap/task-plan-template.md) in `roadmap/pipeline/` or your tool's plan location
 4. **Write tests** for your changes
 5. **Make changes** following code standards
-6. **Run tests**: `npm test`
-7. **Run linter**: `npm run lint:fix`
+6. **Run tests**: `bun run test`
+7. **Run linter**: `bun run lint:fix`
 8. **Commit**: `git commit -m 'feat: add my feature'`
 9. **Push**: `git push origin feature/my-feature`
 10. **Open a Pull Request** (include plan file if helpful for context)
@@ -404,8 +404,8 @@ See [roadmap/README.md](./roadmap/README.md) for detailed planning workflow.
 ### Pull Request Checklist
 
 - [ ] Tests added/updated and passing
-- [ ] Linting passes (`npm run lint`)
-- [ ] Build succeeds (`npm run build:release`)
+- [ ] Linting passes (`bun run lint`)
+- [ ] Build succeeds (`bun run build:release`)
 - [ ] Documentation updated if needed
 - [ ] Commit messages follow conventions
 - [ ] PR description explains changes

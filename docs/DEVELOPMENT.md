@@ -521,10 +521,10 @@ We follow [Semantic Versioning](https://semver.org/):
 **Release:**
 ```bash
 # Build release bundle
-npm run build:release
+bun run build:release
 
 # Package extension
-npm run package:release
+bun run package:release
 
 # Test .vsix file locally
 # (Install in VS Code: Extensions > ... > Install from VSIX)

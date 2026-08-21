@@ -17,13 +17,13 @@ Debug builds include sourcemaps and console logs for easier debugging:
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Build extension and webview (debug mode)
-npm run build:debug
+bun run build:debug
 
 # Watch for changes and rebuild automatically
-npm run watch:debug
+bun run watch:debug
 ```
 
 ### Release Build (Marketplace)
@@ -32,7 +32,7 @@ Release builds are optimized, minified, and verified before publishing:
 
 ```bash
 # Build and verify for marketplace
-npm run build:release
+bun run build:release
 
 # This automatically:
 # - Minifies code
@@ -45,14 +45,14 @@ npm run build:release
 
 The build system automatically handles console logging based on build type:
 
-### Debug Builds (`npm run build:debug`)
+### Debug Builds (`bun run build:debug`)
 - ✅ `console.log()` - Kept (development debugging)
 - ✅ `console.debug()` - Kept (verbose debugging)
 - ✅ `console.info()` - Kept (informational)
 - ✅ `console.warn()` - Kept (non-fatal warnings)
 - ✅ `console.error()` - Kept (errors)
 
-### Release Builds (`npm run build:release`)
+### Release Builds (`bun run build:release`)
 - ❌ `console.log()` - **Removed** (noisy debug info)
 - ❌ `console.debug()` - **Removed** (verbose debug)
 - ❌ `console.info()` - **Removed** (informational)
@@ -78,7 +78,7 @@ The verification script checks:
 ### Running Verification Manually
 
 ```bash
-npm run verify-build
+bun run verify-build
 ```
 
 Output:
@@ -126,13 +126,13 @@ const CRITICAL_FEATURES = {
 **For final testing before release:**
 ```bash
 # Create release package (automatically runs build:release via vscode:prepublish hook)
-npm run package:release
+bun run package:release
 
 # Install and test locally
 code --install-extension markdown-for-humans-0.1.0.vsix
 ```
 
-**Note:** `npm run package:release` always creates a **release build** via the `vscode:prepublish` hook. This ensures:
+**Note:** `bun run package:release` always creates a **release build** via the `vscode:prepublish` hook. This ensures:
 - ✅ You test the exact same build that will be published
 - ✅ No debug logs or sourcemaps in the package
 - ✅ Minified and optimized for production
@@ -159,7 +159,7 @@ vsce publish
 
 **Using npm script:**
 ```bash
-npm run publish:release  # Runs: vsce publish (current version)
+bun run publish:release  # Runs: vsce publish (current version)
 ```
 
 ### Publish to Open VSX Registry (For Cursor, Windsurf, VSCodium & More)
@@ -169,7 +169,7 @@ Open VSX is an open-source marketplace used by multiple VS Code-compatible edito
 **Setup (one-time):**
 ```bash
 # Install ovsx CLI globally
-npm install -g ovsx
+bun add -g ovsx
 
 # Get personal access token from https://open-vsx.org/user-settings/tokens
 
@@ -296,8 +296,8 @@ webviewCss: {
 
 ### 5. Test the verification
 ```bash
-npm run build:debug
-npm run verify-build  # Should pass with your new feature
+bun run build:debug
+bun run verify-build  # Should pass with your new feature
 ```
 
 ## Common Mistakes to Avoid
@@ -345,7 +345,7 @@ import './myFeature.css';  // esbuild will bundle this
 
 Is my build broken?
 ```bash
-npm run verify-build
+bun run verify-build
 ```
 
 If this passes, your build is good. If it fails, see below.
@@ -360,8 +360,8 @@ If this passes, your build is good. If it fails, see below.
 ```bash
 # Clean and rebuild
 rm -rf dist/
-npm run build:debug
-npm run verify-build
+bun run build:debug
+bun run verify-build
 ```
 
 **If that doesn't work**:
@@ -511,7 +511,7 @@ ls -lh dist/
 
 1. Always test the actual .vsix file before publishing:
    ```bash
-   npm run package:release
+   bun run package:release
    code --install-extension markdown-for-humans-0.1.0.vsix
    ```
 
@@ -533,18 +533,18 @@ grep "myBrokenFeature" extension/dist/webview.js
 ```bash
 # Fix the issue in code
 # Rebuild with verification
-npm run build:debug
-npm run verify-build
+bun run build:debug
+bun run verify-build
 
 # Bump patch version
 npm version patch
 
 # Package and test locally
-npm run package:release
+bun run package:release
 code --install-extension markdown-for-humans-0.1.1.vsix
 
 # Test thoroughly, then publish
-npm run publish:release
+bun run publish:release
 ```
 
 #### Step 3: Post-mortem
@@ -558,7 +558,7 @@ Before committing code that adds new features:
 
 - [ ] Feature code is imported/used in entry file
 - [ ] Feature added to `scripts/verify-build.js`
-- [ ] `npm run verify-build` passes
+- [ ] `bun run verify-build` passes
 - [ ] Tested in development (F5)
 - [ ] Tested in production (.vsix install)
 - [ ] Tests added/updated
@@ -575,7 +575,7 @@ If you're still stuck:
    git bisect start
    git bisect bad  # current broken version
    git bisect good v0.0.9  # last working version
-   # Test each commit with: npm run build && npm run verify-build
+   # Test each commit with: bun run build && bun run verify-build
    ```
 
 ## Bundle Size Guidelines
@@ -599,7 +599,7 @@ esbuild src/webview/editor.ts --bundle --outfile=dist/webview.debug.js --format=
 
 ```bash
 # Install bundle analyzer
-npm install -g esbuild-visualizer
+bun add -g esbuild-visualizer
 
 # Generate analysis
 esbuild-visualizer --bundle dist/webview.js
@@ -624,8 +624,8 @@ node -e "console.log(require('./meta.json'))"
 
 ### 2. Build & Verify
 ```bash
-npm run build:release  # Build with release settings
-npm test              # Run all tests
+bun run build:release  # Build with release settings
+bun run test              # Run all tests
 # verify-build runs automatically with build:release
 ```
 
@@ -638,7 +638,7 @@ npm test              # Run all tests
 
 **Option B: Package Testing (Final verification before release)**
 ```bash
-npm run package:release  # Creates release .vsix (via vscode:prepublish hook)
+bun run package:release  # Creates release .vsix (via vscode:prepublish hook)
 code --install-extension markdown-for-humans-X.Y.Z.vsix
 ```
 
@@ -675,15 +675,15 @@ steps:
   - uses: actions/setup-node@v3
     with:
       node-version: '18'
-  - run: npm ci
-  - run: npm run lint
-  - run: npm test
-  - run: npm run build:release  # Build and verify
-  - run: npm run package:release # vscode:prepublish runs build:release again, then packages
+  - run: bun install --frozen-lockfile
+  - run: bun run lint
+  - run: bun run test
+  - run: bun run build:release  # Build and verify
+  - run: bun run package:release # vscode:prepublish runs build:release again, then packages
 ```
 
 **Note:**
-- `npm run package:release` automatically runs `vscode:prepublish` which executes `build:release`
+- `bun run package:release` automatically runs `vscode:prepublish` which executes `build:release`
 - This ensures CI always tests the exact build that will be published
 - The build happens twice (once explicitly, once via hook) but ensures consistency
 
@@ -692,21 +692,21 @@ steps:
 ### Quick Commands
 ```bash
 # Development
-npm run build:debug        # Debug build (sourcemaps, all logs)
-npm run watch:debug        # Auto-rebuild on changes (debug mode)
-npm run verify-build       # Check build integrity
+bun run build:debug        # Debug build (sourcemaps, all logs)
+bun run watch:debug        # Auto-rebuild on changes (debug mode)
+bun run verify-build       # Check build integrity
 
 # Testing
-npm test                   # Run tests
-npm run test:coverage      # With coverage
+bun run test                   # Run tests
+bun run test:coverage      # With coverage
 
 # Packaging
-npm run package:release    # Release package (via vscode:prepublish hook)
+bun run package:release    # Release package (via vscode:prepublish hook)
 
 # Publishing
 vsce publish patch         # Publish to VS Code Marketplace (auto-bumps version)
-npm run publish:release    # Or use: npm run publish:release (runs vsce publish)
-npm run publish:ovsx:release  # Publish to Open VSX (for Cursor & Windsurf)
+bun run publish:release    # Or use: bun run publish:release (runs vsce publish)
+bun run publish:ovsx:release  # Publish to Open VSX (for Cursor & Windsurf)
                            # First time: ovsx create-namespace concretio -p <token>
 ```
 

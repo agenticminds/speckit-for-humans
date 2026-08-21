@@ -409,9 +409,9 @@ rules: {
 
 ```bash
 #!/bin/sh
-npm run lint
-npm run type-check
-npm test
+bun run lint
+bun run type-check
+bun run test
 ```
 
 **Impact:** Blocks commits with violations
@@ -607,13 +607,13 @@ private async applyEdit(content: string, document: vscode.TextDocument): Promise
 - [ ] Clean code - No console.log, debugging code
 
 **Improved:**
-- [ ] **TypeScript:** No `any` types (run `npm run type-check`, must pass)
+- [ ] **TypeScript:** No `any` types (run `bun run type-check`, must pass)
 - [ ] **Logging:** Use `console.log()` for development (automatically removed in production builds), `console.error()` for errors (always kept)
 - [ ] **Listeners:** All `addEventListener()` have matching `removeEventListener()` in cleanup
 - [ ] **Error handling:** All `async` functions have try/catch, critical operations show user errors
 - [ ] **Deprecated APIs:** No `.substr()`, `.substring()` or `.slice()` used instead
 - [ ] **Sync logic:** Uses content hash comparison, not boolean flags
-- [ ] **Tests:** All new code has tests, `npm test` passes
+- [ ] **Tests:** All new code has tests, `bun run test` passes
 
 **Impact:** More actionable, verifiable items
 **Risk:** Low
@@ -624,9 +624,9 @@ private async applyEdit(content: string, document: vscode.TextDocument): Promise
 #### 4.3.2 Add Verification Steps
 
 **Add to Checklist:**
-- [ ] **Run `npm run type-check`** - Must pass with 0 errors
-- [ ] **Run `npm run lint`** - Must pass with 0 errors
-- [ ] **Run `npm test`** - All tests pass
+- [ ] **Run `bun run type-check`** - Must pass with 0 errors
+- [ ] **Run `bun run lint`** - Must pass with 0 errors
+- [ ] **Run `bun run test`** - All tests pass
 - [ ] **Check for listeners:** `grep -r "addEventListener" src/` → verify matching `removeEventListener`
 
 **Impact:** Makes checklist verifiable
@@ -751,8 +751,8 @@ describe('Listener Cleanup', () => {
 . "$(dirname "$0")/_/husky.sh"
 
 # Run on changed files only
-npm run lint-staged
-npm run type-check
+bun run lint-staged
+bun run type-check
 ````
 
 
@@ -764,7 +764,7 @@ module.exports = {
     'eslint --fix',
     'prettier --write',
   ],
-  '*.{ts,tsx}': () => 'npm run type-check',
+  '*.{ts,tsx}': () => 'bun run type-check',
 };
 ```
 
@@ -782,13 +782,13 @@ module.exports = {
 
 ```yaml
 - name: Type Check
-  run: npm run type-check
+  run: bun run type-check
 
 - name: Lint
-  run: npm run lint
+  run: bun run lint
 
 - name: Test
-  run: npm test
+  run: bun run test
 
 - name: Check for any types
   run: |
@@ -825,9 +825,9 @@ module.exports = {
 - ✅ CI/CD validates quality gates
 
 **Manual Checks (Self-Review):**
-- [ ] Run `npm run type-check` - Must pass
-- [ ] Run `npm run lint` - Must pass  
-- [ ] Run `npm test` - All tests pass
+- [ ] Run `bun run type-check` - Must pass
+- [ ] Run `bun run lint` - Must pass  
+- [ ] Run `bun run test` - All tests pass
 - [ ] Verify no listener leaks (grep addEventListener → check removeEventListener)
 
 **If checks fail:**
@@ -844,13 +844,13 @@ module.exports = {
 
 ```markdown
 **Self-Review (Before Shipping) - ALL ITEMS MANDATORY:**
-- [ ] **TypeScript:** Run `npm run type-check` - 0 errors, <20 `any` types (document remaining)
+- [ ] **TypeScript:** Run `bun run type-check` - 0 errors, <20 `any` types (document remaining)
 - [ ] **Logging:** Use `console.log()` for development (removed in production), `console.error()` for errors (always kept)
 - [ ] **Listeners:** Run `grep -r "addEventListener" src/` - Verify matching `removeEventListener` in cleanup
 - [ ] **Error handling:** All `async` functions have try/catch, critical ops show user errors
 - [ ] **Deprecated APIs:** No `.substr()`, check MDN for deprecation status
 - [ ] **Sync logic:** Uses content hash, not boolean flags
-- [ ] **Tests:** `npm test` passes, new code has tests
+- [ ] **Tests:** `bun run test` passes, new code has tests
 - [ ] **Documentation:** JSDoc updated, file headers current, inline WHY comments
 - [ ] **Diff review:** Does this make sense to future you in 6 months?
 - [ ] **Manual read:** Read a 3000+ word doc for 10+ minutes (light/dark)
@@ -1043,7 +1043,7 @@ module.exports = {
 
 **Before:** "No `any`" (subjective)
 
-**After:** "Run `npm run type-check`, must pass"
+**After:** "Run `bun run type-check`, must pass"
 
 **Impact:** Can verify compliance
 

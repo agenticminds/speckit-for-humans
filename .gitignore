@@ -37,14 +37,16 @@ temp/
 test-docs/
 
 # AI coding assistant context files (symlinks to prompts/vibe-coding-guide.md)
-CLAUDE.md
+
 .agent/rules
 .windsurf/
 .a4drules/
 .clinerules
 .cursorrules
-.claude/
 .cursor/zoho-*.json
+# We are keeping .claude in this fork, so we retain the actual skills that produced the markdown and drove the process
+# CLAUDE.md
+# .claude/
 
 # Editor backup files
 *~

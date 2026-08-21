@@ -14,7 +14,7 @@ The workflow is:
 1. **RED:** Write failing test FIRST (defines what success looks like)
 2. **GREEN:** Implement simplest clean solution to make test pass
 3. **REFACTOR:** Clean up code while keeping tests green  
-4. **VERIFY:** Run full `npm test` to ensure no regressions
+4. **VERIFY:** Run full `bun run test` to ensure no regressions
 5. **SHIP:** Mark task as `done` only after ALL tests pass
 
 **Why TDD?**
@@ -69,9 +69,9 @@ it.todo('shows overlay when toggled');
 ## Running Tests
 
 ```bash
-npm test              # Run all tests
-npm run test:watch    # Watch mode for development
-npm run test:coverage # Generate coverage report
+bun run test              # Run all tests
+bun run test:watch    # Watch mode for development
+bun run test:coverage # Generate coverage report
 ```
 
 ---
@@ -97,7 +97,7 @@ Current minimum thresholds (see `jest.config.js`):
 4. Implement simplest clean solution → make test pass
 5. Verify test passes → feature works
 6. Refactor (optional) → clean up, keep tests green
-7. Run full suite → `npm test` (all must pass)
+7. Run full suite → `bun run test` (all must pass)
 8. Repeat for next requirement
 
 ---
@@ -108,7 +108,7 @@ Current minimum thresholds (see `jest.config.js`):
 
 - [ ] Tests written BEFORE implementation
 - [ ] New tests pass
-- [ ] ALL existing tests still pass (`npm test`)
+- [ ] ALL existing tests still pass (`bun run test`)
 - [ ] Test coverage includes positive, negative, edge cases
 - [ ] Task file section 7 documents test approach
 
@@ -142,7 +142,7 @@ When a user reports "X is not working", follow this workflow:
 4. Verify test fails → confirms bug captured
 5. Fix bug → minimal changes, root cause
 6. Verify test passes → bug fixed
-7. Run full suite → `npm test` (all must pass)
+7. Run full suite → `bun run test` (all must pass)
 
 ---
 
@@ -158,5 +158,5 @@ When a user reports "X is not working", follow this workflow:
 - [ ] Verify test fails with current code
 - [ ] Fix the bug (minimal upstream fix preferred)
 - [ ] Verify the new test passes
-- [ ] Run `npm test` - all tests pass
+- [ ] Run `bun run test` - all tests pass
 - [ ] Update task file if applicable

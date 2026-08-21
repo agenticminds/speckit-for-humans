@@ -5,7 +5,7 @@
 #
 # This hook runs automatically before every 'git commit'
 #
-# STATUS: DISABLED - Rename to pre-commit and run npm run install-hooks to enable
+# STATUS: DISABLED - Rename to pre-commit and run bun run install-hooks to enable
 #
 
 set -e
@@ -29,7 +29,7 @@ cd "$PROJECT_ROOT"
 
 # Step 1: Auto-fix linting issues
 echo -e "${CYAN}Step 1:${RESET} Auto-fixing linting issues..."
-if npm run lint:fix > /dev/null 2>&1; then
+if bun run lint:fix > /dev/null 2>&1; then
   echo -e "  ${GREEN}✓${RESET} Auto-fixed linting issues"
 else
   echo -e "  ${YELLOW}⚠${RESET} Some issues could not be auto-fixed"
@@ -37,7 +37,7 @@ fi
 
 # Step 2: Check for remaining linting issues
 echo -e "${CYAN}Step 2:${RESET} Checking for remaining linting issues..."
-if npm run lint > /dev/null 2>&1; then
+if bun run lint > /dev/null 2>&1; then
   echo -e "  ${GREEN}✓${RESET} All linting checks passed"
   echo ""
   exit 0
@@ -49,14 +49,14 @@ else
   echo -e "${RED}│${RESET}                                                                ${RED}│${RESET}"
   echo -e "${RED}│${RESET}  There are linting errors that need to be fixed manually.      ${RED}│${RESET}"
   echo -e "${RED}│${RESET}                                                                ${RED}│${RESET}"
-  echo -e "${RED}│${RESET}  Run: ${CYAN}npm run lint${RESET} to see the errors              ${RED}│${RESET}"
-  echo -e "${RED}│${RESET}  Run: ${CYAN}npm run lint:fix${RESET} to auto-fix what's possible  ${RED}│${RESET}"
+  echo -e "${RED}│${RESET}  Run: ${CYAN}bun run lint${RESET} to see the errors              ${RED}│${RESET}"
+  echo -e "${RED}│${RESET}  Run: ${CYAN}bun run lint:fix${RESET} to auto-fix what's possible  ${RED}│${RESET}"
   echo -e "${RED}│${RESET}                                                                ${RED}│${RESET}"
   echo -e "${RED}│${RESET}  To skip this check (not recommended): ${YELLOW}git commit --no-verify${RESET} ${RED}│${RESET}"
   echo -e "${RED}└────────────────────────────────────────────────────────────────┘${RESET}"
   echo ""
   
   # Show the actual linting errors
-  npm run lint
+  bun run lint
   exit 1
 fi

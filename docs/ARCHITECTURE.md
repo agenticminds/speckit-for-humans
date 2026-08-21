@@ -1007,39 +1007,39 @@ describe('Document Sync', () => {
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Start watch mode (extension + webview)
-npm run watch
+bun run watch
 
 # In VS Code: Press F5 to launch Extension Development Host
 
 # Run tests
-npm test
+bun run test
 
 # Lint code
-npm run lint
-npm run lint:fix
+bun run lint
+bun run lint:fix
 ```
 
 ### Build Process
 
 **Extension Bundle:**
 ```bash
-npm run build:extension
+bun run build:extension
 # → esbuild src/extension.ts → dist/extension.js (~1.8MB)
 ```
 
 **WebView Bundle:**
 ```bash
-npm run build:webview
+bun run build:webview
 # → esbuild src/webview/editor.ts → dist/webview.js (~4.3MB)
 # → cp src/webview/editor.css → dist/webview.css (~67KB)
 ```
 
 **Production Build:**
 ```bash
-npm run build
+bun run build
 # → Runs both build:extension and build:webview
 # → Minifies, tree-shakes, generates source maps
 ```
@@ -1050,7 +1050,7 @@ This is the canonical way to build the `.vsix` file that you can either share wi
 
 ```bash
 # Create .vsix file (for local install or marketplace upload)
-npm run package
+bun run package
 # → Uses vsce (VS Code Extension CLI)
 # → Outputs markdown-for-humans-0.1.0.vsix in the project root
 

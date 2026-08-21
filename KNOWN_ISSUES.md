@@ -137,9 +137,9 @@ _None currently. All critical issues have been resolved._
 **Improvement:** Minor polish for developer experience
 
 **Current Setup:**
-- ✅ Marketplace build (no source maps): `npm run build:marketplace`
-- ✅ Development build (with source maps): `npm run build`
-- ✅ Build verification: `npm run verify-build`
+- ✅ Marketplace build (no source maps): `bun run build:marketplace`
+- ✅ Development build (with source maps): `bun run build`
+- ✅ Build verification: `bun run verify-build`
 - ✅ Console.log removal via build flags
 
 **Status:** Working well, no urgent changes needed

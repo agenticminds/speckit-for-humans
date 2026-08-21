@@ -13,7 +13,11 @@ import {
   dismissToast,
   clearToasts,
 } from '../../webview/features/auditOverlay';
-import { AuditIssue } from '../../webview/features/auditDocument';
+import {
+  AuditIssue,
+  cancelPendingFilePickerRequests,
+  handleAuditPickFileResult,
+} from '../../webview/features/auditDocument';
 
 let mockVscodeApi: { postMessage: jest.Mock };
 
@@ -50,10 +54,15 @@ describe('Audit Overlay UI', () => {
     if (overlay) {
       overlay.remove();
     }
+    // Browse-button tests assert only the outbound postMessage, so they finish with
+    // a file-picker request still in flight. Release it the same way closing the
+    // overlay does, otherwise its safety-net timer outlives the test.
+    cancelPendingFilePickerRequests();
     clearToasts();
     delete (window as any).vscode;
     delete (window as any).resolveImagePath;
     jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
   it('shows a toast notification when no issues found', () => {
@@ -447,6 +456,73 @@ describe('Audit Overlay UI', () => {
         fileType: 'any',
       })
     );
+  });
+
+  it('leaves no pending timer once a Browse request is answered', () => {
+    jest.useFakeTimers();
+
+    const issues: AuditIssue[] = [
+      {
+        type: 'image',
+        message: 'Image file not found: missing.png',
+        target: 'missing.png',
+        pos: 1,
+        nodeSize: 1,
+      },
+    ];
+
+    showAuditOverlay(editor, issues);
+    jest.runOnlyPendingTimers();
+
+    const browseBtn = document.querySelector('.audit-browse-btn') as HTMLButtonElement;
+    browseBtn.click();
+
+    // The Browse click arms a 5-minute safety-net timeout alongside the request.
+    expect(jest.getTimerCount()).toBeGreaterThan(0);
+
+    const requestId = (
+      mockVscodeApi.postMessage.mock.calls.find(
+        call => (call[0] as any).type === 'auditPickFile'
+      )?.[0] as any
+    ).requestId as string;
+    handleAuditPickFileResult(requestId, './images/found.png');
+
+    // Answering the request must disarm the safety-net timer, not just resolve it.
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('closing the overlay cancels an outstanding Browse request', async () => {
+    jest.useFakeTimers();
+
+    const issues: AuditIssue[] = [
+      {
+        type: 'image',
+        message: 'Image file not found: missing.png',
+        target: 'missing.png',
+        pos: 1,
+        nodeSize: 1,
+      },
+    ];
+
+    showAuditOverlay(editor, issues);
+    jest.runOnlyPendingTimers();
+
+    const browseBtn = document.querySelector('.audit-browse-btn') as HTMLButtonElement;
+    browseBtn.click();
+    expect(jest.getTimerCount()).toBeGreaterThan(0);
+
+    const closeBtn = document.querySelector('.audit-overlay-close') as HTMLButtonElement;
+    closeBtn.click();
+
+    // No safety-net timer may survive the panel that owns it.
+    expect(jest.getTimerCount()).toBe(0);
+
+    // The awaiting Browse promise resolves as a cancellation, restoring the button.
+    jest.useRealTimers();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(browseBtn.disabled).toBe(false);
+    expect(browseBtn.textContent).toContain('Browse');
   });
 
   it('renders heading suggestions with a descriptive label (not just the raw slug)', () => {
