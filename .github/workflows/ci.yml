@@ -10,6 +10,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Manual trigger, so CI can be exercised on any branch without opening a pull
+  # request. Fire it with:
+  #   gh workflow run ci.yml --repo <owner>/<repo> --ref <branch>
+  # GitHub only exposes this trigger once the workflow file exists on the
+  # default branch, so it must reach main before it becomes usable.
+  workflow_dispatch:
 
 # Default to no permissions; each job opts in to exactly what it needs.
 permissions: {}
