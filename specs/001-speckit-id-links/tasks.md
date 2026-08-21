@@ -39,7 +39,10 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 **Purpose**: Close the two unproven pieces of work already in the tree.
 
-- [ ] T001 Push the branch and watch the GitHub Actions run at `.github/workflows/ci.yml`, iterating until every job is green — the Bun setup step and the removal of the npm dependency cache are unverified, and this is the only place they can be proven **[Enforced gate]**
+- [X] T001 Push the branch and watch the GitHub Actions run at `.github/workflows/ci.yml`, iterating until every job is green — the Bun setup step and the removal of the npm dependency cache are unverified, and this is the only place they can be proven **[Enforced gate]**
+  - Closed out 2026-08-21. Two attempts were needed. The first run failed in the packaging job: the Bun switch had been applied to the test job's toolbox setup but not the packaging job's, which still asked for an npm dependency cache keyed on the deleted lockfile. Both test jobs passed in that same run, proving Bun itself works on the runner. Second run green across all three jobs — `test (22.x)`, `test (24.x)`, `package`.
+  - A `workflow_dispatch` trigger was added so CI can be fired from the command line on any branch, since pull requests are not used on this repository and the existing triggers only covered `main`. Fire it with `gh workflow run ci.yml --repo <owner>/<repo> --ref <branch>`.
+  - Correction to an earlier note here: the absence of prior runs was **not** a fork permission problem. The dispatch worked on the first attempt. No workflow had ever run simply because no trigger had ever matched.
 - [X] T002 [P] Document the nine script names referenced in docs but absent from `package.json` — `type-check`, `build`, `package`, `watch`, `build:webview`, `build:extension`, `build:marketplace`, `package:marketplace`, `lint-staged` — in `docs/BUILD.md`, noting they predate this work and were inherited
 - [X] T003 [P] Update `.github/hooks/ENABLE_PRE_COMMIT.md` and `.github/hooks/README.md` so the enable instructions name the Bun commands the hook now runs
 
