@@ -40,8 +40,8 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 **Purpose**: Close the two unproven pieces of work already in the tree.
 
 - [ ] T001 Push the branch and watch the GitHub Actions run at `.github/workflows/ci.yml`, iterating until every job is green — the Bun setup step and the removal of the npm dependency cache are unverified, and this is the only place they can be proven **[Enforced gate]**
-- [ ] T002 [P] Document the nine script names referenced in docs but absent from `package.json` — `type-check`, `build`, `package`, `watch`, `build:webview`, `build:extension`, `build:marketplace`, `package:marketplace`, `lint-staged` — in `docs/BUILD.md`, noting they predate this work and were inherited
-- [ ] T003 [P] Update `.github/hooks/ENABLE_PRE_COMMIT.md` and `.github/hooks/README.md` so the enable instructions name the Bun commands the hook now runs
+- [X] T002 [P] Document the nine script names referenced in docs but absent from `package.json` — `type-check`, `build`, `package`, `watch`, `build:webview`, `build:extension`, `build:marketplace`, `package:marketplace`, `lint-staged` — in `docs/BUILD.md`, noting they predate this work and were inherited
+- [X] T003 [P] Update `.github/hooks/ENABLE_PRE_COMMIT.md` and `.github/hooks/README.md` so the enable instructions name the Bun commands the hook now runs
 
 ---
 
