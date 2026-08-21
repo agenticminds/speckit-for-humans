@@ -83,10 +83,15 @@ jobs:
 
       - name: Use Node.js 24.x
         # actions/setup-node@v4
+        # Node is still required: the build scripts are invoked as `node scripts/*.js`.
+        # No dependency cache here - Bun owns installation and caches via bun.lock.
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24.x
-          cache: 'npm'
+
+      - name: Use Bun
+        # oven-sh/setup-bun@v2.2.0
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
