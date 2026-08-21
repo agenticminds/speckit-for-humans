@@ -273,10 +273,44 @@ export function handleAuditUrlCheckResult(requestId: string, reachable: boolean)
 // --- File picker (Browse button) request/response ----------------------------
 
 /**
- * Callbacks awaiting a 'auditPickFileResult' response from the extension host.
- * Key: requestId, Value: resolve function
+ * Safety-net timeout for a file-picker request (5 minutes).
+ * We DO NOT use a short timeout here because OS file pickers are user-driven,
+ * and users may legitimately take several minutes to locate a specific file.
+ * Standard user cancellations are handled natively by the extension host returning null.
  */
-const auditPickFileCallbacks = new Map<string, (path: string | null) => void>();
+const FILE_PICKER_TIMEOUT_MS = 300000;
+
+/**
+ * In-flight 'auditPickFile' requests awaiting a response from the extension host.
+ * Key: requestId. Each entry owns the resolve function AND the safety-net timer
+ * handle so the timer can be cancelled the moment the request settles — leaving it
+ * armed would keep a 5-minute timer (and the captured resolve) alive for every
+ * Browse click.
+ */
+type PendingFilePickerRequest = {
+  resolve: (path: string | null) => void;
+  timeout: ReturnType<typeof setTimeout>;
+};
+
+const auditPickFileCallbacks = new Map<string, PendingFilePickerRequest>();
+
+/**
+ * Settle an in-flight file-picker request exactly once: cancel its safety-net
+ * timer, drop the bookkeeping entry, then resolve the awaiting promise.
+ *
+ * @param requestId - The id issued by requestFilePickerForIssue.
+ * @param selectedPath - Relative path chosen, or null for cancel/timeout.
+ * @returns true if a pending request was settled, false if there was none.
+ */
+function settleFilePickerRequest(requestId: string, selectedPath: string | null): boolean {
+  const pending = auditPickFileCallbacks.get(requestId);
+  if (!pending) return false;
+
+  clearTimeout(pending.timeout);
+  auditPickFileCallbacks.delete(requestId);
+  pending.resolve(selectedPath);
+  return true;
+}
 
 /**
  * Open a file picker dialog in the extension host and return the selected path
@@ -294,18 +328,12 @@ export function requestFilePickerForIssue(fileType: AuditFileType): Promise<stri
       return;
     }
     const requestId = `audit-pick-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    auditPickFileCallbacks.set(requestId, resolve);
 
-    // Safety-net timeout (5 minutes) to prevent memory leaks if the extension host crashes.
-    // We DO NOT use a short timeout here because OS file pickers are user-driven,
-    // and users may legitimately take several minutes to locate a specific file.
-    // Standard user cancellations are handled natively by the extension host returning null.
-    setTimeout(() => {
-      if (auditPickFileCallbacks.has(requestId)) {
-        auditPickFileCallbacks.delete(requestId);
-        resolve(null);
-      }
-    }, 300000);
+    const timeout = setTimeout(() => {
+      settleFilePickerRequest(requestId, null);
+    }, FILE_PICKER_TIMEOUT_MS);
+
+    auditPickFileCallbacks.set(requestId, { resolve, timeout });
 
     vscodeApi.postMessage({
       type: 'auditPickFile',
@@ -323,10 +351,20 @@ export function requestFilePickerForIssue(fileType: AuditFileType): Promise<stri
  * @param selectedPath - Relative path chosen, or null if cancelled.
  */
 export function handleAuditPickFileResult(requestId: string, selectedPath: string | null): void {
-  const cb = auditPickFileCallbacks.get(requestId);
-  if (cb) {
-    cb(selectedPath);
-    auditPickFileCallbacks.delete(requestId);
+  settleFilePickerRequest(requestId, selectedPath);
+}
+
+/**
+ * Abandon every in-flight file-picker request: cancel its safety-net timer and
+ * resolve the awaiting promise with null (the same shape as a user cancellation).
+ *
+ * Called when the audit overlay closes, because a path chosen afterwards can no
+ * longer be applied to the dismissed issue list. Without this, closing the overlay
+ * with a Browse request outstanding would leave a 5-minute timer armed.
+ */
+export function cancelPendingFilePickerRequests(): void {
+  for (const requestId of Array.from(auditPickFileCallbacks.keys())) {
+    settleFilePickerRequest(requestId, null);
   }
 }
 

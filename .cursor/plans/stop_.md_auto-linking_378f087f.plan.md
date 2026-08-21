@@ -203,7 +203,7 @@ export function shouldAutoLink(url: string): boolean {
 
 Run all link-related tests:
 ```bash
-npm test -- --testPathPattern="link|paste" --verbose
+bun run test -- --testPathPattern="link|paste" --verbose
 ```
 
 ## Files to Modify

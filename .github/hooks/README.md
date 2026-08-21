@@ -12,8 +12,8 @@ This directory contains git hook templates that can be installed to automate com
 
 **What it does:**
 - Runs before every `git commit`
-- Automatically fixes linting issues with `npm run lint:fix`
-- Checks for remaining issues with `npm run lint`
+- Automatically fixes linting issues with `bun run lint:fix`
+- Checks for remaining issues with `bun run lint`
 - Blocks the commit if linting fails (with helpful error message)
 
 **Why it's useful:**
@@ -26,7 +26,7 @@ mv .github/hooks/pre-commit.disabled .github/hooks/pre-commit
 chmod +x .github/hooks/pre-commit
 
 # Reinstall hooks
-npm run install-hooks
+bun run install-hooks
 ```
 
 **To skip (not recommended):**
@@ -41,7 +41,7 @@ git commit --no-verify
 Run the installation script from the project root:
 
 ```bash
-npm run install-hooks
+bun run install-hooks
 # or
 ./scripts/install-git-hooks.sh
 ```

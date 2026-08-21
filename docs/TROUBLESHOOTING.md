@@ -5,7 +5,7 @@
 ### Is my build broken?
 
 ```bash
-npm run verify-build
+bun run verify-build
 ```
 
 If this passes, your build is good. If it fails, see below.
@@ -20,8 +20,8 @@ If this passes, your build is good. If it fails, see below.
 ```bash
 # Clean and rebuild
 rm -rf dist/
-npm run build
-npm run verify-build
+bun run build
+bun run verify-build
 ```
 
 **If that doesn't work**:
@@ -171,7 +171,7 @@ ls -lh dist/
 
 1. Always test the actual .vsix file before publishing:
    ```bash
-   npm run package
+   bun run package
    code --install-extension markdown-for-humans-0.1.0.vsix
    ```
 
@@ -195,14 +195,14 @@ grep "myBrokenFeature" extension/dist/webview.js
 ```bash
 # Fix the issue in code
 # Rebuild with verification
-npm run build
-npm run verify-build
+bun run build
+bun run verify-build
 
 # Bump patch version
 npm version patch
 
 # Package and test locally
-npm run package
+bun run package
 code --install-extension markdown-for-humans-0.1.1.vsix
 
 # Test thoroughly, then publish
@@ -246,12 +246,12 @@ node -e "console.log(JSON.stringify(require('./meta.json'), null, 2))" | less
 
 ```bash
 # Before changes
-npm run build
+bun run build
 cp dist/webview.js dist/webview.before.js
 
 # After changes
 # ... make changes ...
-npm run build
+bun run build
 cp dist/webview.js dist/webview.after.js
 
 # Compare
@@ -265,7 +265,7 @@ Before committing code that adds new features:
 
 - [ ] Feature code is imported/used in entry file
 - [ ] Feature added to `scripts/verify-build.js`
-- [ ] `npm run verify-build` passes
+- [ ] `bun run verify-build` passes
 - [ ] Tested in development (F5)
 - [ ] Tested in production (.vsix install)
 - [ ] Tests added/updated
@@ -282,7 +282,7 @@ If you're still stuck:
    git bisect start
    git bisect bad  # current broken version
    git bisect good v0.0.9  # last working version
-   # Test each commit with: npm run build && npm run verify-build
+   # Test each commit with: bun run build && bun run verify-build
    ```
 
 ## Reference: File Structure

@@ -16,7 +16,7 @@ The pre-commit hook is currently **disabled** and saved as `pre-commit.disabled`
 
 3. **Install the hook:**
    ```bash
-   npm run install-hooks
+   bun run install-hooks
    ```
 
 4. **Verify installation:**
@@ -27,8 +27,8 @@ The pre-commit hook is currently **disabled** and saved as `pre-commit.disabled`
 ## What the Hook Does
 
 When enabled, the pre-commit hook will:
-- Automatically run `npm run lint:fix` before each commit
-- Check for remaining linting issues with `npm run lint`
+- Automatically run `bun run lint:fix` before each commit
+- Check for remaining linting issues with `bun run lint`
 - Block commits if linting fails (with helpful error messages)
 
 ## Current Status
@@ -41,10 +41,10 @@ When enabled, the pre-commit hook will:
 ## Testing Before Enabling
 
 Before enabling, ensure:
-- [ ] Run `npm run lint:fix` manually and review all changes
-- [ ] Run `npm run lint` and fix any remaining errors
-- [ ] Verify build still works: `npm run build && npm run verify-build`
-- [ ] Run tests: `npm test`
+- [ ] Run `bun run lint:fix` manually and review all changes
+- [ ] Run `bun run lint` and fix any remaining errors
+- [ ] Verify build still works: `bun run build && bun run verify-build`
+- [ ] Run tests: `bun run test`
 - [ ] All team members are aware of the hook
 
 ---

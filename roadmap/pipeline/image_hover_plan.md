@@ -27,8 +27,8 @@
 - `THIRD_PARTY_LICENSES.md` — Check for updates (likely none)
 
 **Verification**
-1. Run `npm test` to ensure all existing and new tests pass.
-2. Build extension with `npm run build:debug` and verify no TypeScript errors.
+1. Run `bun run test` to ensure all existing and new tests pass.
+2. Build extension with `bun run build:debug` and verify no TypeScript errors.
 3. Install extension in VS Code development host, create test document with images.
 4. Toggle setting in VS Code settings UI and confirm hover overlay appears/disappears immediately.
 5. Test edge cases: setting change while hovering, multiple images, caret/selection states.

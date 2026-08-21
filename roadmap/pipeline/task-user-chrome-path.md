@@ -124,7 +124,7 @@ LLM INSTRUCTIONS: This task removes heavy Chrome bundling (~120MB) and enables u
 3. Verify: Entry matches task metadata in section 1
 
 **Refactor `findChromeExecutable()`:**
-1. Run existing tests: `npm test -- documentExport.test.ts`
+1. Run existing tests: `bun run test -- documentExport.test.ts`
 2. Tests should still pass (behavior unchanged externally)
 3. Function now returns `{ path: string | null, detected: boolean }` instead of throwing
 
@@ -211,7 +211,7 @@ If missing: open Step 2 dialog →
 4. Verify: Links are clickable and go to correct Chrome/Chromium downloads
 
 **Write unit tests:**
-1. Run `npm test`
+1. Run `bun run test`
 2. All tests pass (new + existing)
 3. Coverage includes:
    - Chrome detection (found/not found)

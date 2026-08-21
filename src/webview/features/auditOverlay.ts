@@ -14,6 +14,7 @@ import {
   AuditFileType,
   auditPluginKey,
   requestFilePickerForIssue,
+  cancelPendingFilePickerRequests,
 } from './auditDocument';
 import { getLevenshteinDistance } from './levenshtein';
 
@@ -260,22 +261,25 @@ export function showAuditOverlay(editor: Editor, issues: AuditIssue[]) {
 
   overlay.classList.add('visible');
 
+  // Dismiss the panel and release anything it still owns. A Browse request that
+  // is still outstanding can no longer be applied to a dismissed issue list, so
+  // it is cancelled here rather than left holding its safety-net timer.
+  const closeOverlay = () => {
+    overlay?.classList.remove('visible');
+    auditPreviewPopover.hide();
+    cancelPendingFilePickerRequests();
+  };
+
   // Close button
   const closeBtn = overlay.querySelector('.audit-overlay-close');
   if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      overlay?.classList.remove('visible');
-      auditPreviewPopover.hide();
-    });
+    closeBtn.addEventListener('click', closeOverlay);
   }
 
   // Backdrop click to close
   const backdrop = overlay.querySelector('.audit-overlay-backdrop');
   if (backdrop) {
-    backdrop.addEventListener('click', () => {
-      overlay?.classList.remove('visible');
-      auditPreviewPopover.hide();
-    });
+    backdrop.addEventListener('click', closeOverlay);
   }
 
   // Wire up interaction handlers on all items

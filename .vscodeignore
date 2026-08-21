@@ -56,6 +56,8 @@ jest.config.js
 node_modules/**
 .npm-cache/**
 package-lock.json
+bun.lock
+bun.lockb
 
 # Environment
 .env
@@ -75,6 +77,9 @@ Desktop.ini
 .windsurf/**
 .cursor/**
 .agent/**
+
+# Spec Kit planning metadata (specs/** is already excluded above)
+.specify/**
 
 # Include only essential files for marketplace
 !dist/**

@@ -258,15 +258,23 @@ const documentDirtyCallbacks = new Map<string, (isDirty: boolean) => void>();
 function queryDocumentDirty(): Promise<boolean> {
   return new Promise(resolve => {
     const requestId = `is-dirty-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    documentDirtyCallbacks.set(requestId, resolve);
-    vscode.postMessage({ type: 'queryDocumentDirty', requestId });
+
     // Defensive timeout so a missing host reply can't wedge the toolbar.
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (documentDirtyCallbacks.delete(requestId)) {
         // Treat unknown state as "needs confirmation" — safer than silently saving.
         resolve(true);
       }
     }, 2000);
+
+    // Clear the defensive timer on the reply path too; leaving it armed keeps a
+    // 2-second timer (and this resolver) alive after every toolbar query.
+    documentDirtyCallbacks.set(requestId, isDirty => {
+      clearTimeout(timeout);
+      resolve(isDirty);
+    });
+
+    vscode.postMessage({ type: 'queryDocumentDirty', requestId });
   });
 }
 
@@ -624,7 +632,14 @@ function initializeEditor(initialContent: string) {
         Markdown.configure({
           markedOptions: {
             gfm: true, // GitHub Flavored Markdown for tables, task lists
-            breaks: true, // Preserve single newlines as <br>
+            // CommonMark soft-break behaviour: a single newline inside a paragraph
+            // is a soft wrap and renders as a space; only a blank line starts a new
+            // paragraph. Explicit hard breaks (two trailing spaces or a trailing
+            // backslash) still become <br>. With breaks:true, AI-generated prose
+            // wrapped at ~80 columns rendered as a wall of forced line breaks, and
+            // the round-trip re-wrote every wrap point as a real hard break by
+            // appending two trailing spaces.
+            breaks: false,
           },
         }),
         HtmlPreservingTable.configure({

@@ -89,7 +89,7 @@
 - **Toolbar picker:** In WYSIWYG, select alert type → block appears with label/icon and placeholder; no keyboard/slash entries.
 - **Markdown round-trip:** Type `> [!WARNING]` + content in source → renders colored warning; toggle source to confirm unchanged markdown; export/plain view remains standard blockquote.
 - **Existing quotes unaffected:** Plain blockquote still renders gray and toggles via existing toolbar button.
-- **Unit tests:** Run `npm test`; coverage confirms parsing, rendering, serialization, and toolbar action inserts correct markdown.
+- **Unit tests:** Run `bun run test`; coverage confirms parsing, rendering, serialization, and toolbar action inserts correct markdown.
 
 ---
 
@@ -158,5 +158,5 @@
   - Trim leading hard breaks/empty text from parsed paragraphs and drop empty paragraphs so alerts render without a leading `<br>`.
   - Keep spacing inside the non-editable header via padding (no margin-gap click-through) and rely on `ignoreMutation` only (removed JS selection hacks).
 - **Files:** `src/webview/extensions/githubAlerts.ts`, `src/webview/editor.css`, `src/__tests__/webview/githubAlerts.test.ts`.
-- **Testing:** `npm test -- githubAlerts.test.ts` (18 tests passing).
+- **Testing:** `bun run test -- githubAlerts.test.ts` (18 tests passing).
 - **Status:** Cursor now lands only in real content; blank-line rendering clean; ready to ship.

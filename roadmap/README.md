@@ -54,7 +54,7 @@ You can create plan files using any AI coding tool (Cursor, Antigravity, Windsur
 **Key point**: Don't worry if your tool doesn't have a special "plan mode" — just prompt the AI to create a markdown file using the template, or create one manually. The important part is having a well-drafted plan document.
 
 **When a plan is complete:**
-1. Verify all tests pass (`npm test`)
+1. Verify all tests pass (`bun run test`)
 2. Move plan to shipped: `git mv roadmap/pipeline/[name].md roadmap/shipped/`
 
 **Including plan files in PRs:**

@@ -15,10 +15,10 @@ Quick checklist for publishing Markdown for Humans to VS Code Marketplace.
 # ⚠️  NEVER create separate RELEASE_NOTES_*.md files
 
 # 2. Run full test suite
-npm run lint:fix && npm test && npm run build:release
+bun run lint:fix && bun run test && bun run build:release
 
 # 3. Test locally
-npm run package:release
+bun run package:release
 code --install-extension markdown-for-humans-*.vsix
 # Test features manually
 
@@ -58,9 +58,9 @@ git push origin --tags
 ## Pre-Release
 
 ### Code Quality
-- [ ] Fix linting issues: `npm run lint:fix`
-- [ ] All tests pass: `npm test`
-- [ ] Build succeeds: `npm run build:release`
+- [ ] Fix linting issues: `bun run lint:fix`
+- [ ] All tests pass: `bun run test`
+- [ ] Build succeeds: `bun run build:release`
 
 ### Version & Changelog
 - [ ] **Update `CHANGELOG.md` with new version section** (this is your ONLY changelog file)
@@ -70,7 +70,7 @@ git push origin --tags
 - [ ] Commit all changes (version will be auto-bumped during publish)
 
 ### Package & Test
-- [ ] Create package: `npm run package:release`
+- [ ] Create package: `bun run package:release`
 - [ ] Verify `.vsix` file created and size < 10MB
 - [ ] Test local installation: `code --install-extension markdown-for-humans-<version>.vsix`
 - [ ] Test core features in Extension Development Host:
@@ -112,7 +112,7 @@ git push origin --tags
 - [ ] Run `vsce publish` (publishes current version)
 
 **Alternative: Web upload**
-- [ ] Build: `npm run package:marketplace`
+- [ ] Build: `bun run package:marketplace`
 - [ ] Upload `.vsix` at https://marketplace.visualstudio.com/manage
 
 ### Publish to Open VSX Registry (For Cursor, Windsurf, VSCodium & More)
@@ -126,7 +126,7 @@ git push origin --tags
 - Other Open VSX-compatible IDEs
 
 **One-Time Setup (First Publish Only):**
-- [ ] Install ovsx CLI: `npm install -g ovsx`
+- [ ] Install ovsx CLI: `bun add -g ovsx`
 - [ ] Get token from https://open-vsx.org/user-settings/tokens
 - [ ] Create namespace: `ovsx create-namespace concretio -p <your-token>`
   - ⚠️ **Required before first publish** - namespace must match publisher in package.json
@@ -175,7 +175,7 @@ git push origin --tags
 **Quick Commands:**
 ```bash
 # Full test cycle before publishing
-npm run lint:fix && npm test && npm run build:release && npm run package:release
+bun run lint:fix && bun run test && bun run build:release && bun run package:release
 
 # Publish to VS Code Marketplace
 vsce login concretio

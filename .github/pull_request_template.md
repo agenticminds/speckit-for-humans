@@ -45,10 +45,10 @@ Fixes #
 
 <!-- Describe the testing you've done -->
 
-- [ ] All existing tests pass (`npm test`)
-- [ ] Linting passes with no errors (`npm run lint:fix`)
-- [ ] Build succeeds (`npm run build:release`)
-- [ ] Extension can be packaged (`npm run package:release`)
+- [ ] All existing tests pass (`bun run test`)
+- [ ] Linting passes with no errors (`bun run lint:fix`)
+- [ ] Build succeeds (`bun run build:release`)
+- [ ] Extension can be packaged (`bun run package:release`)
 - [ ] Manually tested in VS Code Extension Development Host
 - [ ] Tested with both saved files (`file:`) and untitled files (`untitled:`)
 - [ ] Tested in light and dark themes
