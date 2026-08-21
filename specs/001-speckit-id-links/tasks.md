@@ -54,16 +54,16 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 ### Gate repairs
 
-- [ ] T004 Resolve the Jest worker force-exit warning reported by `bun run test`, root-caused as Jest's own shutdown deadline being too short to reap eleven workers rather than a leaked handle; set `workerGracefulExitTimeout` in `jest.config.js` to a value that reflects the real reaping time, and record in a comment that this corrects a deadline rather than masking a leak
-- [ ] T005 [P] Replace the real-time wait in the success-toast dismissal test in `src/__tests__/webview/auditOverlay.test.ts` with Jest fake timers, so it stops failing roughly one run in fifteen under load
-- [ ] T006 Confirm the `bun run validate` gate exits zero with no warning and no new skipped tests, capturing the exit code outside a pipe **[Enforced gate]**
+- [X] T004 Resolve the Jest worker force-exit warning reported by `bun run test`, root-caused as Jest's own shutdown deadline being too short to reap eleven workers rather than a leaked handle; set `workerGracefulExitTimeout` in `jest.config.js` to a value that reflects the real reaping time, and record in a comment that this corrects a deadline rather than masking a leak
+- [X] T005 [P] Replace the real-time wait in the success-toast dismissal test in `src/__tests__/webview/auditOverlay.test.ts` with Jest fake timers, so it stops failing roughly one run in fifteen under load
+- [X] T006 Confirm the `bun run validate` gate exits zero with no warning and no new skipped tests, capturing the exit code outside a pipe **[Enforced gate]**
 
 ### VS Code mock expansion
 
-- [ ] T007 Add `workspace.fs` with `readFile` and `stat` to `src/__mocks__/vscode.ts`
-- [ ] T008 Add `workspace.createFileSystemWatcher` and `RelativePattern` to `src/__mocks__/vscode.ts`
-- [ ] T009 Add `workspace.textDocuments`, `workspace.openTextDocument`, and `workspace.findFiles` to `src/__mocks__/vscode.ts`
-- [ ] T010 Reconcile the local `findFiles` stubs in `src/__tests__/editor/imageReferences.test.ts` and `src/__tests__/editor/imageResizeInPlace.test.ts` against the shared mock, standardising on one approach
+- [X] T007 Add `workspace.fs` with `readFile` and `stat` to `src/__mocks__/vscode.ts`
+- [X] T008 Add `workspace.createFileSystemWatcher` and `RelativePattern` to `src/__mocks__/vscode.ts`
+- [X] T009 Add `workspace.textDocuments`, `workspace.openTextDocument`, and `workspace.findFiles` to `src/__mocks__/vscode.ts`
+- [X] T010 Reconcile the local `findFiles` stubs in `src/__tests__/editor/imageReferences.test.ts` and `src/__tests__/editor/imageResizeInPlace.test.ts` against the shared mock, standardising on one approach
 
 ### Document path plumbing
 

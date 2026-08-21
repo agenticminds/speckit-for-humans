@@ -1,79 +1,12 @@
 import { MarkdownEditorProvider } from '../../editor/MarkdownEditorProvider';
 import * as vscode from 'vscode';
 
-jest.mock('vscode', () => ({
-  window: {
-    showErrorMessage: jest.fn(),
-    showInformationMessage: jest.fn(),
-    showWarningMessage: jest.fn(),
-  },
-  workspace: {
-    getWorkspaceFolder: jest.fn(),
-    workspaceFolders: undefined,
-    getConfiguration: jest.fn(() => ({
-      get: jest.fn((_key: string, defaultValue?: unknown) => defaultValue),
-      update: jest.fn(),
-    })),
-    onDidChangeTextDocument: jest.fn(),
-    onDidChangeConfiguration: jest.fn(),
-    applyEdit: jest.fn(),
-    fs: {
-      createDirectory: jest.fn(),
-      writeFile: jest.fn(),
-      readFile: jest.fn(),
-      stat: jest.fn(),
-      delete: jest.fn(),
-      rename: jest.fn(),
-    },
-    findFiles: jest.fn(),
-    openTextDocument: jest.fn(),
-  },
-  Uri: {
-    file: jest.fn((p: string) => ({ fsPath: p, scheme: 'file' })),
-  },
-  TreeItem: class TreeItem {
-    public iconPath: unknown;
-    public description?: string;
-    public command?: unknown;
-    public contextValue?: string;
-    constructor(
-      public label: unknown,
-      public collapsibleState?: unknown
-    ) {}
-  },
-  TreeItemCollapsibleState: {
-    None: 0,
-    Collapsed: 1,
-    Expanded: 2,
-  },
-  ThemeIcon: class ThemeIcon {
-    constructor(
-      public id: string,
-      public color?: unknown
-    ) {}
-  },
-  ThemeColor: class ThemeColor {
-    constructor(public id: string) {}
-  },
-  EventEmitter: class EventEmitter<T> {
-    public event = jest.fn();
-    fire = jest.fn((_data?: T) => {});
-    dispose = jest.fn();
-  },
-  ViewColumn: {
-    Beside: 2,
-  },
-  commands: {
-    executeCommand: jest.fn(),
-    registerCommand: jest.fn(() => ({ dispose: jest.fn() })),
-  },
-  ConfigurationTarget: {
-    Global: 1,
-  },
-  WorkspaceEdit: jest.fn(),
-  Range: jest.fn(),
-  Position: jest.fn(),
-}));
+// Uses the shared VS Code mock at src/__mocks__/vscode.ts, wired up by the
+// moduleNameMapper in jest.config.js. This file previously declared its own
+// inline jest.mock("vscode", ...) factory, which shadowed the shared mock
+// entirely and had to re-declare findFiles, openTextDocument and the fs
+// methods by hand. The shared mock is now a superset, so there is one
+// approach rather than two.
 
 function createMockTextDocument(content: string): vscode.TextDocument {
   return {

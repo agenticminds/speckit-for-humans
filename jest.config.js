@@ -38,5 +38,24 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup-after-env.ts'],
     verbose: true,
     // Fail tests on console warnings/errors to catch issues early
-    silent: false
+    silent: false,
+
+    // Corrects a deadline; does NOT mask a leak.
+    //
+    // Jest was intermittently printing "A worker process has failed to exit
+    // gracefully and has been force exited" on roughly 4 of 6 runs. It was
+    // investigated as a leaked handle and is not one:
+    //   - process._getActiveHandles() at the end of all suites shows only the
+    //     worker's own 2 stdio sockets and 1 IPC pipe. No test-created handles.
+    //   - --detectOpenHandles on a full in-band run reports nothing.
+    //   - Instrumenting jest-worker's end() showed every worker's event loop
+    //     drains 12-31ms after it receives CHILD_MESSAGE_END, but the parent
+    //     observed those exits at 1114-1158ms and flagged all 11 as forced.
+    //   - Clean at --maxWorkers<=5, warns at >=6. Clean at >=2000ms here.
+    //
+    // jest-worker defaults this to 500ms, which is not enough time to reap 11
+    // workers (200-300MB RSS each) terminating at once. Two genuine timer
+    // leaks WERE found during that investigation and fixed separately in
+    // src/webview/features/auditDocument.ts and src/webview/editor.ts.
+    workerGracefulExitTimeout: 2000
 };

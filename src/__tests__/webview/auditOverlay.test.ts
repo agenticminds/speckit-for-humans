@@ -711,42 +711,55 @@ describe('Toast Notifications', () => {
     expect(toast?.textContent).toContain('Info message');
   });
 
-  it('success toast auto-dismisses', done => {
-    const toastId = showToast('Success message', 'success');
+  // Toast dismissal is TOAST_AUTO_DISMISS_MS (3000) followed by
+  // TOAST_REMOVAL_ANIMATION_MS (200), so 3200ms of fake time covers both.
+  // These two tests previously slept 3500ms of REAL time and failed roughly
+  // one run in fifteen under load, when the runner could not service the
+  // timers inside the 10s test timeout. Fake timers make them deterministic
+  // and instant.
+  const TOAST_FULL_DISMISS_MS = 3200;
 
-    const toast = document.getElementById(toastId);
-    expect(toast).not.toBeNull();
+  it('success toast auto-dismisses', () => {
+    jest.useFakeTimers();
+    try {
+      const toastId = showToast('Success message', 'success');
+      expect(document.getElementById(toastId)).not.toBeNull();
 
-    // Should be gone after auto-dismiss timeout
-    setTimeout(() => {
-      const dismissedToast = document.getElementById(toastId);
-      expect(dismissedToast).toBeNull();
-      done();
-    }, 3500);
+      jest.advanceTimersByTime(TOAST_FULL_DISMISS_MS);
+
+      expect(document.getElementById(toastId)).toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
-  it('loading toast does NOT auto-dismiss', done => {
-    const toastId = showToast('Loading...', 'loading');
+  it('loading toast does NOT auto-dismiss', () => {
+    jest.useFakeTimers();
+    try {
+      const toastId = showToast('Loading...', 'loading');
+      expect(document.getElementById(toastId)).not.toBeNull();
 
-    const toast = document.getElementById(toastId);
-    expect(toast).not.toBeNull();
+      // Well past the point a dismissible toast would have gone.
+      jest.advanceTimersByTime(TOAST_FULL_DISMISS_MS * 10);
 
-    // Even after a long time, should still exist
-    setTimeout(() => {
-      const stillHere = document.getElementById(toastId);
-      expect(stillHere).not.toBeNull();
-      done();
-    }, 3500);
+      expect(document.getElementById(toastId)).not.toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('clears pending toast animation and dismissal timers', () => {
     jest.useFakeTimers();
+    try {
+      showToast('Success message', 'success');
+      expect(jest.getTimerCount()).toBeGreaterThan(0);
 
-    showToast('Success message', 'success');
-    expect(jest.getTimerCount()).toBeGreaterThan(0);
+      clearToasts();
 
-    clearToasts();
-
-    expect(jest.getTimerCount()).toBe(0);
+      expect(jest.getTimerCount()).toBe(0);
+    } finally {
+      // Was missing: fake timers were left installed for whatever ran next.
+      jest.useRealTimers();
+    }
   });
 });
