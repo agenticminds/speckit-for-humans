@@ -751,3 +751,38 @@ package.json              # Scripts configuration
 - [VS Code Extension API](https://code.visualstudio.com/api)
 - [esbuild Documentation](https://esbuild.github.io/)
 - [vsce CLI](https://github.com/microsoft/vscode-vsce)
+
+---
+
+## Script names referenced in docs that do not exist
+
+Some documentation in this repository — including parts of this file — refers to scripts that are
+not defined in `package.json`. These references **predate the Bun migration and were inherited**;
+the migration only renamed the tool in front of them, so a dead `npm run build` became a dead
+`bun run build`.
+
+They are recorded here rather than silently rewritten, because guessing at the intended command
+would be a change of meaning, not a fix.
+
+| Referenced but undefined | Nearest real script |
+|---|---|
+| `build` | `build:debug` for development, `build:release` for a marketplace build |
+| `package` | `package:release` |
+| `watch` | `watch:debug` |
+| `build:extension` | `build:extension:debug` or `build:extension:release` |
+| `build:webview` | `build:webview:debug` or `build:webview:release` |
+| `build:marketplace` | `build:release` |
+| `package:marketplace` | `package:release` |
+| `type-check` | none — `bun run lint` type-checks via the TypeScript ESLint rules; for a bare type check run `bunx tsc --noEmit` |
+| `lint-staged` | none — no staged-file linting is configured. The pre-commit hook runs `bun run lint:fix` across the whole source tree |
+
+To see what actually exists at any time:
+
+```bash
+bun run
+```
+
+**Known instance worth flagging**: `.github/hooks/ENABLE_PRE_COMMIT.md` asks the reader to verify
+the build with `bun run build && bun run verify-build`. The first half does not exist. Use
+`bun run build:debug && bun run verify-build`, or simply `bun run validate`, which runs the
+linter, the tests, and a debug build together.
