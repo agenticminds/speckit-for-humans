@@ -317,3 +317,141 @@ describe('each family resolves against an ordered candidate list (FR-015)', () =
     expect(resolve(payload, 'R-029')).toBe(`${FEATURE_ROOT}/data-model.md`);
   });
 });
+
+/**
+ * Phase 6 (US4): sibling features are indexed ON DEMAND (FR-017, FR-018).
+ *
+ * The store learns which other features a document names from its qualifiers
+ * and indexes those and only those. Eagerly indexing the workspace would be 45
+ * folder walks for a document that, nine times out of ten, names no other
+ * feature at all — and it would put every other feature's definitions where an
+ * unqualified reference could reach them, which FR-018 forbids outright.
+ */
+
+const SIBLING = '/w/specs/002-second-feature';
+
+describe('a qualified sibling feature is indexed on demand (FR-017)', () => {
+  function mountTwoFeatures(): void {
+    mountFileSystem({
+      [`${FEATURE_ROOT}/spec.md`]: '- **FR-001**: ours\n',
+      [`${FEATURE_ROOT}/tasks.md`]: '- [ ] T001 cites 002 FR-002\n',
+      [`${SIBLING}/spec.md`]: '- **FR-002**: theirs\n',
+    });
+  }
+
+  it('returns the named feature definitions in their own bucket', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['002']);
+
+    expect(payload.qualified.map(entry => entry.feature)).toEqual(['002']);
+    expect(payload.qualified[0].featureRoot).toBe(SIBLING);
+    expect(payload.qualified[0].definitions.map(site => site.id)).toEqual(['FR-002']);
+    // Never merged into the local bucket: that separation IS FR-018.
+    expect(payload.definitions.map(site => site.id)).not.toContain('FR-002');
+  });
+
+  it('reads no sibling at all when the document qualifies nothing', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`));
+
+    expect(payload.qualified).toEqual([]);
+    const read = (vscode.workspace.fs.readFile as jest.Mock).mock.calls.map(
+      (call: [{ fsPath: string }]) => call[0].fsPath
+    );
+    expect(read.some((fsPath: string) => fsPath.startsWith(SIBLING))).toBe(false);
+  });
+
+  it('shares one index with the sibling own documents, built once', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['002']);
+    const readsAfterFirst = (vscode.workspace.fs.readFile as jest.Mock).mock.calls.length;
+
+    const direct = await store.getIndex(scopeFor(`${SIBLING}/tasks.md`));
+    expect(direct.definitions.map(site => site.id)).toEqual(['FR-002']);
+    expect((vscode.workspace.fs.readFile as jest.Mock).mock.calls.length).toBe(readsAfterFirst);
+  });
+
+  it('caches the sibling, so a repeat push re-reads nothing and repeats its revision', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    const first = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['002']);
+    const reads = (vscode.workspace.fs.readFile as jest.Mock).mock.calls.length;
+
+    const second = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['002']);
+    expect(second.revision).toBe(first.revision);
+    expect((vscode.workspace.fs.readFile as jest.Mock).mock.calls.length).toBe(reads);
+  });
+
+  it('moves the revision forward when a qualifier appears or disappears', async () => {
+    // The webview drops a revision it has already seen and treats a backwards
+    // one as link-nothing, so both directions have to advance (C-msg-2c).
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    const plain = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`));
+    const withQualifier = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['002']);
+    const plainAgain = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`));
+
+    expect(withQualifier.revision).toBeGreaterThan(plain.revision);
+    expect(plainAgain.revision).toBeGreaterThan(withQualifier.revision);
+  });
+
+  it('ignores a number that names no sibling directory', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['100']);
+    expect(payload.qualified).toEqual([]);
+  });
+
+  it('ignores a qualifier naming the document own feature, already in scope', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['001']);
+    expect(payload.qualified).toEqual([]);
+  });
+
+  it('refuses anything that is not exactly three digits, traversal included', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), [
+      '../../etc',
+      '002/../../..',
+      '2026',
+      '02',
+    ]);
+    expect(payload.qualified).toEqual([]);
+    const read = (vscode.workspace.fs.readFile as jest.Mock).mock.calls.map(
+      (call: [{ fsPath: string }]) => call[0].fsPath
+    );
+    expect(read.every((fsPath: string) => fsPath.startsWith(FEATURE_ROOT))).toBe(true);
+  });
+
+  it('caps how many siblings one document can pull in', async () => {
+    const files: Record<string, string> = { [`${FEATURE_ROOT}/spec.md`]: '- **FR-001**: ours\n' };
+    const numbers: string[] = [];
+    for (let n = 2; n <= 20; n++) {
+      const number = String(n).padStart(3, '0');
+      numbers.push(number);
+      files[`/w/specs/${number}-feature/spec.md`] = `- **FR-${number}**: theirs\n`;
+    }
+    mountFileSystem(files);
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), numbers);
+
+    expect(payload.qualified.length).toBeLessThanOrEqual(8);
+    expect(payload.qualified.length).toBeGreaterThan(0);
+  });
+
+  it('degrades quietly when the specs root cannot be listed', async () => {
+    mountTwoFeatures();
+    const store = new SpeckitIndexStore();
+    await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`));
+    (vscode.workspace.fs.readDirectory as jest.Mock).mockRejectedValue(new Error('EACCES'));
+
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/tasks.md`), ['002']);
+    expect(payload.qualified).toEqual([]);
+    expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+  });
+});

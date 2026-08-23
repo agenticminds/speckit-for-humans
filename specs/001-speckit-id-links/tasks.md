@@ -160,9 +160,9 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 **Independent test**: A task list in one feature referencing identifiers in others; confirm each opens the named feature's artifact.
 
-- [ ] T054 [P] [US4] Write the qualifier contract test in `src/__tests__/shared/speckitIds/qualifiers.test.ts`, including that an unqualified reference never falls through to another feature and that the slash form is not supported → C-tok-28 … C-tok-33, FR-017, FR-018
-- [ ] T055 [US4] Implement qualifier binding in `src/shared/speckitIds/qualifiers.ts`, retargeting existing tokens only, requiring exactly three digits and an existing sibling feature directory, and accepting a lead word or possessive → FR-017
-- [ ] T056 [US4] Extend `src/features/speckitIndex/index.ts` to index a qualified sibling feature on demand and cache it, without eagerly indexing every feature → FR-017
+- [X] T054 [P] [US4] Write the qualifier contract test in `src/__tests__/shared/speckitIds/qualifiers.test.ts`, including that an unqualified reference never falls through to another feature and that the slash form is not supported → C-tok-28 … C-tok-33, FR-017, FR-018
+- [X] T055 [US4] Implement qualifier binding in `src/shared/speckitIds/qualifiers.ts`, retargeting existing tokens only, requiring exactly three digits and an existing sibling feature directory, and accepting a lead word or possessive → FR-017
+- [X] T056 [US4] Extend `src/features/speckitIndex/index.ts` to index a qualified sibling feature on demand and cache it, without eagerly indexing every feature → FR-017
 - [ ] T057 [US4] Verify the cross-feature rows of quickstart scenario 5, including that a traversal attempt inside a qualifier is rejected **[Manual check]** → FR-017, FR-018
 
 ---

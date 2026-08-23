@@ -14,13 +14,30 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { extractDefinitions, type DefinitionSite } from './extract';
 import { ID_FAMILIES } from '../../shared/speckitIds/families';
-import type { FeatureScope } from './discovery';
+import { isWithinFeatureScope, type FeatureScope } from './discovery';
+
+/** One sibling feature a document named with a cross-feature qualifier (FR-017). */
+export interface QualifiedFeatureIndex {
+  /** The three-digit number as written in the document. */
+  readonly feature: string;
+  readonly featureRoot: string;
+  readonly definitions: readonly DefinitionSite[];
+}
 
 /** The `speckitIndex` push payload, less its `type` tag (C-msg-2). */
 export interface SpeckitIndexPayload {
   readonly revision: number;
   readonly featureRoot: string | null;
   readonly definitions: readonly DefinitionSite[];
+  /**
+   * Sibling features this document qualified by number, indexed ON DEMAND.
+   *
+   * Empty for the overwhelming majority of documents, which name no other
+   * feature. Nothing here is reachable from an unqualified reference — that is
+   * FR-018, and it is why these definitions travel in their own bucket rather
+   * than merged into `definitions`.
+   */
+  readonly qualified: readonly QualifiedFeatureIndex[];
 }
 
 /**
@@ -44,12 +61,43 @@ interface CachedIndex {
   definitions: DefinitionSite[];
 }
 
-const EMPTY: SpeckitIndexPayload = { revision: 0, featureRoot: null, definitions: [] };
+const EMPTY: SpeckitIndexPayload = {
+  revision: 0,
+  featureRoot: null,
+  definitions: [],
+  qualified: [],
+};
+
+/**
+ * Upper bound on sibling features indexed for one document.
+ *
+ * The busiest real document names three. The cap exists so a file that happens
+ * to be full of three-digit numbers cannot turn one push into forty folder
+ * walks.
+ */
+const MAX_QUALIFIED_FEATURES = 8;
+
+/** A qualifier as written, and as feature-folder discovery spells it. */
+const QUALIFIER = /^\d{3}$/;
+const FEATURE_DIR_NUMBER = /^(\d{3})-/;
 
 export class SpeckitIndexStore {
   private readonly byRoot = new Map<string, CachedIndex>();
-  private inFlight = new Map<string, Promise<SpeckitIndexPayload>>();
+  private inFlight = new Map<string, Promise<CachedIndex>>();
   private nextRevision = 1;
+  /**
+   * Revision issued for one composition of indexes, keyed by the roots AND
+   * their revisions.
+   *
+   * A push carries the document's own feature plus whichever siblings it
+   * qualified, so the same folder can legitimately be sent to two panels with
+   * two different contents. The webview drops a revision it has already seen,
+   * so re-sending an unchanged composition must reuse its number — and a
+   * composition that differs in any part must get a new one.
+   */
+  private readonly composedRevisions = new Map<string, number>();
+  /** Highest revision issued for a root, so a push for it can never go back. */
+  private readonly lastIssued = new Map<string, number>();
 
   /**
    * The index for a scope, building it on first ask.
@@ -57,8 +105,18 @@ export class SpeckitIndexStore {
    * Revisions are drawn from one counter across every feature root, so the
    * sequence a webview sees is monotonic even when it is shown documents from
    * different folders in turn (C-msg-2c).
+   *
+   * `qualifiers` lists the three-digit feature numbers this document actually
+   * names (FR-017). Each is resolved to a sibling directory and indexed ON
+   * DEMAND — the alternative, indexing every feature in the workspace, is 45
+   * folder walks for a benefit almost no document asks for. A number that names
+   * no directory, or that resolves outside the feature and specs roots, is
+   * dropped without a word.
    */
-  async getIndex(scope: FeatureScope): Promise<SpeckitIndexPayload> {
+  async getIndex(
+    scope: FeatureScope,
+    qualifiers: readonly string[] = []
+  ): Promise<SpeckitIndexPayload> {
     const featureRoot = scope.featureRoot;
     if (!featureRoot) {
       // No feature folder means link nothing (FR-019, C-msg-2b). Still carries a
@@ -67,24 +125,24 @@ export class SpeckitIndexStore {
       return { ...EMPTY, revision: this.nextRevision++ };
     }
 
-    const briefsDir = scope.briefsDir;
-    const cached = this.byRoot.get(featureRoot);
-    if (cached) {
-      return { revision: cached.revision, featureRoot, definitions: cached.definitions };
-    }
+    const own = await this.ensure(featureRoot, scope.briefsDir);
+    const qualified = await this.resolveQualified(scope, qualifiers);
 
-    // Collapse concurrent first-opens of two documents in one folder into a
-    // single set of reads.
-    const existing = this.inFlight.get(featureRoot);
-    if (existing) {
-      return existing;
-    }
+    const key = [
+      `${featureRoot}@${own.revision}`,
+      ...qualified.map(entry => `${entry.feature}:${entry.featureRoot}@${entry.revision}`),
+    ].join('|');
 
-    const build = this.build(featureRoot, briefsDir).finally(() =>
-      this.inFlight.delete(featureRoot)
-    );
-    this.inFlight.set(featureRoot, build);
-    return build;
+    return {
+      revision: this.revisionFor(featureRoot, key),
+      featureRoot,
+      definitions: own.definitions,
+      qualified: qualified.map(entry => ({
+        feature: entry.feature,
+        featureRoot: entry.featureRoot,
+        definitions: entry.definitions,
+      })),
+    };
   }
 
   /** Drop a whole feature root, e.g. when its last panel closes. */
@@ -110,9 +168,96 @@ export class SpeckitIndexStore {
   dispose(): void {
     this.byRoot.clear();
     this.inFlight.clear();
+    this.composedRevisions.clear();
+    this.lastIssued.clear();
   }
 
-  private async build(featureRoot: string, briefsDir: string | null): Promise<SpeckitIndexPayload> {
+  /**
+   * The revision to send for one composition of indexes.
+   *
+   * Reused when the same composition is sent again, so an unchanged push is a
+   * duplicate the webview can drop. Re-issued whenever the cached number would
+   * be lower than one already sent for this root — which happens when a
+   * document's qualifier set goes back to a combination seen earlier, and which
+   * the webview would otherwise read as a backwards revision and treat as
+   * "link nothing" (C-msg-2c, C-msg-2d).
+   */
+  private revisionFor(featureRoot: string, key: string): number {
+    const cached = this.composedRevisions.get(key);
+    const highest = this.lastIssued.get(featureRoot) ?? 0;
+    if (cached !== undefined && cached >= highest) {
+      return cached;
+    }
+    const revision = this.nextRevision++;
+    this.composedRevisions.set(key, revision);
+    this.lastIssued.set(featureRoot, revision);
+    return revision;
+  }
+
+  /** The cached index for a root, building it once however many ask at once. */
+  private async ensure(featureRoot: string, briefsDir: string | null): Promise<CachedIndex> {
+    const cached = this.byRoot.get(featureRoot);
+    if (cached) {
+      return cached;
+    }
+
+    // Collapse concurrent first-opens of two documents in one folder into a
+    // single set of reads.
+    const existing = this.inFlight.get(featureRoot);
+    if (existing) {
+      return existing;
+    }
+
+    const build = this.build(featureRoot, briefsDir).finally(() =>
+      this.inFlight.delete(featureRoot)
+    );
+    this.inFlight.set(featureRoot, build);
+    return build;
+  }
+
+  /**
+   * Index the sibling features this document named, and only those (FR-017).
+   *
+   * A sibling is indexed exactly as it would be if the user opened it — same
+   * briefs folder, same cache entry — so a document that qualifies feature 008
+   * and a document that lives inside feature 008 share one index rather than
+   * disagreeing about it.
+   *
+   * Three gates, all silent on failure: the qualifier must be three digits, it
+   * must name a real `NNN-` directory beside this feature, and the directory
+   * must lie inside the derived roots. The last is what a traversal attempt
+   * written into a qualifier runs into (C-msg-3e).
+   */
+  private async resolveQualified(
+    scope: FeatureScope,
+    qualifiers: readonly string[]
+  ): Promise<Array<CachedIndex & { feature: string; featureRoot: string }>> {
+    const specsRoot = scope.specsRoot;
+    const wanted = [...new Set(qualifiers)].filter(value => QUALIFIER.test(value));
+    if (!specsRoot || wanted.length === 0) {
+      return [];
+    }
+
+    // Listed per push rather than cached: it is one directory read, and a cache
+    // would go stale the moment a new feature folder is created.
+    const siblings = await listFeatureDirectories(specsRoot);
+    const resolved: Array<CachedIndex & { feature: string; featureRoot: string }> = [];
+
+    for (const feature of wanted.slice(0, MAX_QUALIFIED_FEATURES)) {
+      const root = siblings.get(feature);
+      // A qualifier naming this document's own feature is not cross-feature;
+      // its definitions are already in `definitions`.
+      if (!root || root === scope.featureRoot || !isWithinFeatureScope(root, scope)) {
+        continue;
+      }
+      const index = await this.ensure(root, scope.briefsDir);
+      resolved.push({ ...index, feature, featureRoot: root });
+    }
+
+    return resolved;
+  }
+
+  private async build(featureRoot: string, briefsDir: string | null): Promise<CachedIndex> {
     const files = new Map<string, DefinitionSite[]>();
     // The briefs folder is a SIBLING of the feature folder, so a walk rooted at
     // the feature folder never reaches it. `BR-`, `AD-` and `OQ-` are defined
@@ -134,8 +279,37 @@ export class SpeckitIndexStore {
     const cached: CachedIndex = { revision: this.nextRevision++, files, definitions: [] };
     cached.definitions = flatten(files, featureRoot);
     this.byRoot.set(featureRoot, cached);
-    return { revision: cached.revision, featureRoot, definitions: cached.definitions };
+    return cached;
   }
+}
+
+/**
+ * The numbered feature folders beside a feature, by their three-digit number.
+ *
+ * Same rule as discovery: a feature folder is identified by its NUMBERED NAME
+ * and by nothing else, so the qualifier grammar and the folder grammar cannot
+ * drift apart.
+ */
+async function listFeatureDirectories(specsRoot: string): Promise<Map<string, string>> {
+  const found = new Map<string, string>();
+  let entries: Array<[string, vscode.FileType]>;
+  try {
+    entries = await vscode.workspace.fs.readDirectory(vscode.Uri.file(specsRoot));
+  } catch {
+    return found;
+  }
+
+  for (const [name, type] of entries) {
+    if (type !== vscode.FileType.Directory) {
+      continue;
+    }
+    const number = FEATURE_DIR_NUMBER.exec(name)?.[1];
+    // First wins, so two folders sharing a number resolve deterministically.
+    if (number && !found.has(number)) {
+      found.set(number, path.join(specsRoot, name));
+    }
+  }
+  return found;
 }
 
 /**

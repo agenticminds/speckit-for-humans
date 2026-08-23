@@ -1002,7 +1002,11 @@ function initializeEditor(initialContent: string) {
       const speckitElement = target.closest('[data-speckit-id]') as HTMLElement | null;
       if (speckitElement) {
         const speckitId = speckitElement.getAttribute('data-speckit-id') ?? '';
-        const site = speckitId ? lookupSpeckitDefinition(speckitId) : null;
+        // Present only on a cross-feature reference (FR-017). The lookup must
+        // ask the same question the decoration answered, or a qualified link
+        // would open the local feature's file instead.
+        const speckitFeature = speckitElement.getAttribute('data-speckit-feature');
+        const site = speckitId ? lookupSpeckitDefinition(speckitId, speckitFeature) : null;
         e.preventDefault();
         e.stopPropagation();
         // No definition means nothing happens. Silently — FR-010 forbids an

@@ -23,6 +23,8 @@ import {
   type FeatureScope,
 } from '../features/speckitIndex/discovery';
 import { SpeckitIndexStore } from '../features/speckitIndex';
+import { recognize } from '../shared/speckitIds/expand';
+import { collectQualifierCandidates } from '../shared/speckitIds/qualifiers';
 
 /**
  * Host → webview reveal (C-msg-4).
@@ -3293,7 +3295,14 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   ): Promise<void> {
     try {
       const scope = discoverFeatureScope(document.uri);
-      const payload = await this.speckitIndexStore.getIndex(scope);
+      // Which sibling features this document actually names, so the store can
+      // index those and only those (FR-017). Read from the raw text rather than
+      // from the parsed document, because the host has no parsed document; a
+      // number inside a code fence at worst costs one directory lookup that
+      // resolves to nothing, and can never produce a link on its own.
+      const text = scope.featureRoot ? document.getText() : '';
+      const qualifiers = text === '' ? [] : collectQualifierCandidates(text, recognize(text));
+      const payload = await this.speckitIndexStore.getIndex(scope, qualifiers);
       void webview.postMessage({ type: 'speckitIndex', ...payload });
     } catch (error) {
       console.warn('[MD4H] Spec-kit index push failed:', error);

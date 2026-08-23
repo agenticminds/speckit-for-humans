@@ -25,14 +25,23 @@ import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
 import type { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
 import { recognize } from '../../shared/speckitIds/expand';
+import { bindQualifiers } from '../../shared/speckitIds/qualifiers';
 import { getDocumentPath } from '../utils/documentPath';
 import type { DefinitionKind, DefinitionSite } from '../../features/speckitIndex/extract';
+
+/** One sibling feature the host indexed on demand, as pushed (FR-017). */
+export interface SpeckitQualifiedFeature {
+  readonly feature: string;
+  readonly featureRoot: string;
+  readonly definitions: readonly DefinitionSite[];
+}
 
 /** The `speckitIndex` push, as the webview receives it (C-msg-2). */
 export interface SpeckitIndexMessage {
   readonly revision: number;
   readonly featureRoot: string | null;
   readonly definitions: readonly DefinitionSite[];
+  readonly qualified?: readonly SpeckitQualifiedFeature[];
 }
 
 interface HeldIndex {
@@ -40,6 +49,16 @@ interface HeldIndex {
   readonly featureRoot: string;
   /** First entry wins: the host emits candidates in resolution order. */
   readonly byId: Map<string, DefinitionSite>;
+  /**
+   * Sibling features by three-digit number, for qualified references only.
+   *
+   * Kept apart from `byId` rather than merged into it. The separation IS
+   * FR-018: an unqualified reference reads `byId` and can never reach another
+   * feature's definitions, however many of them are in memory. It is also the
+   * set of features a qualifier may bind to — the host put a feature here only
+   * after finding the directory.
+   */
+  readonly byFeature: Map<string, Map<string, DefinitionSite>>;
 }
 
 export const speckitIdLinksPluginKey = new PluginKey<DecorationSet>('speckitIdLinks');
@@ -97,16 +116,30 @@ export function applySpeckitIndex(message: unknown): boolean {
     return true;
   }
 
+  const byId = indexById(push.definitions);
+  const byFeature = new Map<string, Map<string, DefinitionSite>>();
+  for (const entry of push.qualified ?? []) {
+    if (entry && typeof entry.feature === 'string' && entry.feature !== '') {
+      byFeature.set(entry.feature, indexById(entry.definitions));
+    }
+  }
+
+  heldIndex = { revision: push.revision, featureRoot, byId, byFeature };
+  repaintAll();
+  return true;
+}
+
+/** First entry wins: the host emits candidates in resolution order. */
+function indexById(
+  definitions: readonly DefinitionSite[] | undefined
+): Map<string, DefinitionSite> {
   const byId = new Map<string, DefinitionSite>();
-  for (const site of push.definitions ?? []) {
+  for (const site of definitions ?? []) {
     if (site && typeof site.id === 'string' && !byId.has(site.id)) {
       byId.set(site.id, site);
     }
   }
-
-  heldIndex = { revision: push.revision, featureRoot, byId };
-  repaintAll();
-  return true;
+  return byId;
 }
 
 /** Forget the index. Test helper, and the reset path for a document swap. */
@@ -115,9 +148,25 @@ export function resetSpeckitIndex(): void {
   repaintAll();
 }
 
-/** The definition an identifier resolves to, or null for plain prose (FR-010). */
-export function lookupSpeckitDefinition(id: string): DefinitionSite | null {
-  return heldIndex?.byId.get(id) ?? null;
+/**
+ * The definition an identifier resolves to, or null for plain prose (FR-010).
+ *
+ * A `featureQualifier` sends the lookup into that feature's map and NOWHERE
+ * else: a qualified reference the sibling does not define stays prose rather
+ * than falling back to the local definition, which would silently answer a
+ * different question than the one written.
+ */
+export function lookupSpeckitDefinition(
+  id: string,
+  featureQualifier?: string | null
+): DefinitionSite | null {
+  if (!heldIndex) {
+    return null;
+  }
+  if (featureQualifier) {
+    return heldIndex.byFeature.get(featureQualifier)?.get(id) ?? null;
+  }
+  return heldIndex.byId.get(id) ?? null;
 }
 
 /**
@@ -260,7 +309,8 @@ function isSelfReference(
 }
 
 function buildDecorations(doc: ProseMirrorNode): DecorationSet {
-  if (!heldIndex) {
+  const index = heldIndex;
+  if (!index) {
     return DecorationSet.empty;
   }
 
@@ -279,11 +329,16 @@ function buildDecorations(doc: ProseMirrorNode): DecorationSet {
       return false;
     }
 
-    // Stage 2 then stage 3: the anchored scan, then continuation expansion, so
-    // that every ID named inside a group or range gets its own decoration
-    // (FR-004). `recognize` returns them in document order.
-    for (const token of recognize(node.text)) {
-      const site = lookupSpeckitDefinition(token.id);
+    // Stage 2, then stage 3, then stage 4: the anchored scan, continuation
+    // expansion so every ID named inside a group or range gets its own
+    // decoration (FR-004), and finally cross-feature binding, which retargets a
+    // token and never creates one (FR-017, C-tok-31). Document order throughout.
+    const tokens = bindQualifiers(node.text, recognize(node.text), {
+      knownFeatures: index.byFeature.keys(),
+    });
+
+    for (const token of tokens) {
+      const site = lookupSpeckitDefinition(token.id, token.featureQualifier);
       if (!site) {
         continue;
       }
@@ -296,6 +351,9 @@ function buildDecorations(doc: ProseMirrorNode): DecorationSet {
           nodeName: 'a',
           class: 'markdown-link',
           'data-speckit-id': token.id,
+          // Present only on a cross-feature reference, so the click handler can
+          // ask the same question the decoration answered.
+          ...(token.featureQualifier ? { 'data-speckit-feature': token.featureQualifier } : {}),
         })
       );
     }
