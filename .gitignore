@@ -61,3 +61,7 @@ test-docs/
 # Package manager cache
 .npm-cache/
 **/.DS_Store
+
+# Spec Kit implementation run files (local only)
+specs/*/.implementation-preflight.md
+specs/*/.implementation-loop-state.md
