@@ -191,3 +191,129 @@ describe('an unreadable artifact degrades quietly (FR-010, SC-007)', () => {
     expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * Phase 4 (US2): the shared briefs folder and family search order.
+ *
+ * Two claims that only bite once the non-spec families are in play. The briefs
+ * folder is a SIBLING of the feature folder, so a walk rooted at the feature
+ * folder never reaches it (FR-016). And a family names an ordered list of
+ * candidate artifacts rather than one owner, so alphabetical file order is not
+ * the resolution order (FR-015).
+ */
+
+const BRIEFS = '/w/specs/briefs';
+
+describe('the shared briefs folder is indexed too (FR-016)', () => {
+  it('finds a brief-stage definition that lives outside every feature folder', async () => {
+    mountFileSystem({
+      [`${FEATURE_ROOT}/spec.md`]: '- **FR-001**: cites BR-4\n',
+      [`${BRIEFS}/multibase-ingress.md`]: '- **BR-4** When HTTPS is enabled\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    const brief = payload.definitions.find(site => site.id === 'BR-4');
+    expect(brief?.fsPath).toBe(`${BRIEFS}/multibase-ingress.md`);
+  });
+
+  it('reads no other sibling feature folder while doing so (FR-018)', async () => {
+    mountFileSystem({
+      [`${FEATURE_ROOT}/spec.md`]: '- **FR-001**: one\n',
+      [`${BRIEFS}/brief.md`]: '- **BR-4** a brief requirement\n',
+      '/w/specs/002-second-feature/spec.md': '- **FR-002**: not ours\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    expect(payload.definitions.map(site => site.id)).not.toContain('FR-002');
+  });
+
+  it('degrades quietly when there is no briefs folder at all', async () => {
+    mountFileSystem({ [`${FEATURE_ROOT}/spec.md`]: '- **FR-001**: one\n' });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    expect(payload.definitions.map(site => site.id)).toEqual(['FR-001']);
+    expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+  });
+});
+
+describe('each family resolves against an ordered candidate list (FR-015)', () => {
+  /** The first site the consumer would pick for an id. */
+  function resolve(
+    payload: { definitions: readonly { id: string; fsPath: string }[] },
+    id: string
+  ) {
+    return payload.definitions.find(site => site.id === id)?.fsPath;
+  }
+
+  it('prefers the artifact that owns the family over one that merely mentions it', async () => {
+    // `contracts/` sorts before `spec.md`, so alphabetical order alone would
+    // resolve FR-001 into the contract file.
+    mountFileSystem({
+      [`${FEATURE_ROOT}/contracts/api.contract.md`]: '- **FR-001**: restated in a contract\n',
+      [`${FEATURE_ROOT}/spec.md`]: '- **FR-001**: the real requirement\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    expect(resolve(payload, 'FR-001')).toBe(`${FEATURE_ROOT}/spec.md`);
+  });
+
+  it('sends a contract identifier to the contracts folder, not to spec.md', async () => {
+    mountFileSystem({
+      [`${FEATURE_ROOT}/contracts/api.contract.md`]: '- **C-ws-1**: the contract entry\n',
+      [`${FEATURE_ROOT}/spec.md`]: '- **C-ws-1**: a restatement in the spec\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    expect(resolve(payload, 'C-ws-1')).toBe(`${FEATURE_ROOT}/contracts/api.contract.md`);
+  });
+
+  it('sends a task to tasks.md even though plan.md sorts first', async () => {
+    mountFileSystem({
+      [`${FEATURE_ROOT}/plan.md`]: '- [ ] T042 mentioned in the plan\n',
+      [`${FEATURE_ROOT}/tasks.md`]: '- [ ] T042 restore scroll\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/spec.md`));
+
+    expect(resolve(payload, 'T042')).toBe(`${FEATURE_ROOT}/tasks.md`);
+  });
+
+  it('lets the local definition beat the briefs one, because local scope is authoritative', async () => {
+    // P-APP-DIR is genuinely defined in both places in the corpus.
+    mountFileSystem({
+      [`${BRIEFS}/multibase-cli-reference.md`]: '| **P-APP-DIR** | Run from a Vite app root |\n',
+      [`${FEATURE_ROOT}/research.md`]: '| `P-APP-DIR` | preflight check |\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    expect(resolve(payload, 'P-APP-DIR')).toBe(`${FEATURE_ROOT}/research.md`);
+  });
+
+  it('still takes the first definition within one artifact', async () => {
+    mountFileSystem({
+      [`${FEATURE_ROOT}/spec.md`]: '- **FR-001**: the winner\n- **FR-001**: the duplicate\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    expect(payload.definitions.find(site => site.id === 'FR-001')?.line).toBe(0);
+  });
+
+  it('falls back to a non-owning artifact when the owner defines nothing', async () => {
+    // A research identifier defined in a data-model sidecar still resolves;
+    // the candidate list is a search order, not a filter.
+    mountFileSystem({
+      [`${FEATURE_ROOT}/data-model.md`]: '- **R-029**: defined off-owner\n',
+    });
+    const store = new SpeckitIndexStore();
+    const payload = await store.getIndex(scopeFor(`${FEATURE_ROOT}/plan.md`));
+
+    expect(resolve(payload, 'R-029')).toBe(`${FEATURE_ROOT}/data-model.md`);
+  });
+});

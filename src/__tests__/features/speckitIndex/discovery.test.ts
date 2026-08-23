@@ -58,17 +58,18 @@ describe('a folder is found by its numbered name (FR-019)', () => {
 describe('a document outside any numbered folder yields no scope (FR-019)', () => {
   it('returns nulls for a document in an ordinary folder', () => {
     const scope = discoverFeatureScope(uri('/w/docs/README.md'));
-    expect(scope).toEqual({ featureRoot: null, specsRoot: null });
+    expect(scope).toEqual({ featureRoot: null, specsRoot: null, briefsDir: null });
   });
 
   it('returns nulls for a non-file scheme', () => {
     const scope = discoverFeatureScope(uri('/w/specs/001-example-feature/plan.md', 'untitled'));
-    expect(scope).toEqual({ featureRoot: null, specsRoot: null });
+    expect(scope).toEqual({ featureRoot: null, specsRoot: null, briefsDir: null });
   });
 
   it('returns nulls for a missing uri', () => {
-    expect(discoverFeatureScope(null)).toEqual({ featureRoot: null, specsRoot: null });
-    expect(discoverFeatureScope(undefined)).toEqual({ featureRoot: null, specsRoot: null });
+    const none = { featureRoot: null, specsRoot: null, briefsDir: null };
+    expect(discoverFeatureScope(null)).toEqual(none);
+    expect(discoverFeatureScope(undefined)).toEqual(none);
   });
 });
 
@@ -103,5 +104,46 @@ describe('containment (C-msg-3e)', () => {
 
   it('does not admit a sibling directory whose name merely starts with the root', () => {
     expect(isWithinFeatureScope('/w/specs-private/leak.md', scope)).toBe(false);
+  });
+});
+
+/**
+ * The shared briefs folder (FR-016).
+ *
+ * `BR-`, `AD-` and `OQ-` originate in `briefs/` and are then cited from inside
+ * numbered feature folders — 90 and 42 such references respectively in the
+ * survey. A tool scoped to the numbered folder alone never finds their definitions, so the
+ * scope has to name the sibling folder explicitly.
+ *
+ * Presence is deliberately NOT checked here. Discovery stays pure path
+ * arithmetic; a briefs folder that does not exist simply contributes no files
+ * when the index tries to list it.
+ */
+describe('the shared briefs folder sits beside the feature folders (FR-016)', () => {
+  it('names it as a sibling of the feature root, under the specs root', () => {
+    const scope = discoverFeatureScope(uri('/w/specs/001-example-feature/plan.md'));
+    expect(scope.briefsDir).toBe('/w/specs/briefs');
+  });
+
+  it('names it for a document nested in a subfolder too', () => {
+    const scope = discoverFeatureScope(
+      uri('/w/specs/001-example-feature/contracts/example.contract.md')
+    );
+    expect(scope.briefsDir).toBe('/w/specs/briefs');
+  });
+
+  it('follows the NEAREST feature root when folders nest', () => {
+    const scope = discoverFeatureScope(uri('/w/specs/001-outer/002-inner/tasks.md'));
+    expect(scope.briefsDir).toBe('/w/specs/001-outer/briefs');
+  });
+
+  it('has no briefs folder when there is no feature scope at all', () => {
+    expect(discoverFeatureScope(uri('/w/docs/README.md')).briefsDir).toBeNull();
+    expect(discoverFeatureScope(null).briefsDir).toBeNull();
+  });
+
+  it('admits a file inside the briefs folder for reading (C-msg-3e)', () => {
+    const scope = discoverFeatureScope(uri('/w/specs/001-example-feature/plan.md'));
+    expect(isWithinFeatureScope('/w/specs/briefs/multibase-ingress.md', scope)).toBe(true);
   });
 });

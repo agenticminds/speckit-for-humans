@@ -27,9 +27,22 @@ export interface FeatureScope {
   readonly featureRoot: string | null;
   /** Parent of `featureRoot`. Sibling features and the shared briefs folder live here. */
   readonly specsRoot: string | null;
+  /**
+   * The shared briefs folder, `<specsRoot>/briefs`, or null when there is no
+   * scope at all (FR-016).
+   *
+   * Named unconditionally rather than probed. Existence is a file-system
+   * question and discovery is pure; a folder that is not there simply lists as
+   * empty when the index walks it, which costs one failed `readDirectory` and
+   * keeps every ancestor walk free of stats.
+   */
+  readonly briefsDir: string | null;
 }
 
-const NONE: FeatureScope = { featureRoot: null, specsRoot: null };
+/** The folder brief-stage families are defined in, beside the feature folders. */
+const BRIEFS_DIR = 'briefs';
+
+const NONE: FeatureScope = { featureRoot: null, specsRoot: null, briefsDir: null };
 
 /**
  * Exactly three digits, then a hyphen.
@@ -60,7 +73,12 @@ export function discoverFeatureScope(uri: UriLike | null | undefined): FeatureSc
   // itself, which is the loop's terminating condition.
   for (;;) {
     if (FEATURE_DIR.test(path.basename(current))) {
-      return { featureRoot: current, specsRoot: path.dirname(current) };
+      const specsRoot = path.dirname(current);
+      return {
+        featureRoot: current,
+        specsRoot,
+        briefsDir: path.join(specsRoot, BRIEFS_DIR),
+      };
     }
     const parent = path.dirname(current);
     if (parent === current) {
@@ -92,7 +110,10 @@ export function isWithinFeatureScope(candidate: string, scope: FeatureScope): bo
   }
 
   const target = path.resolve(candidate);
-  return [scope.featureRoot, scope.specsRoot].some(root => {
+  // `briefsDir` is listed explicitly rather than relied on to sit under
+  // `specsRoot`, so that relocating it later cannot silently close the gate on
+  // the one family that has to be read from outside the feature folder.
+  return [scope.featureRoot, scope.specsRoot, scope.briefsDir].some(root => {
     if (!root) {
       return false;
     }

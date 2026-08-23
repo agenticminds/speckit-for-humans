@@ -135,9 +135,9 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 **Independent test**: Open a contracts file, a research file and a briefs file; confirm those families resolve.
 
-- [ ] T047 [P] [US2] Extend the family contract test in `src/__tests__/shared/speckitIds/families.test.ts` to cover namespaced and camelCase contract identifiers, both research spellings, and the digit-free precondition family → FR-001, FR-002, FR-003
-- [ ] T048 [US2] Extend `src/features/speckitIndex/discovery.ts` to include the shared briefs folder, which sits outside every feature folder → FR-016
-- [ ] T049 [US2] Extend `src/features/speckitIndex/index.ts` so each family resolves against an ordered list of candidate artifacts rather than a single owner → FR-015
+- [X] T047 [P] [US2] Extend the family contract test in `src/__tests__/shared/speckitIds/families.test.ts` to cover namespaced and camelCase contract identifiers, both research spellings, and the digit-free precondition family → FR-001, FR-002, FR-003
+- [X] T048 [US2] Extend `src/features/speckitIndex/discovery.ts` to include the shared briefs folder, which sits outside every feature folder → FR-016
+- [X] T049 [US2] Extend `src/features/speckitIndex/index.ts` so each family resolves against an ordered list of candidate artifacts rather than a single owner → FR-015
 - [ ] T050 [US2] Verify quickstart scenario 3 and the contracts, research and briefs rows of scenario 5 in the Extension Development Host **[Manual check]** → FR-016
 
 ---

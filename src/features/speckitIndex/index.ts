@@ -13,6 +13,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { extractDefinitions, type DefinitionSite } from './extract';
+import { ID_FAMILIES } from '../../shared/speckitIds/families';
 import type { FeatureScope } from './discovery';
 
 /** The `speckitIndex` push payload, less its `type` tag (C-msg-2). */
@@ -66,6 +67,7 @@ export class SpeckitIndexStore {
       return { ...EMPTY, revision: this.nextRevision++ };
     }
 
+    const briefsDir = scope.briefsDir;
     const cached = this.byRoot.get(featureRoot);
     if (cached) {
       return { revision: cached.revision, featureRoot, definitions: cached.definitions };
@@ -78,7 +80,9 @@ export class SpeckitIndexStore {
       return existing;
     }
 
-    const build = this.build(featureRoot).finally(() => this.inFlight.delete(featureRoot));
+    const build = this.build(featureRoot, briefsDir).finally(() =>
+      this.inFlight.delete(featureRoot)
+    );
     this.inFlight.set(featureRoot, build);
     return build;
   }
@@ -108,9 +112,17 @@ export class SpeckitIndexStore {
     this.inFlight.clear();
   }
 
-  private async build(featureRoot: string): Promise<SpeckitIndexPayload> {
+  private async build(featureRoot: string, briefsDir: string | null): Promise<SpeckitIndexPayload> {
     const files = new Map<string, DefinitionSite[]>();
-    const artifacts = await listMarkdownFiles(featureRoot);
+    // The briefs folder is a SIBLING of the feature folder, so a walk rooted at
+    // the feature folder never reaches it. `BR-`, `AD-` and `OQ-` are defined
+    // there and cited from inside feature folders — 90 and 42 such references
+    // in the survey — so omitting it leaves those families permanently
+    // unresolved (FR-016). A briefs folder that does not exist lists as empty.
+    const artifacts = [
+      ...(await listMarkdownFiles(featureRoot)),
+      ...(briefsDir ? await listMarkdownFiles(briefsDir) : []),
+    ];
 
     for (const fsPath of artifacts) {
       const text = await readArtifact(fsPath);
@@ -120,26 +132,109 @@ export class SpeckitIndexStore {
     }
 
     const cached: CachedIndex = { revision: this.nextRevision++, files, definitions: [] };
-    cached.definitions = flatten(files);
+    cached.definitions = flatten(files, featureRoot);
     this.byRoot.set(featureRoot, cached);
     return { revision: cached.revision, featureRoot, definitions: cached.definitions };
   }
 }
 
 /**
+ * The artifacts that may define this identifier's family, in search order.
+ *
+ * A family names an ordered candidate LIST, never a single owner (FR-015). The
+ * survey's table reads as one artifact per family, but `Q` is defined in
+ * `briefs/` and referenced from `research.md`, and `P-APP-DIR` is defined in
+ * both `briefs/` and a feature's `research.md`.
+ *
+ * An identifier belonging to no family — which the extractor cannot produce,
+ * since it uses the same recognizer — yields an empty list and therefore ranks
+ * every artifact equally.
+ */
+function candidateArtifactsFor(id: string): readonly string[] {
+  for (const family of ID_FAMILIES) {
+    family.pattern.lastIndex = 0;
+    const match = family.pattern.exec(id);
+    if (match && match[0] === id) {
+      return family.owningArtifacts;
+    }
+  }
+  return [];
+}
+
+/**
+ * How early this artifact appears in the family's candidate list.
+ *
+ * A file the family does not name still ranks — last, not never. The list is a
+ * search order, not a filter: a research identifier defined in a `data-model.md`
+ * sidecar must still resolve, just behind `research.md` if both define it.
+ */
+function artifactRank(fsPath: string, featureRoot: string, candidates: readonly string[]): number {
+  const relative = path.relative(featureRoot, fsPath);
+  const segments = relative.split(path.sep);
+  const base = segments[segments.length - 1];
+
+  for (let index = 0; index < candidates.length; index++) {
+    const candidate = candidates[index];
+    const matched = candidate.endsWith('/')
+      ? segments.slice(0, -1).includes(candidate.slice(0, -1))
+      : base === candidate;
+    if (matched) {
+      return index;
+    }
+  }
+  return candidates.length;
+}
+
+/** Feature-folder files sort ahead of the shared briefs folder. */
+function locality(fsPath: string, featureRoot: string): number {
+  const relative = path.relative(featureRoot, fsPath);
+  return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative) ? 0 : 1;
+}
+
+/**
  * Definitions in resolution order, capped.
  *
- * The consumer takes the FIRST entry for an identifier, so order encodes the
- * two precedence rules: within one artifact the first definition wins, and
- * across artifacts the search order is the artifact order here. Local scope is
- * authoritative, which is why feature-folder files sort ahead of anything
- * outside the folder.
+ * The consumer takes the FIRST entry for an identifier, so this order IS the
+ * resolution policy, and it encodes three rules in priority order:
+ *
+ * 1. Local scope is authoritative — a feature-folder definition beats the
+ *    briefs one even for a family whose declared home is `briefs/`. `P-APP-DIR`
+ *    is genuinely defined in both places in the corpus.
+ * 2. Within one locality, the family's candidate artifact list decides. Plain
+ *    alphabetical order would resolve `FR-001` into `contracts/` and `T042`
+ *    into `plan.md`, since both sort ahead of their owning artifact.
+ * 3. Within one artifact, the first definition wins.
+ *
+ * Sorting by a key tuple rather than by grouped file order is what lets rules 1
+ * and 2 disagree about file order for two different families in the same pair
+ * of files — which they do, and which a single file ordering cannot express.
  */
-function flatten(files: Map<string, DefinitionSite[]>): DefinitionSite[] {
+function flatten(files: Map<string, DefinitionSite[]>, featureRoot: string): DefinitionSite[] {
   const all: DefinitionSite[] = [];
   for (const fsPath of [...files.keys()].sort()) {
     all.push(...(files.get(fsPath) ?? []));
   }
+
+  const ranks = new Map<string, number>();
+  const keyed = all.map(site => {
+    const cacheKey = `${site.id}\u0000${site.fsPath}`;
+    let rank = ranks.get(cacheKey);
+    if (rank === undefined) {
+      rank = artifactRank(site.fsPath, featureRoot, candidateArtifactsFor(site.id));
+      ranks.set(cacheKey, rank);
+    }
+    return { site, locality: locality(site.fsPath, featureRoot), rank };
+  });
+
+  keyed.sort(
+    (a, b) =>
+      a.locality - b.locality ||
+      a.rank - b.rank ||
+      (a.site.fsPath < b.site.fsPath ? -1 : a.site.fsPath > b.site.fsPath ? 1 : 0) ||
+      a.site.line - b.site.line
+  );
+  all.length = 0;
+  all.push(...keyed.map(entry => entry.site));
   if (all.length > DEFINITION_CAP) {
     console.warn(
       `[MD4H] Spec-kit definition cap reached: ${all.length} found, keeping ${DEFINITION_CAP}. ` +
