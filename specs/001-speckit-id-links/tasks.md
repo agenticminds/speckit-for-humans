@@ -173,11 +173,11 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 **Independent test**: Two documents from one feature open side by side; edit an identifier in one and watch the other change without being touched.
 
-- [ ] T058 [P] [US5] Write the freshness test in `src/__tests__/features/speckitIndex/watch.test.ts` asserting both an unsaved edit in an open document and an on-disk change to an unopened file trigger re-indexing, and that a revision going backwards is treated as link-nothing → C-msg-2c, C-msg-2d, FR-025
-- [ ] T059 [US5] Add one unfiltered workspace-wide document-change listener in `src/features/speckitIndex/watch.ts`, following the pattern in `src/features/wordCount.ts` rather than extending the per-panel listener, which is filtered to its own document → FR-025
-- [ ] T060 [US5] Add a file-system watcher scoped to the feature root and the briefs folder in `src/features/speckitIndex/watch.ts`, covering files nobody has open → FR-025
-- [ ] T061 [US5] Implement the dirty-correct reader in `src/features/speckitIndex/index.ts` that prefers an open document's in-memory text and falls back to reading from disk, without force-opening every artifact → FR-025
-- [ ] T062 [US5] Debounce re-indexing in `src/features/speckitIndex/watch.ts` at the project's existing sync cadence and re-extract only the changed file, pushing to every panel under the changed feature root → C-msg-2f, FR-025
+- [X] T058 [P] [US5] Write the freshness test in `src/__tests__/features/speckitIndex/watch.test.ts` asserting both an unsaved edit in an open document and an on-disk change to an unopened file trigger re-indexing, and that a revision going backwards is treated as link-nothing → C-msg-2c, C-msg-2d, FR-025
+- [X] T059 [US5] Add one unfiltered workspace-wide document-change listener in `src/features/speckitIndex/watch.ts`, following the pattern in `src/features/wordCount.ts` rather than extending the per-panel listener, which is filtered to its own document → FR-025
+- [X] T060 [US5] Add a file-system watcher scoped to the feature root and the briefs folder in `src/features/speckitIndex/watch.ts`, covering files nobody has open → FR-025
+- [X] T061 [US5] Implement the dirty-correct reader in `src/features/speckitIndex/index.ts` that prefers an open document's in-memory text and falls back to reading from disk, without force-opening every artifact → FR-025
+- [X] T062 [US5] Debounce re-indexing in `src/features/speckitIndex/watch.ts` at the project's existing sync cadence and re-extract only the changed file, pushing to every panel under the changed feature root → C-msg-2f, FR-025
 - [ ] T063 [US5] Verify both halves of quickstart scenario 6 — the unsaved-edit path and the on-disk path — in the Extension Development Host **[Manual check]** → SC-006
 
 ---

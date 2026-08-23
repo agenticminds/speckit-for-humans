@@ -23,6 +23,7 @@ import {
   type FeatureScope,
 } from '../features/speckitIndex/discovery';
 import { SpeckitIndexStore } from '../features/speckitIndex';
+import { SpeckitFreshnessWatcher } from '../features/speckitIndex/watch';
 import { recognize } from '../shared/speckitIds/expand';
 import { collectQualifierCandidates } from '../shared/speckitIds/qualifiers';
 
@@ -292,6 +293,11 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   // PROVIDER rather than by a per-panel closure so two documents in one feature
   // folder share it (FR-015).
   private speckitIndexStore = new SpeckitIndexStore();
+  // Keeps that index in step with the artifacts while they are edited (FR-025).
+  // Created lazily for the same reason as `windowStateListener`: a test that
+  // never opens a custom editor must not need `createFileSystemWatcher` on its
+  // mock.
+  private speckitWatcher: SpeckitFreshnessWatcher | undefined;
   // One-shot subscription for `window.onDidChangeWindowState`. Registered the
   // first time a custom editor opens so tests that never call `resolveCustomTextEditor`
   // don't need this VS Code API on their mock.
@@ -576,6 +582,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // script has not run yet. Anything posted now is lost (C-msg-4e).
     this.openPanels.set(panelKey, { panel: webviewPanel, document, ready: false });
     this.ensureWindowStateListener();
+    // Watch this document's feature folder and the shared briefs folder, so an
+    // edit anywhere in them refreshes THIS panel even though nobody touched it
+    // (FR-025, C-msg-2f).
+    this.ensureSpeckitWatcher().watch(discoverFeatureScope(document.uri));
 
     // Update webview when document changes
     const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
@@ -3458,6 +3468,40 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }
     }
     this.speckitIndexStore.invalidate(scope.featureRoot);
+    this.speckitWatcher?.unwatch(scope.featureRoot);
+  }
+
+  /**
+   * The freshness watcher, created on the first custom editor to open.
+   *
+   * Its callback is what turns "this feature root changed" into a push to every
+   * panel under it — never only the active one, which is the whole point of
+   * FR-025 (C-msg-2f).
+   */
+  private ensureSpeckitWatcher(): SpeckitFreshnessWatcher {
+    if (!this.speckitWatcher) {
+      this.speckitWatcher = new SpeckitFreshnessWatcher({
+        store: this.speckitIndexStore,
+        onFeatureRootChanged: featureRoot => this.pushSpeckitIndexToRoot(featureRoot),
+      });
+      this.context.subscriptions.push(this.speckitWatcher);
+    }
+    return this.speckitWatcher;
+  }
+
+  /** Re-push the index to every ready panel showing a document under a root. */
+  private pushSpeckitIndexToRoot(featureRoot: string): void {
+    for (const entry of this.openPanels.values()) {
+      // An unready panel is skipped rather than queued: its `ready` handler
+      // pushes the index itself, and it will read the refreshed one (C-msg-4e).
+      if (!entry.ready) {
+        continue;
+      }
+      if (discoverFeatureScope(entry.document.uri).featureRoot !== featureRoot) {
+        continue;
+      }
+      void this.pushSpeckitIndex(entry.document, entry.panel.webview);
+    }
   }
 
   /**

@@ -59,6 +59,13 @@ interface CachedIndex {
   /** Per artifact, so a single changed file can be re-extracted on its own. */
   readonly files: Map<string, DefinitionSite[]>;
   definitions: DefinitionSite[];
+  /**
+   * The briefs folder this index was built with, remembered so a refresh can
+   * tell that a changed file BELONGS to this root even though it sits outside
+   * the feature folder (FR-016). Recomputing it from the path is not possible:
+   * `briefs/` matches no feature-folder grammar.
+   */
+  readonly briefsDir: string | null;
 }
 
 const EMPTY: SpeckitIndexPayload = {
@@ -156,13 +163,70 @@ export class SpeckitIndexStore {
    * Whole-folder invalidation would be simpler and much more expensive: the
    * steady-state cost of re-extracting one changed file is ~0.3ms against 3.5ms
    * for the largest real folder.
+   *
+   * @returns whether any root actually held it, so a caller can tell a stale
+   *   entry apart from a path no index has ever seen.
    */
-  invalidateFile(fsPath: string): void {
+  invalidateFile(fsPath: string): boolean {
+    let dropped = false;
     for (const [featureRoot, cached] of this.byRoot) {
       if (cached.files.delete(fsPath)) {
         this.byRoot.delete(featureRoot);
+        dropped = true;
       }
     }
+    return dropped;
+  }
+
+  /**
+   * Re-read and re-extract ONE artifact in place, in every root that holds it
+   * (FR-025).
+   *
+   * The cheap half of freshness. Dropping the root and rebuilding costs a
+   * directory walk plus a read of every artifact — 3.5ms for the largest real
+   * feature folder, on every debounce tick while someone types. Re-extracting
+   * the one file that changed is ~0.3ms steady-state and reads exactly one file.
+   *
+   * A file that reads as nothing is REMOVED rather than left behind, so a
+   * deleted artifact stops defining anything. A file that no root has seen but
+   * that lies under a root — a newly created artifact — is added.
+   *
+   * The revision is advanced on every root touched, because the webview treats
+   * a revision that does not move forward as a duplicate to drop, or worse, as
+   * link-nothing (C-msg-2c, C-msg-2d).
+   *
+   * @returns the feature roots whose index changed, so their panels can be
+   *   pushed to and no others (C-msg-2f).
+   */
+  async refreshFile(fsPath: string): Promise<readonly string[]> {
+    if (!fsPath.toLowerCase().endsWith('.md')) {
+      return [];
+    }
+
+    const touched: string[] = [];
+    for (const [featureRoot, cached] of this.byRoot) {
+      const known = cached.files.has(fsPath);
+      if (!known && !belongsTo(fsPath, featureRoot, cached.briefsDir)) {
+        continue;
+      }
+
+      const text = await readArtifact(fsPath);
+      if (text === null) {
+        if (!known) {
+          // Neither on disk nor previously indexed: nothing to refresh, and
+          // nothing to announce.
+          continue;
+        }
+        cached.files.delete(fsPath);
+      } else {
+        cached.files.set(fsPath, extractDefinitions(text, fsPath));
+      }
+
+      cached.definitions = flatten(cached.files, featureRoot);
+      cached.revision = this.nextRevision++;
+      touched.push(featureRoot);
+    }
+    return touched;
   }
 
   dispose(): void {
@@ -276,7 +340,12 @@ export class SpeckitIndexStore {
       }
     }
 
-    const cached: CachedIndex = { revision: this.nextRevision++, files, definitions: [] };
+    const cached: CachedIndex = {
+      revision: this.nextRevision++,
+      files,
+      definitions: [],
+      briefsDir,
+    };
     cached.definitions = flatten(files, featureRoot);
     this.byRoot.set(featureRoot, cached);
     return cached;
@@ -449,7 +518,42 @@ async function listMarkdownFiles(root: string, depth = 0): Promise<string[]> {
   return found;
 }
 
+/** Is this path inside the feature folder, or inside its briefs folder? */
+function belongsTo(fsPath: string, featureRoot: string, briefsDir: string | null): boolean {
+  return [featureRoot, briefsDir].some(root => {
+    if (!root) {
+      return false;
+    }
+    const resolved = path.resolve(root);
+    // The separator matters: without it `/w/specs/001-a` would swallow
+    // `/w/specs/001-are-you-sure`.
+    return path.resolve(fsPath).startsWith(resolved + path.sep);
+  });
+}
+
+/**
+ * An artifact's CURRENT text: the editor's copy if it has one, disk otherwise
+ * (FR-025).
+ *
+ * An open document may hold unsaved edits, and quickstart scenario 6 turns on
+ * exactly that: type a definition into `spec.md` without saving and a reference
+ * in `tasks.md` must link within two seconds. Reading disk here is the single
+ * most likely defect in this component, and it fails silently — the on-disk half
+ * of freshness keeps working, so it looks half-fixed rather than broken.
+ *
+ * `openTextDocument` is deliberately NOT called. It would make the index OPEN
+ * every artifact in the feature folder and the briefs folder, turning a read
+ * into an editor-model allocation apiece; `textDocuments` lists what is already
+ * open and costs nothing.
+ */
 async function readArtifact(fsPath: string): Promise<string | null> {
+  const open = (vscode.workspace.textDocuments ?? []).find(
+    document => document.uri.scheme === 'file' && document.uri.fsPath === fsPath
+  );
+  if (open) {
+    return open.getText();
+  }
+
   try {
     const bytes = await vscode.workspace.fs.readFile(vscode.Uri.file(fsPath));
     return Buffer.from(bytes).toString('utf8');
