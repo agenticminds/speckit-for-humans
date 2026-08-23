@@ -37,6 +37,10 @@ export interface TokenizeOptions {
 /**
  * The longest family match starting exactly at `index`, or null.
  *
+ * Exported because expansion needs it twice: to recover the family of a chain
+ * head, whose `bodyPattern` every later member is validated against, and to ask
+ * whether a fully-qualified member follows an ASCII hyphen.
+ *
  * Longest-match arbitration is defensive, not load-bearing: the family patterns
  * are pairwise disjoint at any given start offset, so at most one ever matches
  * and first-match would behave identically. Mutation testing confirms this —
@@ -59,7 +63,7 @@ export interface TokenizeOptions {
  * hyphen — need the shape without the boundary conditions, or a qualified range
  * such as `US1-US5` could never satisfy its own precondition.
  */
-function longestMatchAt(
+export function matchFamilyAt(
   text: string,
   index: number,
   families: readonly IdFamily[]
@@ -115,11 +119,11 @@ export function tokenize(text: string, options: TokenizeOptions = {}): IdToken[]
   // boundaries: it answers "does an identifier start here", not "would one be
   // accepted here".
   const startsCompleteId = (offset: number): boolean =>
-    longestMatchAt(text, offset, families) !== null;
+    matchFamilyAt(text, offset, families) !== null;
 
   let index = 0;
   while (index < text.length) {
-    const candidate = longestMatchAt(text, index, families);
+    const candidate = matchFamilyAt(text, index, families);
     if (!candidate) {
       index++;
       continue;

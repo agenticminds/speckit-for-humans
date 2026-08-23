@@ -24,7 +24,7 @@ import type { Editor } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
 import type { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
-import { tokenize } from '../../shared/speckitIds/tokenizer';
+import { recognize } from '../../shared/speckitIds/expand';
 import { getDocumentPath } from '../utils/documentPath';
 import type { DefinitionKind, DefinitionSite } from '../../features/speckitIndex/extract';
 
@@ -279,7 +279,10 @@ function buildDecorations(doc: ProseMirrorNode): DecorationSet {
       return false;
     }
 
-    for (const token of tokenize(node.text)) {
+    // Stage 2 then stage 3: the anchored scan, then continuation expansion, so
+    // that every ID named inside a group or range gets its own decoration
+    // (FR-004). `recognize` returns them in document order.
+    for (const token of recognize(node.text)) {
       const site = lookupSpeckitDefinition(token.id);
       if (!site) {
         continue;

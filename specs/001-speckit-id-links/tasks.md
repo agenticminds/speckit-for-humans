@@ -148,8 +148,8 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 **Independent test**: A document containing slash groups, dash ranges, ellipsis ranges and a bracketed tag; confirm each named identifier activates.
 
-- [ ] T051 [P] [US3] Write the expansion contract test in `src/__tests__/shared/speckitIds/expand.test.ts`, including that range intermediates are never synthesized **[Enforced gate]** → C-tok-21 … C-tok-27, FR-004, SC-004
-- [ ] T052 [US3] Implement continuation expansion in `src/shared/speckitIds/expand.ts`, seeding only from confirmed anchors, validating abbreviated tails against the head's body shape, trying separators longest-first, and admitting only fully-qualified members after an ASCII hyphen → FR-004
+- [X] T051 [P] [US3] Write the expansion contract test in `src/__tests__/shared/speckitIds/expand.test.ts`, including that range intermediates are never synthesized **[Enforced gate]** → C-tok-21 … C-tok-27, FR-004, SC-004
+- [X] T052 [US3] Implement continuation expansion in `src/shared/speckitIds/expand.ts`, seeding only from confirmed anchors, validating abbreviated tails against the head's body shape, trying separators longest-first, and admitting only fully-qualified members after an ASCII hyphen → FR-004
 - [ ] T053 [US3] Verify the compressed-reference fixture in the Extension Development Host **[Manual check]** → SC-004
 
 ---
