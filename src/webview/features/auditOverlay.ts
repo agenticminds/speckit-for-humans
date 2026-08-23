@@ -17,6 +17,7 @@ import {
   cancelPendingFilePickerRequests,
 } from './auditDocument';
 import { getLevenshteinDistance } from './levenshtein';
+import { scrollToPos } from '../utils/scrollToPos';
 
 // Maximum number of suggestion pills to show per issue (keeps the UI clean).
 const MAX_SUGGESTION_PILLS = 5;
@@ -783,19 +784,11 @@ function navigateToIssue(item: HTMLElement, editor: Editor): void {
   editor.commands.focus();
 
   // Center the selected issue in the viewport for consistent navigation feedback.
+  // Reveal logic lives in src/webview/utils/scrollToPos.ts; select:false keeps
+  // the selection made above, which for an image issue is a node selection that
+  // a text selection would replace.
   requestAnimationFrame(() => {
-    try {
-      const resolved = editor.view.domAtPos(pos).node as Node;
-      const element =
-        resolved instanceof Element ? resolved : (resolved.parentElement ?? editor.view.dom);
-      element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-    } catch {
-      try {
-        editor.view.dispatch(editor.state.tr.scrollIntoView());
-      } catch {
-        editor.commands.focus();
-      }
-    }
+    scrollToPos(editor, pos, pos, { select: false });
   });
 }
 

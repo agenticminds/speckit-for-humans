@@ -341,6 +341,37 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
    *
    * For untitled documents, falls back to the first workspace folder.
    */
+  /**
+   * The path to hand the webview so it can work out which spec-kit feature
+   * folder it is in (FR-015, FR-018, FR-019).
+   *
+   * Workspace-relative when the document sits inside a workspace folder,
+   * absolute otherwise, and null for any scheme that is not a real file on
+   * disk. Null is meaningful, not merely absent: an untitled or virtual
+   * document has no feature folder, so nothing in it may be linked.
+   *
+   * Forward slashes always, so the webview can split on a single separator
+   * regardless of platform.
+   *
+   * This is deliberately NOT `getWorkspaceFolderPath`, which falls back to the
+   * first workspace folder for untitled documents. That fallback is right for
+   * deciding where to save an image and wrong here, because it would place an
+   * unsaved draft inside a feature folder it does not belong to.
+   */
+  private getDocumentPathForWebview(document: vscode.TextDocument): string | null {
+    if (document.uri.scheme !== 'file') {
+      return null;
+    }
+
+    const documentPath = document.uri.fsPath;
+    const root = this.getWorkspaceFolderPath(document);
+    if (root && (documentPath === root || documentPath.startsWith(root + path.sep))) {
+      return path.relative(root, documentPath).replace(/\\/g, '/');
+    }
+
+    return documentPath;
+  }
+
   private getWorkspaceFolderPath(document: vscode.TextDocument): string | null {
     const direct = vscode.workspace.getWorkspaceFolder(document.uri);
     if (direct) {
@@ -700,6 +731,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       formattingShortcutsEnabled,
       blankLineMode,
       enableMath: enableMath,
+      documentPath: this.getDocumentPathForWebview(document),
     });
   }
 

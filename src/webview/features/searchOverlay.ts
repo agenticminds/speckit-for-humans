@@ -7,6 +7,7 @@
 import { Editor } from '@tiptap/core';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { scrollToPos } from '../utils/scrollToPos';
 
 /**
  * Search Overlay - In-document search for Markdown for Humans
@@ -185,33 +186,10 @@ function ensureSearchPlugin(editor: Editor) {
 function scrollToMatch(editor: Editor, match: { from: number; to: number }) {
   const shouldRefocusInput = isVisible;
 
-  // Set selection to the match
-  editor.commands.setTextSelection({ from: match.from, to: match.to });
-
-  // Ensure the position is scrolled into view (ProseMirror + DOM fallback)
-  try {
-    editor.view.dispatch(editor.state.tr.scrollIntoView());
-  } catch {
-    // ignore
-  }
-
-  // Scroll match into view - try element.scrollIntoView first, fallback to window.scrollTo
-  const coords = editor.view.coordsAtPos(match.from);
-  if (coords) {
-    const domAtPos = editor.view.domAtPos(match.from);
-    const node = domAtPos?.node as Node | null;
-    const element =
-      (node?.nodeType === Node.TEXT_NODE ? node.parentElement : (node as HTMLElement | null)) ||
-      null;
-
-    if (element && typeof element.scrollIntoView === 'function') {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      // Fallback when scrollIntoView is unavailable
-      const y = coords.top + window.scrollY - window.innerHeight * 0.3;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  }
+  // Reveal logic lives in src/webview/utils/scrollToPos.ts. It was extracted
+  // from here so the spec-kit ID reveal could use the same code instead of a
+  // third copy; the audit overlay had the second.
+  scrollToPos(editor, match.from, match.to);
 
   // Return focus to the search input when the overlay is visible
   if (shouldRefocusInput) {

@@ -57,5 +57,11 @@ module.exports = {
     // workers (200-300MB RSS each) terminating at once. Two genuine timer
     // leaks WERE found during that investigation and fixed separately in
     // src/webview/features/auditDocument.ts and src/webview/editor.ts.
-    workerGracefulExitTimeout: 2000
+    // Raised from 2000 after the suite grew from 73 files to 80. At 2000ms the
+    // warning still appeared in roughly one run in four — more suites means more
+    // workers finishing at once, so the parent needs longer to reap them all.
+    // This is a MAXIMUM wait, not a fixed delay: when workers exit promptly, as
+    // they normally do within ~30ms, nothing is spent. Verified with
+    // --detectOpenHandles that no test in the suite leaks a handle.
+    workerGracefulExitTimeout: 5000
 };

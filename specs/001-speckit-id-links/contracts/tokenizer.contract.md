@@ -65,10 +65,11 @@ Position-bearing but AST-free. Node-level exclusion (stage 0) happens in the cal
 
 ## Ordering guarantees
 
-- **C-tok-34**: On **rejection** the scanner resumes at `start + 1`. Assertion: `versionFR-001` yields **no** tokens — resuming at `end` would hide, then wrongly surface, the inner `R-001`.
-- **C-tok-35**: On **acceptance** it resumes at `end`. Assertion: `C-CORE-3` yields exactly one token.
-- **C-tok-36**: Output is invariant under family declaration order. Assertion: shuffle the family array N times, assert identical output. This was verified empirically over 12 permutations across the corpus, 18,722 tokens every time.
-- **C-tok-37**: Boundary predicates are evaluated at match time, not as a post-filter. Observable via C-tok-34, which a post-filter cannot satisfy.
+- **C-tok-34**: On **rejection** the scanner resumes at `start + 1` rather than at the rejected shape's end, because that cannot skip text. **Revised after implementation**: this is a safe default, not an observable behaviour. Mutation testing showed the two strategies indistinguishable — a candidate contains only letters, digits and hyphens, so anything starting inside one is preceded by a boundary-blocking character and is rejected either way. The original claim that `versionFR-001` proves the difference was wrong. Pinned as an unproven property in `mechanisms.test.ts`.
+- **C-tok-35**: On **acceptance** it resumes at `end`, so a compound identifier's interior is never a candidate. Assertion: `C-CORE-3` yields exactly one token.
+- **C-tok-36**: Output is invariant under family declaration order. **Revised**: the real property is that the family patterns are **pairwise disjoint at any start offset**, which is what makes order irrelevant and also makes longest-match arbitration redundant. Assert disjointness directly; an order-shuffling test alone would pass whether or not the property held.
+- **C-tok-37**: Boundary predicates are load-bearing and must be evaluated at match time. **Revised**: the original justification pointed at C-tok-34, which turned out not to demonstrate it. The genuine evidence is mutation counts — disabling the left predicate fails 13 tests, the right predicate 5. Assert those behaviours directly rather than inferring them from resume order.
+- **C-tok-41**: The mechanisms the grammar actually depends on MUST be pinned by test, and the ones it does not MUST NOT be described as though it does. Measured mutation results: greedy prefix extraction 33 failures, left boundary 13, right boundary 5, and **zero** for each of the family prefix-equality filter, the prefix-set membership gate, longest-match arbitration, and resume-at-start-plus-one. The four inert mechanisms are retained as speed-ups or safe defaults, and the properties that make them redundant are asserted so a later change cannot make them load-bearing unnoticed.
 
 ## Corpus-level acceptance
 

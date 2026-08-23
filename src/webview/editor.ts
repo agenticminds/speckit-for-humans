@@ -99,6 +99,7 @@ import sql from 'highlight.js/lib/languages/sql';
 import java from 'highlight.js/lib/languages/java';
 import go from 'highlight.js/lib/languages/go';
 import rust from 'highlight.js/lib/languages/rust';
+import { setDocumentPath } from './utils/documentPath';
 
 // Register languages with lowlight
 lowlight.registerLanguage('javascript', javascript);
@@ -1117,6 +1118,10 @@ window.addEventListener('message', (event: MessageEvent) => {
 
     switch (message.type) {
       case 'update':
+        // Record the document's own path. The webview cannot discover this for
+        // itself, and spec-kit feature-folder resolution needs it. Null means
+        // the document has no path on disk, so nothing in it may be linked.
+        setDocumentPath(message.documentPath);
         // Store skipResizeWarning setting if present
         if (typeof message.skipResizeWarning === 'boolean') {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

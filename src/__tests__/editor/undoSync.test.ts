@@ -212,6 +212,10 @@ describe('MarkdownEditorProvider undo/redo safety', () => {
       zoom: 100,
       enableMath: true,
       formattingShortcutsEnabled: true,
+      // Added by C-msg-1: the webview cannot discover its own path, and
+      // feature-folder resolution for spec-kit ID links needs it. Null here
+      // because this test's document has no file-scheme URI.
+      documentPath: null,
     });
   });
 
@@ -257,6 +261,10 @@ describe('MarkdownEditorProvider undo/redo safety', () => {
       zoom: 100,
       enableMath: true,
       formattingShortcutsEnabled: true,
+      // Added by C-msg-1: the webview cannot discover its own path, and
+      // feature-folder resolution for spec-kit ID links needs it. Null here
+      // because this test's document has no file-scheme URI.
+      documentPath: null,
     });
 
     getConfigurationSpy.mockRestore();

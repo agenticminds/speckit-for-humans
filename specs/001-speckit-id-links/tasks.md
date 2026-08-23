@@ -67,26 +67,27 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 ### Document path plumbing
 
-- [ ] T011 Write a failing test in `src/__tests__/editor/documentPath.test.ts` asserting the `update` payload carries the document's workspace-relative path and that every existing field survives unchanged → C-msg-1
-- [ ] T012 Add `documentPath` to the `update` payload in `src/editor/MarkdownEditorProvider.ts`, null for any non-file scheme → C-msg-1, FR-019
-- [ ] T013 Consume `documentPath` in the `update` handler in `src/webview/editor.ts` and store it in module state → FR-015, FR-018
+- [X] T011 Write a failing test in `src/__tests__/editor/documentPath.test.ts` asserting the `update` payload carries the document's workspace-relative path and that every existing field survives unchanged → C-msg-1
+- [X] T012 Add `documentPath` to the `update` payload in `src/editor/MarkdownEditorProvider.ts`, null for any non-file scheme → C-msg-1, FR-019
+- [X] T013 Consume `documentPath` in the `update` handler in `src/webview/editor.ts` and store it in module state → FR-015, FR-018
 
 ### Recognition grammar — the highest-risk component
 
-- [ ] T014 [P] Build the provenance-recorded fixture corpus under `src/__tests__/fixtures/speckit/`, reproducing all six definition syntaxes, all nineteen families, every look-alike class, the priority-marker collision, and every compressed-reference form — each fixture recording the survey section and corpus location its structure derives from, never copying private corpus text → SC-003
-- [ ] T015 Write the family vocabulary contract test in `src/__tests__/shared/speckitIds/families.test.ts` → C-tok-1 … C-tok-9, FR-001, FR-001a, FR-002, FR-003
-- [ ] T016 [P] Write the rejection contract test in `src/__tests__/shared/speckitIds/rejection.test.ts`, including the assertion that bare `P` followed by digits never yields a token → C-tok-10 … C-tok-20, FR-007, FR-008, FR-009, FR-001c, SC-003
-- [ ] T017 [P] Write the boundary-predicate and ordering contract test in `src/__tests__/shared/speckitIds/boundaries.test.ts`, including that `versionFR-001` yields nothing and that output is invariant under family declaration order → C-tok-34 … C-tok-37, FR-009
-- [ ] T018 Observe T015 through T017 failing, then declare the nineteen families in `src/shared/speckitIds/families.ts` with their exact body shapes → FR-001, FR-001a, FR-002, FR-003
-- [ ] T019 Implement boundary predicates in `src/shared/speckitIds/boundaries.ts`, including the refined hyphen clause that admits `per-FR-022` while still rejecting compound interiors → FR-009
-- [ ] T020 Implement the anchored scanner in `src/shared/speckitIds/tokenizer.ts` with greedy prefix matching, resume-at-start-plus-one on rejection, and resume-at-end on acceptance → FR-001, FR-001a, FR-007
-- [ ] T021 Run T015 through T017 green and record per-family accept counts **[Recorded]** → C-tok-40
-- [ ] T022 Add a corpus measurement harness in `src/__tests__/shared/speckitIds/corpus.test.ts` that runs the recognizer over the whole fixture corpus and asserts the resolution floor and the recognition-miss ceiling, failing the run if either is breached **[Enforced gate]** → C-tok-38, SC-002, SC-002a
+- [X] T014 [P] Build the provenance-recorded fixture corpus under `src/__tests__/fixtures/speckit/`, reproducing all six definition syntaxes, all nineteen families, every look-alike class, the priority-marker collision, and every compressed-reference form — each fixture recording the survey section and corpus location its structure derives from, never copying private corpus text → SC-003
+- [X] T015 Write the family vocabulary contract test in `src/__tests__/shared/speckitIds/families.test.ts` → C-tok-1 … C-tok-9, FR-001, FR-001a, FR-002, FR-003
+- [X] T016 [P] Write the rejection contract test in `src/__tests__/shared/speckitIds/rejection.test.ts`, including the assertion that bare `P` followed by digits never yields a token → C-tok-10 … C-tok-20, FR-007, FR-008, FR-009, FR-001c, SC-003
+- [X] T017 [P] Write the boundary-predicate and ordering contract test in `src/__tests__/shared/speckitIds/boundaries.test.ts`, including that `versionFR-001` yields nothing and that output is invariant under family declaration order → C-tok-34 … C-tok-37, FR-009
+- [X] T018 Observe T015 through T017 failing, then declare the nineteen families in `src/shared/speckitIds/families.ts` with their exact body shapes → FR-001, FR-001a, FR-002, FR-003
+- [X] T019 Implement boundary predicates in `src/shared/speckitIds/boundaries.ts`, including the refined hyphen clause that admits `per-FR-022` while still rejecting compound interiors → FR-009
+- [X] T020 Implement the anchored scanner in `src/shared/speckitIds/tokenizer.ts` with greedy prefix matching, resume-at-start-plus-one on rejection, and resume-at-end on acceptance → FR-001, FR-001a, FR-007
+- [X] T021 Run T015 through T017 green and record per-family accept counts **[Recorded]** → C-tok-40
+- [X] T022 Add a corpus measurement harness in `src/__tests__/shared/speckitIds/corpus.test.ts` that runs the recognizer over the whole fixture corpus and asserts the resolution floor and the recognition-miss ceiling, failing the run if either is breached **[Enforced gate]** → C-tok-38, SC-002, SC-002a
+  - **Half done, deliberately.** The recognition-miss ceiling (SC-002a) and the zero-look-alike gate are enforced: frozen per-file and per-family censuses, and a file of pure look-alikes asserted to yield zero tokens. The resolution floor (SC-002) is NOT enforced yet, because measuring it needs the definition index from T033. Asserting it now would mean either duplicating extraction in the test or writing an assertion that cannot fail, and a gate that cannot fail is worse than an absent one because it reads as covered. Recorded in the test file too.
 
 ### Shared reveal helper
 
-- [ ] T023 [P] Write a failing test in `src/__tests__/webview/scrollToPos.test.ts` asserting a position inside a list item, a task item, and a table cell each resolve to a scrollable element → C-msg-4f
-- [ ] T024 Extract the node-agnostic reveal from `src/webview/features/searchOverlay.ts` into `src/webview/utils/scrollToPos.ts`, then repoint `searchOverlay.ts` and `src/webview/features/auditOverlay.ts` at it so no third copy exists → FR-022
+- [X] T023 [P] Write a failing test in `src/__tests__/webview/scrollToPos.test.ts` asserting a position inside a list item, a task item, and a table cell each resolve to a scrollable element → C-msg-4f
+- [X] T024 Extract the node-agnostic reveal from `src/webview/features/searchOverlay.ts` into `src/webview/utils/scrollToPos.ts`, then repoint `searchOverlay.ts` and `src/webview/features/auditOverlay.ts` at it so no third copy exists → FR-022
 
 ---
 
