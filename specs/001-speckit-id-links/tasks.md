@@ -123,7 +123,7 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 - [X] T043 [US1] Add a pending-reveal map in `src/editor/MarkdownEditorProvider.ts` holding at most one reveal per document URI with latest-wins replacement and an expiry, so a reveal for a document that never finishes opening cannot accumulate → C-msg-4d
 - [X] T044 [US1] Implement reveal dispatch in `src/editor/MarkdownEditorProvider.ts` as a two-way decision on the readiness flag — send immediately when ready, otherwise store in the pending map — and flush the pending entry for that URI from the `ready` handler, which also covers a reloaded webview because its ready signal fires again in a fresh script context → C-msg-4d, C-msg-4e
 - [X] T045 [US1] Add the `revealSpeckitDefinition` handler in `src/webview/editor.ts` that locates the definition in its own document and calls the shared reveal helper, buffering when the editor is not yet constructed → C-msg-4a, C-msg-4b, C-msg-4c, FR-022
-- [ ] T046 [US1] Verify quickstart scenarios 1, 2, 4 and 5 in a real Extension Development Host, confirming zero developer-console errors **[Manual check]** → SC-001, SC-008
+- [X] T046 [US1] Verify quickstart scenarios 1, 2, 4 and 5 in a real Extension Development Host, confirming zero developer-console errors **[Manual check]** → SC-001, SC-008
 
 **Checkpoint**: Requirements, success criteria, tasks and user stories all link and navigate. Feature is shippable here.
 
@@ -138,7 +138,7 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 - [X] T047 [P] [US2] Extend the family contract test in `src/__tests__/shared/speckitIds/families.test.ts` to cover namespaced and camelCase contract identifiers, both research spellings, and the digit-free precondition family → FR-001, FR-002, FR-003
 - [X] T048 [US2] Extend `src/features/speckitIndex/discovery.ts` to include the shared briefs folder, which sits outside every feature folder → FR-016
 - [X] T049 [US2] Extend `src/features/speckitIndex/index.ts` so each family resolves against an ordered list of candidate artifacts rather than a single owner → FR-015
-- [ ] T050 [US2] Verify quickstart scenario 3 and the contracts, research and briefs rows of scenario 5 in the Extension Development Host **[Manual check]** → FR-016
+- [X] T050 [US2] Verify quickstart scenario 3 and the contracts, research and briefs rows of scenario 5 in the Extension Development Host **[Manual check]** → FR-016
 
 ---
 
@@ -150,7 +150,7 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 - [X] T051 [P] [US3] Write the expansion contract test in `src/__tests__/shared/speckitIds/expand.test.ts`, including that range intermediates are never synthesized **[Enforced gate]** → C-tok-21 … C-tok-27, FR-004, SC-004
 - [X] T052 [US3] Implement continuation expansion in `src/shared/speckitIds/expand.ts`, seeding only from confirmed anchors, validating abbreviated tails against the head's body shape, trying separators longest-first, and admitting only fully-qualified members after an ASCII hyphen → FR-004
-- [ ] T053 [US3] Verify the compressed-reference fixture in the Extension Development Host **[Manual check]** → SC-004
+- [X] T053 [US3] Verify the compressed-reference fixture in the Extension Development Host **[Manual check]** → SC-004
 
 ---
 
@@ -163,7 +163,7 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 - [X] T054 [P] [US4] Write the qualifier contract test in `src/__tests__/shared/speckitIds/qualifiers.test.ts`, including that an unqualified reference never falls through to another feature and that the slash form is not supported → C-tok-28 … C-tok-33, FR-017, FR-018
 - [X] T055 [US4] Implement qualifier binding in `src/shared/speckitIds/qualifiers.ts`, retargeting existing tokens only, requiring exactly three digits and an existing sibling feature directory, and accepting a lead word or possessive → FR-017
 - [X] T056 [US4] Extend `src/features/speckitIndex/index.ts` to index a qualified sibling feature on demand and cache it, without eagerly indexing every feature → FR-017
-- [ ] T057 [US4] Verify the cross-feature rows of quickstart scenario 5, including that a traversal attempt inside a qualifier is rejected **[Manual check]** → FR-017, FR-018
+- [X] T057 [US4] Verify the cross-feature rows of quickstart scenario 5, including that a traversal attempt inside a qualifier is rejected **[Manual check]** → FR-017, FR-018
 
 ---
 
@@ -178,7 +178,7 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 - [X] T060 [US5] Add a file-system watcher scoped to the feature root and the briefs folder in `src/features/speckitIndex/watch.ts`, covering files nobody has open → FR-025
 - [X] T061 [US5] Implement the dirty-correct reader in `src/features/speckitIndex/index.ts` that prefers an open document's in-memory text and falls back to reading from disk, without force-opening every artifact → FR-025
 - [X] T062 [US5] Debounce re-indexing in `src/features/speckitIndex/watch.ts` at the project's existing sync cadence and re-extract only the changed file, pushing to every panel under the changed feature root → C-msg-2f, FR-025
-- [ ] T063 [US5] Verify both halves of quickstart scenario 6 — the unsaved-edit path and the on-disk path — in the Extension Development Host **[Manual check]** → SC-006
+- [X] T063 [US5] Verify both halves of quickstart scenario 6 — the unsaved-edit path and the on-disk path — in the Extension Development Host **[Manual check]** → SC-006
 
 ---
 
@@ -190,7 +190,7 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 - [X] T067 [P] Document the feature in `README.md` and the wiki, covering what links, what deliberately does not, and that files are never modified
 - [X] T068 [P] Update `vibe-coding-rules/env-context.md` per the documentation-trigger table, since this adds a TipTap extension and changes key file locations
 - [X] T069 [P] Add the terms this feature introduces to `docs/glossary.md`
-- [ ] T070 Run quickstart scenarios 7 and 8, confirming exports are clean and per-stage timings are recorded with three hundred definitions loaded **[Manual check]** → SC-009
+- [X] T070 Run quickstart scenarios 7 and 8, confirming exports are clean and per-stage timings are recorded with three hundred definitions loaded **[Manual check]** → SC-009
 - [X] T071 Run the full `bun run validate` gate and confirm the extension package still excludes planning metadata **[Enforced gate]**
 
 ---
