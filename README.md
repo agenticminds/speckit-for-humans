@@ -190,6 +190,36 @@ Customize the editor behavior through VS Code settings. Access via `Ctrl+,` (Set
 
 *Navigate your document quickly with sidebar outline showing all headings for instant access.*
 
+### Spec Kit ID Links
+
+If you write specifications with [Spec Kit](https://github.com/github/spec-kit), the short codes
+scattered through your planning documents become clickable. Write `FR-001` in `tasks.md` and it
+turns into a link to the bullet that defines it in `spec.md`. Click it and that file opens in this
+editor, scrolled to the definition.
+
+**What links.** Nineteen identifier families are recognized: functional requirements (`FR-001`),
+success criteria (`SC-002`), tasks (`T042`), user stories and their acceptance scenarios (`US2`,
+`US2-3`), contracts in both spellings (`C-1`, `C1`, `C-msg-4g`), research questions (`R-11`, `R2`),
+research decisions (`D13`), clarification questions (`Q7`), assertion scenarios (`AS3`),
+brief-stage requirements (`BR-12`), architecture decisions (`AD-4`), open questions (`OQ-2`),
+assumptions (`A-6`) and preconditions (`P-APP-DIR`). Ranges and groups link every member, so
+`FR-001–FR-003` gives you three links, not one.
+
+**What deliberately does not.** Text that merely looks like an identifier is left as prose, on
+purpose: `AES-256`, `SHA-256` and `HS256` are constants, `P-256` is a curve, `TS7016` is a compiler
+code, `(Priority: P1)` is a priority marker, and `spec.md:120-140` is a line range. An identifier
+nothing defines stays plain text — no squiggle, no warning, no dialog. Links resolve only inside
+the document's own feature folder plus the shared `briefs/` folder next to it; to reach another
+feature you name it, as in `024 FR-007`. A document that is not inside a numbered feature folder
+gets no links at all. Identifiers inside code spans, code blocks, and links you wrote yourself are
+never touched, and neither is the line that defines an identifier — a definition does not link to
+itself.
+
+**Your files are never modified.** The links are drawn on screen only. Nothing is written into the
+markdown, so the file on disk is byte-for-byte what you typed, Git shows no diff, and opening the
+same file in any other editor shows plain text. Exported PDF and Word files carry the identifier
+text with no link wrapper. Nothing needs to be enabled, indexed, or configured.
+
 ### GitHub Alerts
 
 ![GitHub Alerts](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/github_alerts.gif)
@@ -211,6 +241,8 @@ Markdown for Humans includes everything you need for a modern writing experience
 - **Document outline** with sidebar navigation for quick heading access
 - **Theme support** for Light, Dark, and System themes (inherits your VS Code theme)
 - **Word count and reading time** to track your writing progress
+- **Spec Kit ID links** turning `FR-001`, `T042` and seventeen more identifier families into
+  navigation, without writing a single byte into your files
 
 [Full feature list → Wiki](https://github.com/concretios/markdown-for-humans/wiki)
 

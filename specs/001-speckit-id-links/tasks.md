@@ -184,14 +184,14 @@ Recorded so nothing here is claimed twice. Done during planning, out of order, a
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T064 Strip elements carrying the identifier data attribute in `src/webview/utils/exportContent.ts` so exported documents carry no dead links
-- [ ] T065 [P] Add structured per-stage timing in `src/features/speckitIndex/index.ts` and `src/webview/extensions/speckitIdLinks.ts` for tokenize, read, extract, resolve and decorate, reporting reads separately from extraction so a regression is attributable **[Recorded]** → SC-009
-- [ ] T066 [P] Add the nineteenth family, research decisions, to `src/shared/speckitIds/families.ts` with its heading-defined extraction → FR-001b
-- [ ] T067 [P] Document the feature in `README.md` and the wiki, covering what links, what deliberately does not, and that files are never modified
-- [ ] T068 [P] Update `vibe-coding-rules/env-context.md` per the documentation-trigger table, since this adds a TipTap extension and changes key file locations
-- [ ] T069 [P] Add the terms this feature introduces to `docs/glossary.md`
+- [X] T064 Strip elements carrying the identifier data attribute in `src/webview/utils/exportContent.ts` so exported documents carry no dead links
+- [X] T065 [P] Add structured per-stage timing in `src/features/speckitIndex/index.ts` and `src/webview/extensions/speckitIdLinks.ts` for tokenize, read, extract, resolve and decorate, reporting reads separately from extraction so a regression is attributable **[Recorded]** → SC-009
+- [X] T066 [P] Add the nineteenth family, research decisions, to `src/shared/speckitIds/families.ts` with its heading-defined extraction → FR-001b
+- [X] T067 [P] Document the feature in `README.md` and the wiki, covering what links, what deliberately does not, and that files are never modified
+- [X] T068 [P] Update `vibe-coding-rules/env-context.md` per the documentation-trigger table, since this adds a TipTap extension and changes key file locations
+- [X] T069 [P] Add the terms this feature introduces to `docs/glossary.md`
 - [ ] T070 Run quickstart scenarios 7 and 8, confirming exports are clean and per-stage timings are recorded with three hundred definitions loaded **[Manual check]** → SC-009
-- [ ] T071 Run the full `bun run validate` gate and confirm the extension package still excludes planning metadata **[Enforced gate]**
+- [X] T071 Run the full `bun run validate` gate and confirm the extension package still excludes planning metadata **[Enforced gate]**
 
 ---
 

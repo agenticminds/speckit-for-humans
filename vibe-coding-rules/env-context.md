@@ -2,7 +2,7 @@
 
 > **Distilled technical context** for LLMs implementing features in `markdown-for-humans`.
 >
-> This file is intentionally lean (~80 lines). For deep dives, see `docs/ARCHITECTURE.md`.
+> This file is intentionally lean (~130 lines). For deep dives, see `docs/ARCHITECTURE.md`.
 >
 > **Maintenance rule:** Update this file when architecture changes. Keep it brief—essentials only.
 
@@ -30,7 +30,8 @@
               │    • StarterKit (formatting)  │
               │    • Markdown (serialization) │
               │    • Tables, TaskList, Link   │
-              │    • Custom: Mermaid, Image   │
+              │    • Custom: Mermaid, Image,  │
+              │      SpeckitIdLinks           │
               │                               │
               │    BubbleMenuView (toolbar)   │
               └───────────────────────────────┘
@@ -56,6 +57,10 @@
 | Webview → Extension | `edit` | User changed content, apply to TextDocument |
 | Webview → Extension | `save` | User pressed Cmd/Ctrl+S, trigger VS Code save |
 | Webview → Extension | `ready` | Webview initialized, request initial content |
+| Extension → Webview | `speckitIndex` | Spec Kit definition index for this document's feature folder. Carries a monotonic `revision`; the webview drops a duplicate and treats a backwards one as "link nothing" |
+| Webview → Extension | `openSpeckitDefinition` | An ID link was clicked. Host resolves the path, opens the artifact in **this** editor, and pushes a reveal |
+| Extension → Webview | `revealSpeckitDefinition` | Scroll to a definition. Carries an identifier, never a position or a line number — the webview locates it in its own parsed document |
+| Webview → Extension | `openFileAtLocation` | Reused as the ID-link reveal fallback when the parsed document does not contain the definition |
 
 ---
 
@@ -67,6 +72,7 @@
 | Sync debounce | 500ms | Batch rapid edits before sending to extension |
 | External update skip | 2s | Don't interrupt user if they edited recently |
 | Target doc size | <10,000 lines | Beyond this, consider virtual scrolling |
+| Spec Kit stage timings | none set | Recorded, not gated. Five disjoint stages — `tokenize`, `read`, `extract`, `resolve`, `decorate` — via `src/shared/perf/stageTimings.ts`. Reads are reported apart from extraction so a regression is attributable |
 
 ---
 
@@ -81,6 +87,10 @@
 | Custom TipTap extension | Create new file | `src/webview/extensions/` |
 | Styles | `editor.css` | `src/webview/` |
 | Extension manifest | `package.json` | Root |
+| Spec Kit ID grammar (pure) | `families.ts`, `tokenizer.ts`, `expand.ts`, `qualifiers.ts`, `boundaries.ts` | `src/shared/speckitIds/` |
+| Spec Kit definition index (host) | `index.ts`, `extract.ts`, `discovery.ts`, `watch.ts` | `src/features/speckitIndex/` |
+| Spec Kit ID link decorations | `speckitIdLinks.ts` | `src/webview/extensions/` |
+| Per-stage timing instrumentation | `stageTimings.ts` | `src/shared/perf/` |
 
 ---
 
@@ -93,6 +103,22 @@ New features often follow this pattern:
 3. **Add toolbar button** in `BubbleMenuView.ts` (if UI needed)
 4. **Wire messages** in `MarkdownEditorProvider.ts` (if extension-side logic needed)
 5. **Add command** in `package.json` contributes (if command palette entry needed)
+
+### View-only extensions must not touch the document
+
+`SpeckitIdLinks` is the reference example. It presents Spec Kit identifiers as links using
+ProseMirror **decorations**, never marks:
+
+- A mark lives in `state.doc` and is serialized into the file. A decoration lives in the view and
+  cannot reach disk. That is the whole reason the feature can promise a byte-identical file.
+- The plugin never dispatches a document-changing transaction. Its repaint carries plugin meta
+  only, so `docChanged` is false, the editor's update event does not fire, and the
+  index → decorate → sync loop terminates.
+- The decoration carries **no `href`**. Dispatch is keyed on a `data-` attribute, checked as the
+  first statement of the link click handler, before any `href` is read.
+- Anything view-only must be stripped from the export clone. The export sanitizer is a denylist
+  that passes `class` and unknown attributes through untouched — see `stripSpeckitIdLinks` in
+  `src/webview/utils/exportContent.ts`.
 
 ---
 

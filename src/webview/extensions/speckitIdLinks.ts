@@ -27,6 +27,7 @@ import type { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
 import { recognize } from '../../shared/speckitIds/expand';
 import { bindQualifiers } from '../../shared/speckitIds/qualifiers';
 import { getDocumentPath } from '../utils/documentPath';
+import { webviewStageTimings } from '../../shared/perf/stageTimings';
 import type { DefinitionKind, DefinitionSite } from '../../features/speckitIndex/extract';
 
 /** One sibling feature the host indexed on demand, as pushed (FR-017). */
@@ -315,6 +316,10 @@ function buildDecorations(doc: ProseMirrorNode): DecorationSet {
   }
 
   const decorations: Decoration[] = [];
+  // SC-009. `decorate` is closed out with the nested `tokenize` time SUBTRACTED,
+  // so the two stages are disjoint and a regression lands on exactly one of them.
+  const endDecorate = webviewStageTimings.begin('decorate');
+  const tokenizeBefore = webviewStageTimings.snapshot().tokenize?.totalMs ?? 0;
 
   doc.descendants((node, pos) => {
     // Stage 0 exclusion: markdown structure is invisible to a text scanner, so
@@ -333,9 +338,12 @@ function buildDecorations(doc: ProseMirrorNode): DecorationSet {
     // expansion so every ID named inside a group or range gets its own
     // decoration (FR-004), and finally cross-feature binding, which retargets a
     // token and never creates one (FR-017, C-tok-31). Document order throughout.
-    const tokens = bindQualifiers(node.text, recognize(node.text), {
-      knownFeatures: index.byFeature.keys(),
-    });
+    const text = node.text;
+    const tokens = webviewStageTimings.measure('tokenize', () =>
+      bindQualifiers(text, recognize(text), {
+        knownFeatures: index.byFeature.keys(),
+      })
+    );
 
     for (const token of tokens) {
       const site = lookupSpeckitDefinition(token.id, token.featureQualifier);
@@ -359,6 +367,12 @@ function buildDecorations(doc: ProseMirrorNode): DecorationSet {
     }
     return false;
   });
+
+  const tokenizeMs = (webviewStageTimings.snapshot().tokenize?.totalMs ?? 0) - tokenizeBefore;
+  endDecorate(tokenizeMs);
+  // Throttled inside: this runs on every keystroke, and a log line per keystroke
+  // would itself be the latency the measurement exists to catch.
+  webviewStageTimings.report('decoration pass');
 
   return DecorationSet.create(doc, decorations);
 }
@@ -417,6 +431,48 @@ export function findSpeckitDefinitionPos(
   });
 
   return found;
+}
+
+/** The line-based open request the reveal fallback sends (C-msg-4g). */
+export interface SpeckitOpenAtLocationMessage {
+  readonly type: 'openFileAtLocation';
+  readonly fsPath: string;
+  /** ONE-based, which is what the existing open-at-location handler expects. */
+  readonly line: number;
+  readonly openToSide: false;
+}
+
+/**
+ * The fallback for a reveal the parsed document cannot satisfy (C-msg-4g).
+ *
+ * Two things can put a reveal here: a definition whose syntax the recognizer
+ * records but the WYSIWYG parse reshapes beyond recognition, and an index that
+ * is fresher than the document on screen. Both are better served by VS Code's
+ * plain text editor at the recorded line — the one place a raw line number IS
+ * correct, because nothing has rewritten the content on the way in — than by
+ * nothing happening at all.
+ *
+ * The line comes from THIS webview's own index and never from the reveal
+ * message, which carries no line number by contract (C-msg-4a).
+ *
+ * @returns the message to post, or null when there is nothing to open. Null is
+ *   silence, never a dialog: FR-010 and SC-007 count interruptions.
+ */
+export function speckitRevealFallback(id: string): SpeckitOpenAtLocationMessage | null {
+  if (typeof id !== 'string' || id === '') {
+    return null;
+  }
+  const site = lookupSpeckitDefinition(id);
+  if (!site || typeof site.fsPath !== 'string' || site.fsPath === '') {
+    return null;
+  }
+  return {
+    type: 'openFileAtLocation',
+    fsPath: site.fsPath,
+    // The index records a ZERO-based line; the handler expects a one-based one.
+    line: (typeof site.line === 'number' ? site.line : 0) + 1,
+    openToSide: false,
+  };
 }
 
 /**

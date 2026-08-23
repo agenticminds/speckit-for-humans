@@ -15,6 +15,7 @@ import * as vscode from 'vscode';
 import { extractDefinitions, type DefinitionSite } from './extract';
 import { ID_FAMILIES } from '../../shared/speckitIds/families';
 import { isWithinFeatureScope, type FeatureScope } from './discovery';
+import { hostStageTimings } from '../../shared/perf/stageTimings';
 
 /** One sibling feature a document named with a cross-feature qualifier (FR-017). */
 export interface QualifiedFeatureIndex {
@@ -210,7 +211,7 @@ export class SpeckitIndexStore {
         continue;
       }
 
-      const text = await readArtifact(fsPath);
+      const text = await hostStageTimings.measureAsync('read', () => readArtifact(fsPath));
       if (text === null) {
         if (!known) {
           // Neither on disk nor previously indexed: nothing to refresh, and
@@ -219,13 +220,21 @@ export class SpeckitIndexStore {
         }
         cached.files.delete(fsPath);
       } else {
-        cached.files.set(fsPath, extractDefinitions(text, fsPath));
+        cached.files.set(
+          fsPath,
+          hostStageTimings.measure('extract', () => extractDefinitions(text, fsPath))
+        );
       }
 
-      cached.definitions = flatten(cached.files, featureRoot);
+      cached.definitions = hostStageTimings.measure('resolve', () =>
+        flatten(cached.files, featureRoot)
+      );
       cached.revision = this.nextRevision++;
       touched.push(featureRoot);
     }
+    // SC-009. Throttled inside, so a burst of debounced refreshes while someone
+    // types produces one line rather than one per keystroke.
+    hostStageTimings.report('index refresh');
     return touched;
   }
 
@@ -334,9 +343,15 @@ export class SpeckitIndexStore {
     ];
 
     for (const fsPath of artifacts) {
-      const text = await readArtifact(fsPath);
+      // Read and extract are timed SEPARATELY and never as one number (SC-009).
+      // Extraction is 3.5ms for the largest real folder; the reads around it are
+      // where the cost actually lives, and a combined figure hides which moved.
+      const text = await hostStageTimings.measureAsync('read', () => readArtifact(fsPath));
       if (text !== null) {
-        files.set(fsPath, extractDefinitions(text, fsPath));
+        files.set(
+          fsPath,
+          hostStageTimings.measure('extract', () => extractDefinitions(text, fsPath))
+        );
       }
     }
 
@@ -346,8 +361,9 @@ export class SpeckitIndexStore {
       definitions: [],
       briefsDir,
     };
-    cached.definitions = flatten(files, featureRoot);
+    cached.definitions = hostStageTimings.measure('resolve', () => flatten(files, featureRoot));
     this.byRoot.set(featureRoot, cached);
+    hostStageTimings.report('index build');
     return cached;
   }
 }

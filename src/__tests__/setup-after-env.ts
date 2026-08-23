@@ -6,6 +6,12 @@
  */
 
 import { resetAllMocks } from '../__mocks__/vscode';
+import { setStageTimingSink } from '../shared/perf/stageTimings';
+
+// The spec-kit per-stage timings (SC-009) record on every decoration pass and
+// every index build. Recording is left ON — a test may assert it — but the
+// reports are sent nowhere, so the suite output is not flooded with them.
+setStageTimingSink(() => {});
 
 // Reset VS Code mocks before each test
 beforeEach(() => {

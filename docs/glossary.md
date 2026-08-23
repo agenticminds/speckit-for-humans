@@ -86,6 +86,44 @@ Ordered by topic, not alphabetically, because related terms explain each other.
 
 **Corpus** — the body of real spec files at `~/bl/dev/specs`, used as evidence for what conventions actually exist. 508 files. Private, so its contents are never copied into this public repository.
 
+**Briefs folder** — the shared `briefs/` directory sitting **beside** the feature folders rather than inside one. Home to the brief-stage families (`BR-`, `AD-`, `OQ-`, `A-`, some `Q` and `P-`). A walk rooted at a feature folder never reaches it, so it is searched deliberately.
+
+**Feature scope** — the set of directories a document's identifiers may resolve within: its own feature folder plus the briefs folder next to it. Derived from the document's path, nothing else.
+
+---
+
+## Spec Kit ID links
+
+The vocabulary of feature 001. The pipeline runs in four stages: **tokenize**, **expand**, **recognize**, **bind qualifiers**.
+
+**Closed vocabulary** — the rule that only the nineteen declared prefixes are identifier families, and any other letter run is prose. The alternative, an open prefix pattern, accepted 1,948 non-identifiers across the corpus. Adding a prefix is a deliberate spec change, not a configuration option.
+
+**Greedy prefix extraction** — taking the **whole** letter run at a candidate position before checking it against the vocabulary. `TS7016` yields `TS`, which is not a family, so it is rejected. Non-greedy extraction would yield `T` and wrongly proceed.
+
+**Separator** — whether a family is spelled with a hyphen or without. `C-1` and `C1` are **different identifiers in different files**, never two spellings of one.
+
+**Compressed reference** — one written phrase naming several identifiers, such as `FR-001–FR-003` or `T012, T013 and T014`. Every member named gets its own link.
+
+**Continuation** — an abbreviated member of a compressed reference, such as the `A05` in `FR-A01–A05`. Expanded against the shape of the chain's head, so it resolves to `FR-A05`.
+
+**Qualifier** — a three-digit feature number written next to an identifier, as in `024 FR-007`, naming another feature as the place to resolve it. Without one, an identifier can never reach outside its own feature scope.
+
+**Cross-feature reference** — an identifier carrying a qualifier. Resolved only in the named feature; if that feature does not define it, the reference stays prose rather than falling back to the local answer.
+
+**Definition index** — the extension host's map from identifier to definition site for one feature root, built by reading and extracting every artifact in scope. One per feature root, shared by every open document in it, never one per panel.
+
+**Revision** — the monotonically increasing number stamped on each index push. The webview drops a push whose revision it has already seen, and treats one that goes backwards as an instruction to link nothing.
+
+**Self-reference suppression** — leaving the identifier on its own defining line as plain text. A definition must not link to itself. Decided from the **shape of the block** it sits in, not from a line number.
+
+**Reveal** — scrolling the receiving editor to a definition. Carries an identifier, never a position or a line number, because the host holds a text document rather than a ProseMirror one and raw line numbers are wrong in roughly 6.5% of real files.
+
+**Reveal fallback** — opening the artifact in VS Code's plain text editor at the recorded line, used when the receiving editor cannot find the definition in its parsed document. The one place a raw line number is correct.
+
+**Stage timing** — a recorded measurement of one pipeline stage: `tokenize`, `read`, `extract`, `resolve`, or `decorate`. Disjoint by construction, and reads are kept apart from extraction so a regression is attributable to one of them. No threshold is set; the figures are recorded, not gated.
+
+**Export strip** — removing the view-only ID-link wrappers from the cloned DOM on the way into a PDF or Word file. Without it the export carries links with no destination, because the export sanitizer is a denylist that passes unknown attributes through untouched.
+
 ---
 
 ## Testing

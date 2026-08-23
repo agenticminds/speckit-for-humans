@@ -37,6 +37,7 @@ import {
   applySpeckitIndex,
   findSpeckitDefinitionPos,
   lookupSpeckitDefinition,
+  speckitRevealFallback,
   type SpeckitRevealTarget,
 } from './extensions/speckitIdLinks';
 import { scrollToPos } from './utils/scrollToPos';
@@ -1188,15 +1189,48 @@ function revealSpeckitDefinition(target: SpeckitRevealTarget): void {
   }
   const pos = findSpeckitDefinitionPos(editor, target);
   if (pos === null) {
-    // Degrade, never error. An identifier the parsed document does not contain
-    // is not worth an interruption (FR-010, SC-007).
-    console.log('[MD4H] Spec-kit definition not found in this document:', target.id);
+    // Not in the parsed document. Fall back to the existing line-based
+    // open-at-location handler, which lands in VS Code's plain text editor —
+    // the one place raw line numbers ARE correct, because nothing has rewritten
+    // the content on the way in (C-msg-4g).
+    //
+    // The line comes from THIS webview's own index rather than from the reveal
+    // message, which carries no line number by contract (C-msg-4a). The index
+    // held here is the one for this document's feature, so it names the same
+    // definition site the host resolved.
+    openSpeckitDefinitionAsText(target.id);
     return;
   }
   // The node-agnostic reveal, not `scrollToHeading`: that helper climbs the DOM
   // for an `h1`-`h6` and skips its sticky-toolbar offset when it finds none, so
   // a bullet or table cell can land underneath the toolbar (C-msg-4f).
   scrollToPos(editor, pos);
+}
+
+/**
+ * Last resort for a reveal that the parsed document cannot satisfy (C-msg-4g).
+ *
+ * Two things can put us here: a definition syntax the recognizer records but
+ * the WYSIWYG parse reshapes beyond recognition, and an index that is fresher
+ * than the document on screen. Both are better served by the plain text editor
+ * at the recorded line than by nothing at all.
+ *
+ * Silent when there is nothing to open. FR-010 and SC-007 count interruptions,
+ * and a dialog reading "definition not found" is exactly the interruption they
+ * forbid.
+ */
+function openSpeckitDefinitionAsText(id: string): void {
+  const request = speckitRevealFallback(id);
+  if (!request) {
+    console.log('[MD4H] Spec-kit definition not found in this document:', id);
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const vscodeApi = (window as any).vscode;
+  if (vscodeApi && typeof vscodeApi.postMessage === 'function') {
+    vscodeApi.postMessage(request);
+  }
 }
 
 /** Deliver a reveal that arrived before the editor was constructed. */

@@ -25,6 +25,51 @@ export interface ExportContent {
 }
 
 /**
+ * The data attribute the spec-kit ID link decoration stamps on its wrapper.
+ *
+ * Kept as a literal rather than imported from the decoration plugin: this
+ * module must not pull a ProseMirror plugin into the export path, and the
+ * attribute is a contract between the two either way.
+ */
+const SPECKIT_ID_ATTRIBUTE = 'data-speckit-id';
+
+/**
+ * Unwrap every spec-kit ID link in an export clone, leaving the text behind.
+ *
+ * A recognized identifier is presented as an `<a>` with no `href` — the whole
+ * point of the decoration is that it carries a data attribute instead. That is
+ * correct inside the live editor, where a click handler keyed on the attribute
+ * does the navigating, and useless in a PDF or a Word file, where nothing reads
+ * the attribute and an `<a>` with no destination is a dead link. The export
+ * sanitizer cannot catch this: it is a denylist that passes `class` and
+ * unknown attributes through untouched.
+ *
+ * The element is UNWRAPPED, never deleted. Deleting it would take the
+ * identifier text with it and silently drop `FR-001` out of the sentence.
+ *
+ * @param root - the cloned editor DOM, which is what gets exported
+ * @returns how many wrappers were removed, so a caller or a test can assert it
+ */
+export function stripSpeckitIdLinks(root: HTMLElement): number {
+  const wrappers = root.querySelectorAll(`[${SPECKIT_ID_ATTRIBUTE}]`);
+  let removed = 0;
+
+  wrappers.forEach(wrapper => {
+    const parent = wrapper.parentNode;
+    if (!parent) {
+      return;
+    }
+    while (wrapper.firstChild) {
+      parent.insertBefore(wrapper.firstChild, wrapper);
+    }
+    parent.removeChild(wrapper);
+    removed++;
+  });
+
+  return removed;
+}
+
+/**
  * Collect HTML content and Mermaid diagrams from the editor
  *
  * @param editor - TipTap editor instance
@@ -34,6 +79,10 @@ export async function collectExportContent(editor: Editor): Promise<ExportConten
   // Get HTML content from editor
   const editorElement = editor.view.dom as HTMLElement;
   const clonedContent = editorElement.cloneNode(true) as HTMLElement;
+
+  // View-only decorations must not reach the exported file. Done on the CLONE,
+  // before anything else reads it, so the live editor is untouched.
+  stripSpeckitIdLinks(clonedContent);
 
   // Find all Mermaid diagrams
   const mermaidWrappers = clonedContent.querySelectorAll('.mermaid-wrapper');
