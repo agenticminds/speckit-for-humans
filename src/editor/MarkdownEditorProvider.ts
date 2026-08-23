@@ -17,6 +17,47 @@ import { setActiveWebviewPanel, getActiveWebviewPanel } from '../activeWebview';
 import { buildResizeBackupLocation, resolveBackupPathWithCollisionDetection } from './imageBackups';
 import { hasSameBlankLineLayout, isMarkdownStructurallyEquivalent } from './markdownAstEquivalence';
 import { applyBlankLinePolicy, type BlankLineMode } from '../shared/blankLinePolicy';
+import {
+  discoverFeatureScope,
+  isWithinFeatureScope,
+  type FeatureScope,
+} from '../features/speckitIndex/discovery';
+import { SpeckitIndexStore } from '../features/speckitIndex';
+
+/**
+ * Host → webview reveal (C-msg-4).
+ *
+ * Deliberately carries NO position and NO line number. The host holds a
+ * `TextDocument`, not a ProseMirror document, so it cannot produce a valid
+ * position; and a raw line number is wrong in roughly 6.5% of real files,
+ * because content is rewritten twice on its way into the webview. The receiving
+ * webview locates the definition in its own parsed document instead.
+ */
+export interface SpeckitRevealMessage {
+  readonly type: 'revealSpeckitDefinition';
+  readonly id: string;
+  readonly kind: string;
+  readonly headingText?: string;
+}
+
+/**
+ * How long a queued reveal stays interesting.
+ *
+ * A reveal for a document that never finishes opening — the person cancelled,
+ * or the editor failed to construct — must not sit in the map forever and then
+ * fire minutes later when an unrelated panel for that URI opens.
+ */
+const PENDING_REVEAL_TTL_MS = 30_000;
+
+/**
+ * This editor's custom view type, as declared in `package.json`.
+ *
+ * Named here because spec-kit navigation must open its target in THIS editor.
+ * The custom editor's priority is `option`, so `showTextDocument` would land in
+ * VS Code's plain text editor instead — where a bullet or a table row cannot be
+ * revealed at all (C-msg-3d).
+ */
+const SPECKIT_EDITOR_VIEW_TYPE = 'markdownForHumans.editor';
 
 /**
  * Coerce text to end with exactly one `\n` (markdownlint MD047). An empty
@@ -230,10 +271,25 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   private flushAckResolvers = new Map<string, () => void>();
   // Panels keyed by document URI so the window-state listener can iterate
   // every open custom editor instead of relying on the single active panel.
+  //
+  // `ready` records whether the webview inside the panel has signalled that its
+  // script is running. Panel presence CANNOT be used to infer it: registration
+  // happens right after the webview HTML is assigned and before that HTML's
+  // script has loaded, so there is a window in which the entry exists and a
+  // `postMessage` into it goes nowhere. Getting this wrong produces the failure
+  // where the first click works and the second silently does nothing (C-msg-4e).
   private openPanels = new Map<
     string,
-    { panel: vscode.WebviewPanel; document: vscode.TextDocument }
+    { panel: vscode.WebviewPanel; document: vscode.TextDocument; ready: boolean }
   >();
+  // At most ONE reveal per document URI, latest wins, with an expiry. A reveal
+  // aimed at a document that never finishes opening must not accumulate
+  // (C-msg-4d).
+  private pendingReveals = new Map<string, { reveal: SpeckitRevealMessage; expiresAt: number }>();
+  // The spec-kit definition index, one entry per feature root, owned by the
+  // PROVIDER rather than by a per-panel closure so two documents in one feature
+  // folder share it (FR-015).
+  private speckitIndexStore = new SpeckitIndexStore();
   // One-shot subscription for `window.onDidChangeWindowState`. Registered the
   // first time a custom editor opens so tests that never call `resolveCustomTextEditor`
   // don't need this VS Code API on their mock.
@@ -514,7 +570,9 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // its own panel/document from closure but registering here keeps lifetimes
     // consistent.
     const panelKey = document.uri.toString();
-    this.openPanels.set(panelKey, { panel: webviewPanel, document });
+    // `ready: false` — the webview HTML was assigned two statements ago and its
+    // script has not run yet. Anything posted now is lost (C-msg-4e).
+    this.openPanels.set(panelKey, { panel: webviewPanel, document, ready: false });
     this.ensureWindowStateListener();
 
     // Update webview when document changes
@@ -652,6 +710,8 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       if (this.openPanels.get(docUri)?.panel === webviewPanel) {
         this.openPanels.delete(docUri);
       }
+      this.pendingReveals.delete(docUri);
+      this.releaseSpeckitIndexIfUnused(document);
       if (getActiveWebviewPanel() === webviewPanel) {
         setActiveWebviewPanel(undefined);
       }
@@ -789,8 +849,20 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         break;
       }
       case 'ready': {
+        // The webview's script is running, so messages posted to it now arrive.
+        // A reloaded webview signals ready again in a fresh script context,
+        // which is why this is a plain assignment and the flush below covers the
+        // reload case without needing to detect it (C-msg-4e).
+        this.markPanelReady(document);
         // Webview is ready, send initial content and settings
         this.updateWebview(document, webview);
+        // The definition index, as its own message type. NEVER folded into
+        // `update` (C-msg-2a): three separate layers would swallow it — the
+        // content-equality guard and the 100ms echo suppressor in
+        // `updateWebview`, and the webview's own content-hash dedupe — so an
+        // index change with unchanged document content would silently never
+        // arrive.
+        void this.pushSpeckitIndex(document, webview);
         // Also send settings separately
         const config = vscode.workspace.getConfiguration();
         const skipWarning = config.get<boolean>('markdownForHumans.imageResize.skipWarning', false);
@@ -836,8 +908,14 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           blankLineMode,
           enableMath: enableMath,
         });
+        // Flushed AFTER the content push, so the webview has a document to
+        // reveal into by the time the reveal lands.
+        this.flushPendingReveal(document, webview);
         break;
       }
+      case 'openSpeckitDefinition':
+        void this.handleOpenSpeckitDefinition(message, document);
+        break;
       case 'outlineUpdated': {
         const outline = this.parseOutlineEntries(message.outline);
         outlineViewProvider.setOutline(outline);
@@ -3183,6 +3261,194 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       console.error('[MD4H] Failed to open file link:', errorMessage, error);
       vscode.window.showErrorMessage(`Failed to open file: ${errorMessage}`);
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Spec-kit ID links
+  // -------------------------------------------------------------------------
+
+  /**
+   * Record that a panel's webview script is running.
+   *
+   * `ready` arrives once per webview LIFETIME, and again in a fresh script
+   * context after a reload. Both cases want the same two actions — set the flag,
+   * flush anything queued — which is why neither is special-cased.
+   */
+  private markPanelReady(document: vscode.TextDocument): void {
+    const entry = this.openPanels.get(document.uri.toString());
+    if (entry) {
+      entry.ready = true;
+    }
+  }
+
+  /**
+   * Send the definition index for this document's feature folder (C-msg-2).
+   *
+   * Failures are swallowed on purpose. An unreadable artifact must degrade to
+   * "that identifier is undefined", never to a dialog (FR-010, SC-007).
+   */
+  private async pushSpeckitIndex(
+    document: vscode.TextDocument,
+    webview: vscode.Webview
+  ): Promise<void> {
+    try {
+      const scope = discoverFeatureScope(document.uri);
+      const payload = await this.speckitIndexStore.getIndex(scope);
+      void webview.postMessage({ type: 'speckitIndex', ...payload });
+    } catch (error) {
+      console.warn('[MD4H] Spec-kit index push failed:', error);
+    }
+  }
+
+  /**
+   * Open the artifact that defines an identifier and reveal the definition
+   * (C-msg-3d, C-msg-3e, FR-022).
+   *
+   * Every exit is silent. This handler exists precisely because the local-file
+   * link branch is not silent, and routing spec-kit navigation through it would
+   * break FR-010, FR-022 and SC-007 at once.
+   */
+  private async handleOpenSpeckitDefinition(
+    message: { type: string; [key: string]: unknown },
+    document: vscode.TextDocument
+  ): Promise<void> {
+    try {
+      const id = typeof message.id === 'string' ? message.id : '';
+      const rawPath = typeof message.fsPath === 'string' ? message.fsPath : '';
+      const kind = typeof message.kind === 'string' ? message.kind : '';
+      const headingText = typeof message.headingText === 'string' ? message.headingText : undefined;
+      if (id === '' || rawPath === '') {
+        return;
+      }
+
+      const scope = discoverFeatureScope(document.uri);
+      if (!scope.featureRoot) {
+        return;
+      }
+
+      const target = this.resolveSpeckitTarget(rawPath, document, scope);
+      if (!target) {
+        return;
+      }
+
+      const reveal: SpeckitRevealMessage = {
+        type: 'revealSpeckitDefinition',
+        id,
+        kind,
+        ...(headingText === undefined ? {} : { headingText }),
+      };
+
+      // The definition is in the document that asked. Bounce straight back
+      // without reopening anything (C-msg-3c).
+      if (target.fsPath === document.uri.fsPath) {
+        this.dispatchSpeckitReveal(document.uri, reveal);
+        return;
+      }
+
+      // Queue BEFORE opening: a panel that does not exist yet cannot be sent to,
+      // and the open below is what causes it to exist.
+      this.dispatchSpeckitReveal(target, reveal);
+      // `vscode.openWith` and not `showTextDocument`: this editor's priority is
+      // `option`, so a plain open lands in VS Code's text editor, where a list
+      // item or table row cannot be revealed at all (C-msg-3d).
+      await vscode.commands.executeCommand('vscode.openWith', target, SPECKIT_EDITOR_VIEW_TYPE);
+    } catch (error) {
+      // Logged, never surfaced. SC-007 counts dialogs, not log lines.
+      console.warn('[MD4H] Spec-kit definition open failed:', error);
+    }
+  }
+
+  /**
+   * Resolve a definition's recorded path, document-relative first and then
+   * workspace-relative, and refuse anything outside the derived roots.
+   *
+   * Containment is checked on the RESOLVED path, so a traversal segment inside a
+   * cross-feature qualifier collapses first and is then measured like any other
+   * path (C-msg-3e).
+   */
+  private resolveSpeckitTarget(
+    rawPath: string,
+    document: vscode.TextDocument,
+    scope: FeatureScope
+  ): vscode.Uri | null {
+    const candidates: string[] = [];
+    if (path.isAbsolute(rawPath)) {
+      candidates.push(path.resolve(rawPath));
+    } else {
+      candidates.push(path.resolve(path.dirname(document.uri.fsPath), rawPath));
+      const workspaceRoot = this.getWorkspaceFolderPath(document);
+      if (workspaceRoot) {
+        candidates.push(path.resolve(workspaceRoot, rawPath));
+      }
+    }
+
+    for (const candidate of candidates) {
+      if (isWithinFeatureScope(candidate, scope)) {
+        return vscode.Uri.file(candidate);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Deliver a reveal, or hold it until the destination can receive one.
+   *
+   * A two-way decision on the readiness flag, and deliberately not on panel
+   * presence: registration happens before the webview script loads, so a panel
+   * can exist and still be unable to receive anything (C-msg-4d, C-msg-4e).
+   */
+  private dispatchSpeckitReveal(uri: vscode.Uri, reveal: SpeckitRevealMessage): void {
+    const key = uri.toString();
+    const entry = this.openPanels.get(key);
+    if (entry?.ready) {
+      void entry.panel.webview.postMessage(reveal);
+      // Delivered, so nothing may stay queued — otherwise the next `ready`
+      // would deliver it a second time.
+      this.pendingReveals.delete(key);
+      return;
+    }
+
+    this.prunePendingReveals();
+    // Latest wins. Holding a queue would replay stale navigations in order when
+    // the panel finally opened, which is never what anybody meant.
+    this.pendingReveals.set(key, { reveal, expiresAt: Date.now() + PENDING_REVEAL_TTL_MS });
+  }
+
+  /** Send whatever was queued for this document, exactly once. */
+  private flushPendingReveal(document: vscode.TextDocument, webview: vscode.Webview): void {
+    const key = document.uri.toString();
+    const pending = this.pendingReveals.get(key);
+    if (!pending) {
+      return;
+    }
+    this.pendingReveals.delete(key);
+    if (pending.expiresAt <= Date.now()) {
+      return;
+    }
+    void webview.postMessage(pending.reveal);
+  }
+
+  private prunePendingReveals(): void {
+    const now = Date.now();
+    for (const [key, pending] of this.pendingReveals) {
+      if (pending.expiresAt <= now) {
+        this.pendingReveals.delete(key);
+      }
+    }
+  }
+
+  /** Drop a feature root's index once no panel is showing a document under it. */
+  private releaseSpeckitIndexIfUnused(document: vscode.TextDocument): void {
+    const scope = discoverFeatureScope(document.uri);
+    if (!scope.featureRoot) {
+      return;
+    }
+    for (const entry of this.openPanels.values()) {
+      if (discoverFeatureScope(entry.document.uri).featureRoot === scope.featureRoot) {
+        return;
+      }
+    }
+    this.speckitIndexStore.invalidate(scope.featureRoot);
   }
 
   /**

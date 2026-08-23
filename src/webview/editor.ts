@@ -32,6 +32,14 @@ import { BlankLinePreservation } from './extensions/blankLinePreservation';
 import { OrderedListMarkdownFix } from './extensions/orderedListMarkdownFix';
 import { HtmlPreservingTable } from './extensions/htmlPreservingTable';
 import { DraggableBlocks } from './extensions/draggableBlocks';
+import {
+  SpeckitIdLinks,
+  applySpeckitIndex,
+  findSpeckitDefinitionPos,
+  lookupSpeckitDefinition,
+  type SpeckitRevealTarget,
+} from './extensions/speckitIdLinks';
+import { scrollToPos } from './utils/scrollToPos';
 import { DocumentAuditExtension } from './features/auditDocument';
 import { createFormattingToolbar, createTableMenu, updateToolbarStates } from './BubbleMenuView';
 import { getEditorMarkdownForSync } from './utils/markdownSerialization';
@@ -681,6 +689,10 @@ function initializeEditor(initialContent: string) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any),
         DraggableBlocks,
+        // View-only inline decorations over recognized spec-kit identifiers.
+        // Adds no schema, no mark and no command, so it can be registered
+        // anywhere in this array without affecting parsing or serialization.
+        SpeckitIdLinks,
         DocumentAuditExtension,
       ],
       // Don't pass content here - we'll set it after init with contentType: 'markdown'
@@ -784,6 +796,10 @@ function initializeEditor(initialContent: string) {
       editor.commands.setContent(initialContent, { contentType: 'markdown' });
       isUpdating = false;
     }
+
+    // A reveal that raced the editor's construction. The document is parsed by
+    // this point, so the definition can actually be located (C-msg-4c).
+    flushPendingSpeckitReveal();
 
     // Create and insert formatting toolbar at top
     formattingToolbar = createFormattingToolbar(editorInstance);
@@ -976,6 +992,37 @@ function initializeEditor(initialContent: string) {
     // Add link click handler for navigation
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+
+      // FIRST, ahead of the href read (C-msg-3a). An ID link carries no href at
+      // all, so any later placement lets it fall through to the local-file
+      // branch below — which cannot carry a position, opens the plain text
+      // editor, and raises a `File not found` dialog on a miss, violating
+      // FR-010, FR-022 and SC-007 at once. Keyed on the data attribute the
+      // decoration sets, never on an href (C-msg-3b).
+      const speckitElement = target.closest('[data-speckit-id]') as HTMLElement | null;
+      if (speckitElement) {
+        const speckitId = speckitElement.getAttribute('data-speckit-id') ?? '';
+        const site = speckitId ? lookupSpeckitDefinition(speckitId) : null;
+        e.preventDefault();
+        e.stopPropagation();
+        // No definition means nothing happens. Silently — FR-010 forbids an
+        // interruption and there is nowhere to navigate to.
+        if (site) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const vscodeApi = (window as any).vscode;
+          if (vscodeApi && typeof vscodeApi.postMessage === 'function') {
+            vscodeApi.postMessage({
+              type: 'openSpeckitDefinition',
+              id: site.id,
+              fsPath: site.fsPath,
+              kind: site.kind,
+              headingText: site.headingText,
+            });
+          }
+        }
+        return;
+      }
+
       const link = target.closest('.markdown-link') as HTMLAnchorElement;
       if (!link) return;
 
@@ -1107,6 +1154,55 @@ function initializeEditor(initialContent: string) {
       `;
     }
   }
+}
+
+/**
+ * A reveal that arrived before the editor existed (C-msg-4c).
+ *
+ * Follows the existing pending-initial-content pattern. Dropping a reveal on a
+ * null editor loses the navigation entirely, and that is the common case rather
+ * than a rare one: opening the target document is what causes the reveal, so the
+ * two race by construction.
+ */
+let pendingSpeckitReveal: SpeckitRevealTarget | null = null;
+
+/**
+ * Bring a definition into view in THIS document (C-msg-4a, C-msg-4b, FR-022).
+ *
+ * The message carries an identifier, not a position: the host has no ProseMirror
+ * document to measure one against, and the raw line it does hold is wrong in
+ * roughly 6.5% of real files. Locating it here is also what makes the reveal
+ * work for a bullet or a table row rather than only a heading.
+ */
+function revealSpeckitDefinition(target: SpeckitRevealTarget): void {
+  if (!target || typeof target.id !== 'string' || target.id === '') {
+    return;
+  }
+  if (!editor) {
+    pendingSpeckitReveal = target;
+    return;
+  }
+  const pos = findSpeckitDefinitionPos(editor, target);
+  if (pos === null) {
+    // Degrade, never error. An identifier the parsed document does not contain
+    // is not worth an interruption (FR-010, SC-007).
+    console.log('[MD4H] Spec-kit definition not found in this document:', target.id);
+    return;
+  }
+  // The node-agnostic reveal, not `scrollToHeading`: that helper climbs the DOM
+  // for an `h1`-`h6` and skips its sticky-toolbar offset when it finds none, so
+  // a bullet or table cell can land underneath the toolbar (C-msg-4f).
+  scrollToPos(editor, pos);
+}
+
+/** Deliver a reveal that arrived before the editor was constructed. */
+function flushPendingSpeckitReveal(): void {
+  if (!pendingSpeckitReveal) {
+    return;
+  }
+  const target = pendingSpeckitReveal;
+  pendingSpeckitReveal = null;
+  revealSpeckitDefinition(target);
 }
 
 /**
@@ -1644,6 +1740,17 @@ window.addEventListener('message', (event: MessageEvent) => {
         if (!editor) return;
         const pos = message.pos as number;
         scrollToHeading(editor, pos);
+        break;
+      }
+      case 'speckitIndex': {
+        // Its own message type, never folded into `update` (C-msg-2a). The
+        // extension repaints its own decorations; nothing here touches the
+        // document, so this cannot start a refresh loop.
+        applySpeckitIndex(message);
+        break;
+      }
+      case 'revealSpeckitDefinition': {
+        revealSpeckitDefinition(message as unknown as SpeckitRevealTarget);
         break;
       }
       case 'fileSearchResults': {
