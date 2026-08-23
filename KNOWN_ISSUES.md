@@ -1,8 +1,8 @@
 # Known Issues & Technical Debt
 
-This document tracks known issues, limitations, workarounds, and technical debt for Markdown for Humans.
+This document tracks known issues, limitations, workarounds, and technical debt for Speckit for Humans.
 
-> **For Users:** Check the issues and workarounds sections below. If you encounter an issue not listed here, please [report it](https://github.com/concretios/markdown-for-humans/issues).
+> **For Users:** Check the issues and workarounds sections below. If you encounter an issue not listed here, please [report it](https://github.com/agenticminds/speckit-for-humans/issues).
 >
 > **For Developers:** See technical debt, roadmap, and development guidelines sections. For troubleshooting during development, see [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md).
 
@@ -88,10 +88,10 @@ _None currently. All critical issues have been resolved._
 ## 🔧 Common Workarounds
 
 ### Extension Not Opening Files
-**Issue:** Right-click → "Open with Markdown for Humans" doesn't work
+**Issue:** Right-click → "Open with Speckit for Humans" doesn't work
 **Workaround:**
 1. Open VS Code Command Palette (Cmd/Ctrl + Shift + P)
-2. Type "Markdown for Humans: Open File"
+2. Type "Speckit for Humans: Open File"
 3. Select the command
 
 ### Theme Colors Not Matching
@@ -147,7 +147,7 @@ _None currently. All critical issues have been resolved._
 ### Documentation & Repository Polish
 
 **GitHub Repository Setup:**
-- [x] Repository exists: https://github.com/concretios/markdown-for-humans
+- [x] Repository exists: https://github.com/agenticminds/speckit-for-humans
 - [x] README.md comprehensive and professional
 - [x] LICENSE file present (MIT)
 - [x] CONTRIBUTING.md present
@@ -334,4 +334,4 @@ If you find a workaround for a known issue or have additional information, pleas
 **Status:** ✅ Production Ready for v0.1.0
 **Next Review:** After v0.1.0 marketplace release (plan v0.2.0 improvements)
 
-**Note:** This document is maintained manually. For the most up-to-date issue tracking, see [GitHub Issues](https://github.com/concretios/markdown-for-humans/issues).
+**Note:** This document is maintained manually. For the most up-to-date issue tracking, see [GitHub Issues](https://github.com/agenticminds/speckit-for-humans/issues).

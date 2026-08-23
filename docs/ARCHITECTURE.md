@@ -1,4 +1,4 @@
-# Markdown for Humans - Technical Architecture
+# Speckit for Humans - Technical Architecture
 
 **Complete technical documentation: architecture, implementation, and key technical decisions**
 
@@ -224,13 +224,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.openFile', ...)
+    vscode.commands.registerCommand('speckitForHumans.openFile', ...)
   );
 }
 ```
 
 **Registration:**
-- Activates on `onCustomEditor:markdownForHumans.editor` event
+- Activates on `onCustomEditor:speckitForHumans.editor` event
 - Registers for `.md` and `.markdown` files
 - Priority: `"option"` (user can choose this editor via right-click)
 
@@ -1052,7 +1052,7 @@ This is the canonical way to build the `.vsix` file that you can either share wi
 # Create .vsix file (for local install or marketplace upload)
 bun run package
 # → Uses vsce (VS Code Extension CLI)
-# → Outputs markdown-for-humans-0.1.0.vsix in the project root
+# → Outputs speckit-for-humans-0.1.0.vsix in the project root
 
 # Publish to marketplace (requires publisher account)
 vsce publish patch  # Auto-bumps version and publishes

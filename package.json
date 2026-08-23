@@ -1,12 +1,12 @@
 {
-  "name": "markdown-for-humans",
-  "displayName": "Markdown for Humans: WYSIWYG Editor",
+  "name": "speckit-for-humans",
+  "displayName": "Speckit for Humans: WYSIWYG Editor",
   "description": "A full-featured WYSIWYG Markdown editor with visual table editing, drag-and-drop images, Mermaid diagrams, and distraction-free writing—all inside VS Code.",
   "version": "0.3.0",
   "publisher": "concretio",
   "author": {
-    "name": "Abhinav",
-    "email": "abhinav@concret.io"
+    "name": "Agentic Minds",
+    "email": "support@agenticminds.ai"
   },
   "license": "MIT",
   "icon": "icon.png",
@@ -16,12 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/concretios/markdown-for-humans"
+    "url": "https://github.com/agenticminds/speckit-for-humans"
   },
   "bugs": {
-    "url": "https://github.com/concretios/markdown-for-humans/issues"
+    "url": "https://github.com/agenticminds/speckit-for-humans/issues"
   },
-  "homepage": "https://github.com/concretios/markdown-for-humans#readme",
+  "homepage": "https://agenticminds.ai",
   "engines": {
     "vscode": "^1.85.0",
     "node": ">=22"
@@ -66,8 +66,8 @@
   "contributes": {
     "customEditors": [
       {
-        "viewType": "markdownForHumans.editor",
-        "displayName": "Markdown for Humans",
+        "viewType": "speckitForHumans.editor",
+        "displayName": "Speckit for Humans",
         "selector": [
           {
             "filenamePattern": "*.md",
@@ -91,98 +91,98 @@
     ],
     "commands": [
       {
-        "command": "markdownForHumans.openFile",
-        "title": "Open with Markdown for Humans"
+        "command": "speckitForHumans.openFile",
+        "title": "Open with Speckit for Humans"
       },
       {
-        "command": "markdownForHumans.outline.revealCurrent",
+        "command": "speckitForHumans.outline.revealCurrent",
         "title": "Outline: Reveal Current Heading",
         "icon": "$(target)"
       },
       {
-        "command": "markdownForHumans.outline.filter",
+        "command": "speckitForHumans.outline.filter",
         "title": "Outline: Filter Headings",
         "icon": "$(search)"
       },
       {
-        "command": "markdownForHumans.outline.clearFilter",
+        "command": "speckitForHumans.outline.clearFilter",
         "title": "Outline: Clear Filter",
         "icon": "$(close)"
       },
       {
-        "command": "markdownForHumans.copyAiContextRef",
-        "title": "Markdown for Humans: Copy AI Context Reference (@file#lines)"
+        "command": "speckitForHumans.copyAiContextRef",
+        "title": "Speckit for Humans: Copy AI Context Reference (@file#lines)"
       },
       {
-        "command": "markdownForHumans.toggleFormattingShortcuts",
-        "title": "Markdown for Humans: Toggle Formatting Shortcuts (Cmd/Ctrl+B/I/U)"
+        "command": "speckitForHumans.toggleFormattingShortcuts",
+        "title": "Speckit for Humans: Toggle Formatting Shortcuts (Cmd/Ctrl+B/I/U)"
       }
     ],
     "keybindings": [
       {
-        "command": "markdownForHumans.copyAiContextRef",
+        "command": "speckitForHumans.copyAiContextRef",
         "key": "alt+c",
         "mac": "alt+c",
-        "when": "activeCustomEditorId == 'markdownForHumans.editor'"
+        "when": "activeCustomEditorId == 'speckitForHumans.editor'"
       },
       {
-        "command": "markdownForHumans.toggleFormattingShortcuts",
+        "command": "speckitForHumans.toggleFormattingShortcuts",
         "key": "ctrl+alt+b",
         "mac": "cmd+alt+b",
-        "when": "activeCustomEditorId == 'markdownForHumans.editor'"
+        "when": "activeCustomEditorId == 'speckitForHumans.editor'"
       }
     ],
     "views": {
       "explorer": [
         {
-          "id": "markdownForHumansOutline",
-          "name": "Markdown for Humans: Outline",
-          "when": "markdownForHumans.isActive"
+          "id": "speckitForHumansOutline",
+          "name": "Speckit for Humans: Outline",
+          "when": "speckitForHumans.isActive"
         }
       ]
     },
     "menus": {
       "explorer/context": [
         {
-          "command": "markdownForHumans.openFile",
+          "command": "speckitForHumans.openFile",
           "when": "resourceExtname == .md",
           "group": "navigation"
         }
       ],
       "editor/title/context": [
         {
-          "command": "markdownForHumans.openFile",
-          "when": "resourceExtname == .md && activeCustomEditorId != 'markdownForHumans.editor'",
+          "command": "speckitForHumans.openFile",
+          "when": "resourceExtname == .md && activeCustomEditorId != 'speckitForHumans.editor'",
           "group": "navigation"
         }
       ],
       "view/title": [
         {
-          "command": "markdownForHumans.outline.revealCurrent",
-          "when": "view == markdownForHumansOutline",
+          "command": "speckitForHumans.outline.revealCurrent",
+          "when": "view == speckitForHumansOutline",
           "group": "navigation@1"
         },
         {
-          "command": "markdownForHumans.outline.filter",
-          "when": "view == markdownForHumansOutline && !markdownForHumans.outlineFilterActive",
+          "command": "speckitForHumans.outline.filter",
+          "when": "view == speckitForHumansOutline && !speckitForHumans.outlineFilterActive",
           "group": "navigation@2"
         },
         {
-          "command": "markdownForHumans.outline.clearFilter",
-          "when": "view == markdownForHumansOutline && markdownForHumans.outlineFilterActive",
+          "command": "speckitForHumans.outline.clearFilter",
+          "when": "view == speckitForHumansOutline && speckitForHumans.outlineFilterActive",
           "group": "navigation@2"
         }
       ]
     },
     "configuration": {
-      "title": "Markdown for Humans",
+      "title": "Speckit for Humans",
       "properties": {
-        "markdownForHumans.imagePath": {
+        "speckitForHumans.imagePath": {
           "type": "string",
           "default": "images",
-          "description": "Folder path for saved images. Interpreted relative to markdownForHumans.imagePathBase."
+          "description": "Folder path for saved images. Interpreted relative to speckitForHumans.imagePathBase."
         },
-        "markdownForHumans.imagePathBase": {
+        "speckitForHumans.imagePathBase": {
           "type": "string",
           "enum": [
             "relativeToDocument",
@@ -191,22 +191,22 @@
           "default": "relativeToDocument",
           "description": "Controls whether Image Path is relative to the current markdown file folder or the workspace folder."
         },
-        "markdownForHumans.chromePath": {
+        "speckitForHumans.chromePath": {
           "type": "string",
           "default": "",
           "markdownDescription": "Path to Google Chrome or Chromium executable for PDF export. Leave empty to auto-detect.\n\n**Download Chrome:**\n- [Windows/Mac/Linux](https://www.google.com/chrome/)\n- [Chromium (open source)](https://www.chromium.org/getting-involved/download-chromium/)\n\n**Common paths:**\n- **Mac:** `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`\n- **Windows:** `C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe`\n- **Linux:** `/usr/bin/google-chrome` or `/usr/bin/chromium`"
         },
-        "markdownForHumans.imageResize.skipWarning": {
+        "speckitForHumans.imageResize.skipWarning": {
           "type": "boolean",
           "default": false,
           "description": "Skip the warning dialog when resizing images. When enabled, images will be resized immediately without confirmation."
         },
-        "markdownForHumans.copyAiContextRef.skipSaveWarning": {
+        "speckitForHumans.copyAiContextRef.skipSaveWarning": {
           "type": "boolean",
           "default": false,
           "description": "Skip the warning dialog when 'Copy AI Context Reference' needs to save the file first. When enabled, the document is saved silently before copying the reference."
         },
-        "markdownForHumans.blankLines.mode": {
+        "speckitForHumans.blankLines.mode": {
           "type": "string",
           "enum": [
             "preserve",
@@ -215,13 +215,13 @@
           "default": "strip",
           "description": "Controls whether extra blank lines are preserved or removed in the editor and saved file."
         },
-        "markdownForHumans.imagePreview.hover.enabled": {
+        "speckitForHumans.imagePreview.hover.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable the image hover overlay that shades images and displays metadata (resolution, file size, etc.) on hover.",
           "scope": "application"
         },
-        "markdownForHumans.paragraph.spacingBefore": {
+        "speckitForHumans.paragraph.spacingBefore": {
           "type": "number",
           "default": 0,
           "minimum": 0,
@@ -229,7 +229,7 @@
           "description": "Space before paragraphs in points (margin-top). Default: 0pt",
           "scope": "application"
         },
-        "markdownForHumans.paragraph.spacingAfter": {
+        "speckitForHumans.paragraph.spacingAfter": {
           "type": "number",
           "default": 0,
           "minimum": 0,
@@ -237,7 +237,7 @@
           "description": "Space after paragraphs in points (margin-bottom). Default: 0pt",
           "scope": "application"
         },
-        "markdownForHumans.zoom": {
+        "speckitForHumans.zoom": {
           "type": "number",
           "default": 100,
           "minimum": 50,
@@ -245,12 +245,12 @@
           "description": "Zoom level for the editor as a percentage. 100 = default size, 150 = 50% larger, etc.",
           "scope": "application"
         },
-        "markdownForHumans.enableMath": {
+        "speckitForHumans.enableMath": {
           "type": "boolean",
           "default": true,
           "description": "Render LaTeX math expressions using KaTeX. Use $...$ for inline math and $$...$$ for display math. Toggling this setting requires reopening the editor."
         },
-        "markdownForHumans.formattingShortcuts.enabled": {
+        "speckitForHumans.formattingShortcuts.enabled": {
           "type": "boolean",
           "default": true,
           "description": "When enabled, Cmd/Ctrl+B, +I, and +U toggle bold/italic/underline inside the editor. Disable this if you rely on VS Code keybindings that use the same chords (e.g. a sidebar toggle rebound to Cmd+B) and want them to keep working while a markdown file is open in this editor.",

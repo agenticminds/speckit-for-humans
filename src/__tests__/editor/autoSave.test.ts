@@ -31,7 +31,7 @@ type ProviderInternals = {
   autoSaveTimers: Map<string, unknown>;
 };
 
-describe('markdownForHumans.autoSave.enabled', () => {
+describe('speckitForHumans.autoSave.enabled', () => {
   let getConfigurationSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe('markdownForHumans.autoSave.enabled', () => {
   it('does not save automatically when the setting is off (default)', async () => {
     getConfigurationSpy = jest
       .spyOn(vscode.workspace, 'getConfiguration')
-      .mockReturnValue(mockConfig({ 'markdownForHumans.autoSave.enabled': false }));
+      .mockReturnValue(mockConfig({ 'speckitForHumans.autoSave.enabled': false }));
 
     const provider = new MarkdownEditorProvider({} as unknown as vscode.ExtensionContext);
     const document = createDocument('hello world');
@@ -72,7 +72,7 @@ describe('markdownForHumans.autoSave.enabled', () => {
   it('saves a short delay after typing stops once enabled', async () => {
     getConfigurationSpy = jest
       .spyOn(vscode.workspace, 'getConfiguration')
-      .mockReturnValue(mockConfig({ 'markdownForHumans.autoSave.enabled': true }));
+      .mockReturnValue(mockConfig({ 'speckitForHumans.autoSave.enabled': true }));
 
     const provider = new MarkdownEditorProvider({} as unknown as vscode.ExtensionContext);
     const document = createDocument('hello world');
@@ -99,7 +99,7 @@ describe('markdownForHumans.autoSave.enabled', () => {
   it('debounces repeated edits into a single save', async () => {
     getConfigurationSpy = jest
       .spyOn(vscode.workspace, 'getConfiguration')
-      .mockReturnValue(mockConfig({ 'markdownForHumans.autoSave.enabled': true }));
+      .mockReturnValue(mockConfig({ 'speckitForHumans.autoSave.enabled': true }));
 
     const provider = new MarkdownEditorProvider({} as unknown as vscode.ExtensionContext);
     const document = createDocument('hello world');
@@ -134,7 +134,7 @@ describe('markdownForHumans.autoSave.enabled', () => {
   it('does not save when the document is already clean', async () => {
     getConfigurationSpy = jest
       .spyOn(vscode.workspace, 'getConfiguration')
-      .mockReturnValue(mockConfig({ 'markdownForHumans.autoSave.enabled': true }));
+      .mockReturnValue(mockConfig({ 'speckitForHumans.autoSave.enabled': true }));
 
     const provider = new MarkdownEditorProvider({} as unknown as vscode.ExtensionContext);
     const document = createDocument('hi world');
@@ -158,7 +158,7 @@ describe('markdownForHumans.autoSave.enabled', () => {
   it('skips untitled documents even when enabled', async () => {
     getConfigurationSpy = jest
       .spyOn(vscode.workspace, 'getConfiguration')
-      .mockReturnValue(mockConfig({ 'markdownForHumans.autoSave.enabled': true }));
+      .mockReturnValue(mockConfig({ 'speckitForHumans.autoSave.enabled': true }));
 
     const provider = new MarkdownEditorProvider({} as unknown as vscode.ExtensionContext);
     const document = createDocument('hello world', 'untitled:Untitled-1');
@@ -183,7 +183,7 @@ describe('markdownForHumans.autoSave.enabled', () => {
   it('does not schedule a save for save-policy-enforce edits', async () => {
     getConfigurationSpy = jest
       .spyOn(vscode.workspace, 'getConfiguration')
-      .mockReturnValue(mockConfig({ 'markdownForHumans.autoSave.enabled': true }));
+      .mockReturnValue(mockConfig({ 'speckitForHumans.autoSave.enabled': true }));
 
     const provider = new MarkdownEditorProvider({} as unknown as vscode.ExtensionContext);
     const document = createDocument('hello world');

@@ -29,7 +29,7 @@ Users need a persistent Outline panel in the VS Code sidebar (Explorer) to navig
 
 ## 4. UX & Behavior
 
-- **Entry points:** Explorer sidebar view "Markdown for Humans: Outline" (auto-shown only when our editor is active). Toolbar TOC button keeps opening the modal overlay (unchanged). No palette command (palette hygiene).
+- **Entry points:** Explorer sidebar view "Speckit for Humans: Outline" (auto-shown only when our editor is active). Toolbar TOC button keeps opening the modal overlay (unchanged). No palette command (palette hygiene).
 - **Sidebar behavior:**
   - Hierarchical tree with H-level description
   - View-title actions: Reveal Current, Filter, Clear Filter
@@ -65,7 +65,7 @@ Users need a persistent Outline panel in the VS Code sidebar (Explorer) to navig
 
 - **Surfaces:** VS Code Explorer view with title actions; extension tree data provider; toolbar modal overlay retained; webview messaging for outline data, selection, and navigation.
 - **Key changes (done):**
-  - `package.json` – contributed Explorer view `markdownForHumansOutline` with title actions (reveal current, filter, clear filter). Removed custom Expand All / Collapse to H1/H2 due to VS Code API limitations.
+  - `package.json` – contributed Explorer view `speckitForHumansOutline` with title actions (reveal current, filter, clear filter). Removed custom Expand All / Collapse to H1/H2 due to VS Code API limitations.
   - `src/extension.ts` / `src/editor/MarkdownEditorProvider.ts` / `src/activeWebview.ts` – track active webview, create tree view with `showCollapseAll: true`, wire commands to provider, keep context key so view shows only when editor is active.
   - `src/features/outlineView.ts` – tree provider with:
     - Nesting, filtering, reveal current
@@ -139,4 +139,4 @@ Users need a persistent Outline panel in the VS Code sidebar (Explorer) to navig
 
 ### Note on command palette clutter
 
-- Intentional choice: do **not** add a command palette entry for the Outline view to avoid polluting the palette. Primary entry points are the Explorer view and the toolbar modal overlay. If future UX needs a palette shortcut, scope it to `activeCustomEditorId == markdownForHumans.editor` to keep the palette clean.
+- Intentional choice: do **not** add a command palette entry for the Outline view to avoid polluting the palette. Primary entry points are the Explorer view and the toolbar modal overlay. If future UX needs a palette shortcut, scope it to `activeCustomEditorId == speckitForHumans.editor` to keep the palette clean.

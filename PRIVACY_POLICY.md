@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Concret.io ("we," "our," or "us") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we handle information when you use the Markdown for Humans extension ("Extension") for Visual Studio Code.
+Agentic Minds ("we," "our," or "us") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we handle information when you use the Speckit for Humans extension ("Extension") for Visual Studio Code.
 
 **This Privacy Policy complies with the Information Technology Act, 2000 of India and applicable data protection laws.**
 
@@ -25,7 +25,7 @@ The Extension operates entirely locally on your device. All processing, includin
 ### Local Storage
 
 The Extension may store configuration preferences locally on your device through VS Code's standard settings mechanism. This includes:
-- Extension settings (e.g., `markdownForHumans.imagePath`, `markdownForHumans.chromePath`)
+- Extension settings (e.g., `speckitForHumans.imagePath`, `speckitForHumans.chromePath`)
 - VS Code theme preferences
 - User-configured paths (e.g., Chrome path for PDF export)
 
@@ -69,7 +69,7 @@ The Extension is not intended for users under the age of 18 (or the age of major
 
 Under applicable Indian laws, including the Information Technology Act, 2000, you have certain rights regarding your personal information. However, since we do not collect or store any personal information through the Extension, these rights are not applicable to Extension usage.
 
-If you have questions about your privacy rights or wish to exercise any rights, please contact us at privacy@concret.io.
+If you have questions about your privacy rights or wish to exercise any rights, please contact us at privacy@agenticminds.ai.
 
 ## Changes to This Privacy Policy
 
@@ -84,14 +84,14 @@ We may update this Privacy Policy from time to time to reflect changes in our pr
 
 If you have questions about this Privacy Policy, please contact us at:
 
-**Email:** privacy@concret.io  
-**Website:** https://concret.io
+**Email:** privacy@agenticminds.ai  
+**Website:** https://agenticminds.ai
 
 ## Open Source
 
-The Extension is open source software. You can review the source code at: https://github.com/concretios/markdown-for-humans
+The Extension is open source software. You can review the source code at: https://github.com/agenticminds/speckit-for-humans
 
 ---
 
-**Concret.io**  
-© 2025-2026 Concret.io. All rights reserved.
+**Agentic Minds**  
+© 2025-2026 Agentic Minds. All rights reserved.

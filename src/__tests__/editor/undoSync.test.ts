@@ -232,7 +232,7 @@ describe('MarkdownEditorProvider undo/redo safety', () => {
     const getConfigurationSpy = jest.spyOn(vscode.workspace, 'getConfiguration');
     getConfigurationSpy.mockReturnValue({
       get: (key: string, defaultValue?: unknown) => {
-        if (key === 'markdownForHumans.imagePreview.hover.enabled') {
+        if (key === 'speckitForHumans.imagePreview.hover.enabled') {
           return false;
         }
         return defaultValue;

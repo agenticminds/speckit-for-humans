@@ -4,11 +4,11 @@
 
 ## Agreement to Terms
 
-By installing, copying, or using the Markdown for Humans extension ("Extension") for Visual Studio Code, you agree to be bound by the terms of this End User License Agreement ("Agreement"). If you do not agree to these terms, do not install or use the Extension.
+By installing, copying, or using the Speckit for Humans extension ("Extension") for Visual Studio Code, you agree to be bound by the terms of this End User License Agreement ("Agreement"). If you do not agree to these terms, do not install or use the Extension.
 
 ## License Grant
 
-Concret.io ("Licensor") grants you a non-exclusive, non-transferable, revocable license to use the Extension in accordance with the MIT License (see LICENSE file) and the terms of this Agreement.
+Agentic Minds ("Licensor") grants you a non-exclusive, non-transferable, revocable license to use the Extension in accordance with the MIT License (see LICENSE file) and the terms of this Agreement.
 
 ## Permitted Uses
 
@@ -85,7 +85,7 @@ This license is effective until terminated. Your rights under this license will 
 
 ## Updates and Modifications
 
-Concret.io reserves the right to:
+Agentic Minds reserves the right to:
 - Modify, update, or discontinue the Extension at any time, with or without notice
 - Release updates that may add, modify, or remove features, which may affect existing functionality
 - Change the terms of this Agreement at any time (with notice via repository or Extension update)
@@ -111,19 +111,19 @@ If any provision of this Agreement is found to be unenforceable or invalid, that
 
 ## Entire Agreement
 
-This Agreement, together with the MIT License (LICENSE file), constitutes the entire agreement between you and Concret.io regarding the Extension and supersedes all prior agreements and understandings.
+This Agreement, together with the MIT License (LICENSE file), constitutes the entire agreement between you and Agentic Minds regarding the Extension and supersedes all prior agreements and understandings.
 
 ## Contact Information
 
 For questions about this EULA, please contact:
 
-**Concret.io**  
-**Email:** legal@concret.io  
-**Website:** https://concret.io
+**Agentic Minds**  
+**Email:** legal@agenticminds.ai  
+**Website:** https://agenticminds.ai
 
 ---
 
 **By using the Extension, you acknowledge that you have read this Agreement, understand it, and agree to be bound by its terms.**
 
-**Concret.io**  
-© 2025-2026 Concret.io. All rights reserved.
+**Agentic Minds**  
+© 2025-2026 Agentic Minds. All rights reserved.

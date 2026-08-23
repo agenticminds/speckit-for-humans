@@ -15,7 +15,7 @@
 
 **Current state:**
 - Extension only works with saved files in the repository
-- Users must save files before opening with "Markdown for Humans"
+- Users must save files before opening with "Speckit for Humans"
 - No support for quick workflows like creating blank editors, pasting markdown, and editing immediately
 
 **Pain points:**
@@ -34,7 +34,7 @@
 ## 3. Desired Outcome & Scope
 
 **Success criteria:**
-- User can create untitled markdown file (CMD+N) and open it with "Markdown for Humans"
+- User can create untitled markdown file (CMD+N) and open it with "Speckit for Humans"
 - User can paste markdown content into untitled file and see it rendered
 - Images work correctly when untitled file is in a workspace (resolve relative to workspace folder)
 - Images work when untitled file has no workspace (use absolute paths, show warning dialog)
@@ -58,7 +58,7 @@
 
 **Entry points:**
 - **CMD+N:** Create new untitled file, set language to markdown
-- **Command Palette:** "Open with Markdown for Humans" on untitled markdown file
+- **Command Palette:** "Open with Speckit for Humans" on untitled markdown file
 - **Right-click:** Context menu on untitled markdown file
 
 **User flows:**
@@ -67,7 +67,7 @@
 1. User presses CMD+N to create new file
 2. User sets language to markdown (or file is auto-detected as markdown)
 3. User pastes markdown content with images: `![alt](./images/photo.jpg)`
-4. User runs "Open with Markdown for Humans" from command palette
+4. User runs "Open with Speckit for Humans" from command palette
 5. Editor opens with content rendered, images resolve relative to workspace folder
 6. User can edit, save images, resize images - all works normally
 
@@ -75,7 +75,7 @@
 1. User opens VS Code without workspace folder
 2. User presses CMD+N, sets language to markdown
 3. User pastes markdown content
-4. User runs "Open with Markdown for Humans"
+4. User runs "Open with Speckit for Humans"
 5. Warning dialog appears: "You are working without a workspace. Images will be saved to: [home directory]"
 6. Editor opens, images with absolute paths work, relative paths resolve to home directory
 
@@ -110,7 +110,7 @@
 
 - **Key changes:**
   - `package.json` – Add `untitled` scheme to custom editor selector for `*.md` and `*.markdown`
-  - `src/extension.ts` – Remove save requirement for untitled files in `markdownForHumans.openFile` command
+  - `src/extension.ts` – Remove save requirement for untitled files in `speckitForHumans.openFile` command
   - `src/editor/MarkdownEditorProvider.ts` – Add `getDocumentDirectory()` and `getImageBasePath()` helper methods. Update `localResourceRoots` to include workspace folder or home directory. Add warning dialog for untitled files without workspace. Update all image handlers to use helper methods.
   - `src/features/documentExport.ts` – Add `getDocumentBasePath()` helper and update image resolution
 
@@ -146,31 +146,31 @@
 **Add untitled scheme to package.json:**
 1. Open `package.json`
 2. Verify `customEditors[0].selector` includes entries with `"scheme": "untitled"`
-3. Test: Create untitled file, right-click → "Open with Markdown for Humans" should appear
+3. Test: Create untitled file, right-click → "Open with Speckit for Humans" should appear
 
 **Update openFile command:**
 1. Create untitled markdown file (CMD+N, set language to markdown)
 2. Paste some markdown content
-3. Run "Open with Markdown for Humans" from command palette
+3. Run "Open with Speckit for Humans" from command palette
 4. Verify: Editor opens without requiring save first
 
 **Image resolution in workspace:**
 1. Create untitled file in workspace with markdown: `![test](./images/test.jpg)`
-2. Open with Markdown for Humans
+2. Open with Speckit for Humans
 3. Verify: Image resolves correctly relative to workspace folder
 4. Check browser console: Image URI should point to workspace folder, not home directory
 
 **Image resolution without workspace:**
 1. Open VS Code without workspace folder
 2. Create untitled markdown file with image: `![test](./images/test.jpg)`
-3. Open with Markdown for Humans
+3. Open with Speckit for Humans
 4. Verify: Warning dialog appears showing home directory path
 5. Verify: Image resolves relative to home directory (or shows error if image doesn't exist there)
 
 **Warning dialog:**
 1. Open VS Code without workspace
 2. Create untitled markdown file
-3. Open with Markdown for Humans
+3. Open with Speckit for Humans
 4. Verify: Information message appears: "You are working without a workspace. Images will be saved to: [path]"
 5. Verify: Dialog is non-blocking (doesn't prevent editor from opening)
 

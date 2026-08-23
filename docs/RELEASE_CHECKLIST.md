@@ -1,6 +1,6 @@
 # Release Checklist
 
-Quick checklist for publishing Markdown for Humans to VS Code Marketplace.
+Quick checklist for publishing Speckit for Humans to VS Code Marketplace.
 
 ---
 
@@ -19,7 +19,7 @@ bun run lint:fix && bun run test && bun run build:release
 
 # 3. Test locally
 bun run package:release
-code --install-extension markdown-for-humans-*.vsix
+code --install-extension speckit-for-humans-*.vsix
 # Test features manually
 
 # 4. Commit changes (version will auto-bump on publish)
@@ -40,7 +40,7 @@ git tag v$(node -p "require('./package.json').version")
 git push origin --tags
 
 # 8. Create GitHub release
-# Go to: https://github.com/concretios/markdown-for-humans/releases/new
+# Go to: https://github.com/agenticminds/speckit-for-humans/releases/new
 # Select the tag, copy/polish content from CHANGELOG.md, publish
 # Tip: Make it user-friendly with emojis and "What's New" sections
 ```
@@ -72,7 +72,7 @@ git push origin --tags
 ### Package & Test
 - [ ] Create package: `bun run package:release`
 - [ ] Verify `.vsix` file created and size < 10MB
-- [ ] Test local installation: `code --install-extension markdown-for-humans-<version>.vsix`
+- [ ] Test local installation: `code --install-extension speckit-for-humans-<version>.vsix`
 - [ ] Test core features in Extension Development Host:
   - [ ] WYSIWYG editing
   - [ ] Tables (create, resize, context menu)
@@ -134,7 +134,7 @@ git push origin --tags
 
 **Every Release:**
 - [ ] Publish: `ovsx publish -p <your-token>`
-- [ ] Verify at https://open-vsx.org/extension/concretio/markdown-for-humans
+- [ ] Verify at https://open-vsx.org/extension/concretio/speckit-for-humans
 
 ### Git Tag & GitHub Release (Post-Publish)
 
@@ -144,7 +144,7 @@ git push origin --tags
 - [ ] Push tag: `git push origin v<version>`
 
 **Create GitHub Release:**
-- [ ] Create release: https://github.com/concretios/markdown-for-humans/releases/new
+- [ ] Create release: https://github.com/agenticminds/speckit-for-humans/releases/new
 - [ ] Select tag: `v<version>` (just created)
 - [ ] Title: "v<version> - <description>"
 - [ ] Description: Copy from CHANGELOG.md
@@ -155,14 +155,14 @@ git push origin --tags
 ## Post-Release
 
 ### Verify VS Code Marketplace
-- [ ] Extension appears: https://marketplace.visualstudio.com/items?itemName=concretio.markdown-for-humans
+- [ ] Extension appears: https://marketplace.visualstudio.com/items?itemName=concretio.speckit-for-humans
 - [ ] All metadata correct
 - [ ] Screenshots display correctly
 - [ ] Links work
 - [ ] Test installation from VS Code
 
 ### Verify Open VSX Registry
-- [ ] Extension appears: https://open-vsx.org/extension/concretio/markdown-for-humans
+- [ ] Extension appears: https://open-vsx.org/extension/concretio/speckit-for-humans
 - [ ] All metadata correct
 - [ ] Test installation from at least one Open VSX-compatible IDE:
   - [ ] Cursor IDE

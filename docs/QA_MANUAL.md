@@ -1,4 +1,4 @@
-# Manual QA + Usage Guide — Markdown for Humans (VS Code)
+# Manual QA + Usage Guide — Speckit for Humans (VS Code)
 
 This document is for **manual QA engineers** and also doubles as a **user-facing usage guide** for the extension.
 
@@ -28,13 +28,13 @@ Why this matters for QA:
 
 ### Install
 Pick one:
-- Marketplace: install “Markdown for Humans”.
+- Marketplace: install “Speckit for Humans”.
 - VSIX: in VS Code, run `Extensions: Install from VSIX...` and choose the `.vsix`.
 
 ### Open a file in the editor
 Pick one:
-- Right click a `.md` file → **Open with Markdown for Humans**
-- Command Palette → **Open with Markdown for Humans**
+- Right click a `.md` file → **Open with Speckit for Humans**
+- Command Palette → **Open with Speckit for Humans**
 - If you want it to be default: click the file tab’s “Open With…” UI and choose this editor.
 
 ---
@@ -46,7 +46,7 @@ Pick one:
 - A clean reading layout: serif body typography, generous spacing, theme-aware colors.
 
 ### VS Code integration surfaces
-- **Explorer View:** “Markdown for Humans: Outline” (heading tree)
+- **Explorer View:** “Speckit for Humans: Outline” (heading tree)
 - **Status bar:** word count (click shows detailed stats)
 - **Command Palette:** outline commands (reveal/filter/clear)
 
@@ -54,7 +54,7 @@ Pick one:
 
 ## 4) Quick smoke test (15–20 minutes)
 
-1. Open `docs/DEVELOPMENT.md` (long doc) in Markdown for Humans and scroll for ~2 minutes.
+1. Open `docs/DEVELOPMENT.md` (long doc) in Speckit for Humans and scroll for ~2 minutes.
 2. Type a sentence, apply **Bold** and **Italic**, then `Cmd/Ctrl+S` to save.
 3. Insert a heading (H2), confirm the **Outline view** updates and clicking it navigates.
 4. `Cmd/Ctrl+F` search for a word, jump next/previous, press `Esc` to close search.
@@ -171,7 +171,7 @@ Pick one:
 ### 5.8 Document outline (Explorer view + overlay)
 
 **Surfaces**
-- Explorer view: “Markdown for Humans: Outline”
+- Explorer view: “Speckit for Humans: Outline”
 - Toolbar button: “Outline” (overlay)
 
 **What to do**
@@ -315,7 +315,7 @@ This is **intentional, non-configurable behavior** — the editor's paste handli
 
 **PDF requirements**
 - Chrome/Chromium is required; the extension will:
-  - use `markdownForHumans.chromePath` if set, otherwise
+  - use `speckitForHumans.chromePath` if set, otherwise
   - auto-detect common Chrome/Chromium locations, otherwise
   - prompt you to browse/enter a path or download Chrome.
 
@@ -334,13 +334,13 @@ This is **intentional, non-configurable behavior** — the editor's paste handli
 
 Open settings via:
 - Toolbar → “Export settings” (gear) or
-- VS Code Settings search for “Markdown for Humans”
+- VS Code Settings search for “Speckit for Humans”
 
 **Settings to verify**
-- `markdownForHumans.imagePath` (default `images`)
-- `markdownForHumans.imagePathBase` (`relativeToDocument` or `workspaceFolder`)
-- `markdownForHumans.chromePath` (PDF export)
-- `markdownForHumans.imageResize.skipWarning`
+- `speckitForHumans.imagePath` (default `images`)
+- `speckitForHumans.imagePathBase` (`relativeToDocument` or `workspaceFolder`)
+- `speckitForHumans.chromePath` (PDF export)
+- `speckitForHumans.imageResize.skipWarning`
 
 ---
 

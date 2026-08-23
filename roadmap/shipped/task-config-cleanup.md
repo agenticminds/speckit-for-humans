@@ -53,24 +53,24 @@
 
 ### Removed Configurations
 
-1. **`markdownForHumans.enableMath`**
+1. **`speckitForHumans.enableMath`**
    - **Reason:** Not implemented - KaTeX support is planned but not shipped
    - **Status:** Can be re-added when implementing KaTeX math support
 
-2. **`markdownForHumans.enableDiagrams`**
+2. **`speckitForHumans.enableDiagrams`**
    - **Reason:** Always enabled - Mermaid is always loaded, no conditional logic exists
    - **Status:** Removed - no toggle functionality needed
 
-3. **`markdownForHumans.autoSave`**
+3. **`speckitForHumans.autoSave`**
    - **Reason:** Redundant - VS Code handles auto-save natively via `files.autoSave`
    - **Status:** Removed - redundant setting
 
 ### Kept Configurations (All Actively Used)
 
-1. **`markdownForHumans.imagePath`** - Used in image drag/drop and storage
-2. **`markdownForHumans.imagePathBase`** - Controls whether image path is relative to document or workspace folder
-3. **`markdownForHumans.chromePath`** - Used in PDF export functionality
-4. **`markdownForHumans.imageResize.skipWarning`** - Used in image resize modal
+1. **`speckitForHumans.imagePath`** - Used in image drag/drop and storage
+2. **`speckitForHumans.imagePathBase`** - Controls whether image path is relative to document or workspace folder
+3. **`speckitForHumans.chromePath`** - Used in PDF export functionality
+4. **`speckitForHumans.imageResize.skipWarning`** - Used in image resize modal
 
 ### Files Modified
 

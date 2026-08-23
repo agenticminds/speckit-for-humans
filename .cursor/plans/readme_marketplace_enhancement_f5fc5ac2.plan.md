@@ -73,7 +73,7 @@ The current README is text-heavy and lacks visual demonstrations. It doesn't qui
 
 5. **Before vs After** (comparison table)
 
-- Side-by-side comparison of traditional markdown vs Markdown for Humans
+- Side-by-side comparison of traditional markdown vs Speckit for Humans
 
 6. **Key Features** (reorganized, text-based)
 
@@ -133,7 +133,7 @@ The current README is text-heavy and lacks visual demonstrations. It doesn't qui
 
 5. **`outline-view.gif`** (5-7 seconds) - **FIFTH GIF**
 
-- Show sidebar with "Markdown for Humans: Outline" panel
+- Show sidebar with "Speckit for Humans: Outline" panel
 - Show document headings tree structure
 - Click heading in outline → jump to that section in editor
 - Show outline updating as headings are added/modified
@@ -243,7 +243,7 @@ The current README is text-heavy and lacks visual demonstrations. It doesn't qui
 **Before/After Table:**
 
 - New comparison table showing benefits
-- Columns: "Before (Traditional Markdown)" vs "After (Markdown for Humans)"
+- Columns: "Before (Traditional Markdown)" vs "After (Speckit for Humans)"
 - Rows: Preview, Tables, Images, Commands, etc.
 
 **Feature Descriptions:**

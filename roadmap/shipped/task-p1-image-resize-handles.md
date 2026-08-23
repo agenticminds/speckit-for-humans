@@ -74,7 +74,7 @@
   - Copy option allows choosing target folder
 - **Warning dialog:**
   - Shows on resize confirmation (after user clicks "Confirm" in modal)
-  - Message: "Markdown for Humans will reduce resolution of image to fit the size. Continue?"
+  - Message: "Speckit for Humans will reduce resolution of image to fit the size. Continue?"
   - Options: "Resize", "Cancel", checkbox "Never ask again"
   - Setting saved to VS Code config (package.json)
   - Setting synchronized in real-time between extension and webview
@@ -154,7 +154,7 @@
 ### Flow 6: Never ask again
 1. User resizes image → Warning dialog appears
 2. User checks "Never ask again" → Clicks "Resize"
-3. Setting saved: `markdownForHumans.imageResize.skipWarning = true`
+3. Setting saved: `speckitForHumans.imageResize.skipWarning = true`
 4. Setting synchronized immediately (no restart needed)
 5. Future resizes skip warning dialog
 6. User can restore in VS Code settings
@@ -230,7 +230,7 @@
   - `src/webview/editor.ts` – Message handlers for external image download, workspace check, copy to repo
 - `src/webview/BubbleMenuView.ts` – Add toolbar button for image insertion
 - `src/editor/MarkdownEditorProvider.ts` – Add `handleResizeImage()`, `handleUndoResize()`, `handleRedoResize()`, `handleDownloadExternalImage()`, `handleCheckImageInWorkspace()`, `handleCopyLocalImageToWorkspace()` message handlers
-- `package.json` – Add `markdownForHumans.imageResize.skipWarning` setting
+- `package.json` – Add `speckitForHumans.imageResize.skipWarning` setting
 
 - **Architecture notes:**
   - Resize icon added in `CustomImage.addNodeView()` as button element (codicon-edit-sparkle)
@@ -269,7 +269,7 @@
 | `completed` | Create localImageOutsideRepoDialog.ts | Dialog for local images outside workspace with copy/edit options ✅ |
 | `completed` | Modify CustomImage extension | Add resize icon on hover (top-right), icon click opens modal, removed image click handler ✅ |
 | `completed` | Add CSS styles | Image wrapper, resize icon, modal dialog styles ✅ |
-| `completed` | Add settings to package.json | `markdownForHumans.imageResize.skipWarning` setting ✅ |
+| `completed` | Add settings to package.json | `speckitForHumans.imageResize.skipWarning` setting ✅ |
 | `completed` | Add handleResizeImage() in MarkdownEditorProvider | Backup original (timestamped), save resized image ✅ |
 | `completed` | Add handleUndoResize() and handleRedoResize() | Restore from backup, reapply resize ✅ |
 | `completed` | Wire up settings reading/updating | Read setting before showing warning, update on "never ask again", real-time sync ✅ |
@@ -345,7 +345,7 @@
 
 **Add settings:**
 1. Open VS Code settings
-2. Verify: `markdownForHumans.imageResize.skipWarning` appears
+2. Verify: `speckitForHumans.imageResize.skipWarning` appears
 3. Set to `true`
 4. Resize image
 5. Verify: Warning dialog skipped

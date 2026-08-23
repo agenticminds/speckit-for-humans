@@ -11,7 +11,7 @@ Per constitution principle 6, **build success and passing unit tests are not evi
 ## Prerequisites
 
 ```bash
-cd /Users/marty/am/markdown-for-humans
+cd /Users/marty/am/speckit-for-humans
 bun install
 ```
 
@@ -119,7 +119,7 @@ bun run watch:debug
 In the dev host:
 
 1. Open a fixture feature folder.
-2. Right-click `plan.md` → **Open with Markdown for Humans**.
+2. Right-click `plan.md` → **Open with Speckit for Humans**.
 
 **Expected**:
 

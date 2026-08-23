@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2026 Concret.io
+ * Copyright (c) 2025-2026 Agentic Minds
  *
  * Licensed under the MIT License. See LICENSE file in the project root for details.
  */
@@ -10,7 +10,7 @@ import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { scrollToPos } from '../utils/scrollToPos';
 
 /**
- * Search Overlay - In-document search for Markdown for Humans
+ * Search Overlay - In-document search for Speckit for Humans
  *
  * Provides a search experience with:
  * - Real-time match highlighting

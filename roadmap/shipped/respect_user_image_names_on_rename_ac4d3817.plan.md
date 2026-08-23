@@ -99,7 +99,7 @@ const newFilename = `${newName}.${oldExt.replace('.', '')}`;
 ```typescript
 // Update filename with new dimensions and source prefix (respect includeDimensions config)
 const config = vscode.workspace.getConfiguration();
-const includeDimensions = config.get<boolean>('markdownForHumans.imageFilename.includeDimensions', true);
+const includeDimensions = config.get<boolean>('speckitForHumans.imageFilename.includeDimensions', true);
 
 let newFilename: string;
 if (includeDimensions) {
@@ -202,7 +202,7 @@ export function buildImageFilenameForUserRename(
 ## File Changes
 
 1. **`package.json`** (optional - update description)
-   - Update `markdownForHumans.imageFilename.includeDimensions` description to clarify it controls both dimensions AND source prefix for resize operations
+   - Update `speckitForHumans.imageFilename.includeDimensions` description to clarify it controls both dimensions AND source prefix for resize operations
    - Current: "Include image dimensions in filenames..."
    - Suggested: "Include image context in filenames (dimensions and source prefix) for resize operations. When disabled, both dimensions and source prefix are removed from filenames on resize. Note: Manual renames always respect user's exact name regardless of this setting."
 

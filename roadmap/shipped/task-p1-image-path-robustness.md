@@ -14,14 +14,14 @@
 ## 2. Context & Problem
 
 **Current state:**
-- Markdown for Humans renders images in the webview by resolving `src` attributes through the extension (`handleResolveImageUri`)
+- Speckit for Humans renders images in the webview by resolving `src` attributes through the extension (`handleResolveImageUri`)
 - Workspace images inserted via drag & drop / paste are saved with filesystem-friendly relative paths (e.g. `./images/foo bar.png`) and generally work
 - Many existing markdown documents (imported from web, docs tools, or static sites) use URL-encoded image paths like `Hero%20Image.png` or `images/My%20Diagram%201.png`
 - The resolver currently treats `relativePath` as a raw filesystem path and never URL-decodes it before resolving
 
 **Pain points:**
 - **Broken images in real-world docs:** Markdown that works on GitHub / websites fails to render images in the WYSIWYG view when filenames contain spaces and `%20` encoding
-- **Surprising behavior:** Users see the same repository render fine on GitHub but show broken images in Markdown for Humans
+- **Surprising behavior:** Users see the same repository render fine on GitHub but show broken images in Speckit for Humans
 - **Workspace friction:** Mixed content (images created via the extension + legacy `%20` paths) behaves inconsistently in the same file
 - **Debugging overhead:** Users have to inspect the filesystem and manually rewrite image URLs just to get previews working
 - **Product trust:** “Images just work” is an expectation for a modern markdown editor; broken screenshots hurt perceived quality
@@ -29,7 +29,7 @@
 **Why it matters:**
 - **Reading experience:** Images are core to technical docs and blog posts; missing screenshots break narrative flow
 - **Adoption friction:** Users often bring existing markdown into VS Code; incompatibility with common URL-encoding patterns is a silent adoption killer
-- **Alignment with VS Code:** VS Code’s own markdown preview is tolerant of typical relative paths; Markdown for Humans should match or exceed that robustness
+- **Alignment with VS Code:** VS Code’s own markdown preview is tolerant of typical relative paths; Speckit for Humans should match or exceed that robustness
 - **Foundation for future features:** Robust path handling is a prerequisite for advanced features like image refactors, workspace moves, and export flows
 
 ---
@@ -70,7 +70,7 @@
 ## 4. UX & Behavior
 
 **Entry points:**
-- Opening any `.md` file in Markdown for Humans that already contains image references
+- Opening any `.md` file in Speckit for Humans that already contains image references
 - Typing or pasting markdown image syntax in source view (future) that includes URL-encoded paths
 - Images inserted via existing drag & drop / paste flows (should continue to "just work" and be resilient if users later hand-edit the paths)
 
@@ -80,7 +80,7 @@
 1. User opens a markdown file that contains images like:
    - `![Hero](marketplace-assets/screenshots/Hero%20Image.png)`
    - `![Diagram](../assets/Diagrams/My%20Diagram%201.png)`
-2. Markdown for Humans loads the WYSIWYG editor.
+2. Speckit for Humans loads the WYSIWYG editor.
 3. All images that exist in the workspace at the corresponding decoded paths render correctly (no broken-image icons).
 4. User can scroll and read the document with screenshots inline, matching GitHub/web behavior.
 
@@ -155,12 +155,12 @@
 
 **`handleResolveImageUri` integration:**
 1. Open a markdown file with workspace images using `%20` in paths.
-2. Start Markdown for Humans WYSIWYG editor.
+2. Start Speckit for Humans WYSIWYG editor.
 3. Confirm that images resolve and display when the corresponding decoded files exist in the workspace.
 
 **Remote/data URLs:**
 1. Create a markdown file with `https://` image URLs and `data:` URIs.
-2. Open in Markdown for Humans and verify that these images still load.
+2. Open in Speckit for Humans and verify that these images still load.
 
 **Unit tests:**
 1. Run `npm test`.

@@ -36,7 +36,7 @@
   - Advanced engine unlocks at least:
     - Custom headers and footers with page numbers.
     - More flexible margins and page sizes per export.
-  - The `markdownForHumans.chromePath` integration from `task-user-chrome-path` is reused for Puppeteer `executablePath`.
+  - The `speckitForHumans.chromePath` integration from `task-user-chrome-path` is reused for Puppeteer `executablePath`.
   - The feature is clearly documented as **optional** and does not regress basic export.
 
 - **In scope:**
@@ -59,7 +59,7 @@
   - Additional behavior controlled via VS Code settings.
 
 - **Engine selection behavior:**
-  - New setting: `markdownForHumans.pdf.engine`
+  - New setting: `speckitForHumans.pdf.engine`
     - Values: `"chromeCli"` (default), `"puppeteer"`.
   - When `"chromeCli"` is selected:
     - Behavior is exactly the same as defined in `task-user-chrome-path.md` and `task-document-export.md`.
@@ -88,7 +88,7 @@
 
 - **Key changes:**
   - `package.json`
-    - Add `markdownForHumans.pdf.engine` setting (enum-like string):
+    - Add `speckitForHumans.pdf.engine` setting (enum-like string):
       - Default: `"chromeCli"`.
       - Alternate: `"puppeteer"`.
     - Add markdown description explaining trade-offs and that this is an **advanced**, optional feature.
@@ -117,7 +117,7 @@
 
 | Status | Priority | Task | Notes |
 |--------|----------|------|-------|
-| `planned` | P0 | Add `markdownForHumans.pdf.engine` setting | Default to `"chromeCli"`, document options and trade-offs. |
+| `planned` | P0 | Add `speckitForHumans.pdf.engine` setting | Default to `"chromeCli"`, document options and trade-offs. |
 | `planned` | P1 | Refactor `exportToPDF()` to support engine dispatch | Keep Chrome-CLI as the default path; introduce `exportToPDFWithChromeCli` helper. |
 | `planned` | P1 | Implement `exportToPDFWithPuppeteer()` | Lazy-load `puppeteer-core`, reuse `buildExportHTML()`, wire to `page.pdf()`. |
 | `planned` | P1 | Add header/footer support via Puppeteer | Minimal templates for page numbers and document title, configurable via simple settings. |
@@ -130,7 +130,7 @@
 ## 7. How to Verify
 
 1. **Engine selection:**
-   - Set `markdownForHumans.pdf.engine` to `"chromeCli"`.
+   - Set `speckitForHumans.pdf.engine` to `"chromeCli"`.
    - Trigger PDF export and confirm behavior matches current implementation.
    - Set it to `"puppeteer"` and confirm advanced path is taken (e.g., via logs or header/footer output).
 

@@ -146,7 +146,7 @@ See detailed CSS in plan file for small/medium/large image typography rules.
 
 ### Overview
 
-Add configuration option `markdownForHumans.imageFilename.includeDimensions` (default: `true`) to control whether image filenames include dimension suffixes like `_1000x563px`. When disabled, images are named without dimensions.
+Add configuration option `speckitForHumans.imageFilename.includeDimensions` (default: `true`) to control whether image filenames include dimension suffixes like `_1000x563px`. When disabled, images are named without dimensions.
 
 ### Implementation
 
@@ -155,7 +155,7 @@ Add configuration option `markdownForHumans.imageFilename.includeDimensions` (de
 **File:** `package.json`
 
 ```json
-"markdownForHumans.imageFilename.includeDimensions": {
+"speckitForHumans.imageFilename.includeDimensions": {
   "type": "boolean",
   "default": true,
   "description": "Include image dimensions in filenames (e.g., image_1000x563px.png). When disabled, images are named without dimensions (e.g., image.png)."
@@ -175,7 +175,7 @@ Add configuration option `markdownForHumans.imageFilename.includeDimensions` (de
 
 ```typescript
 // In updateWebview()
-const includeDimensions = config.get<boolean>('markdownForHumans.imageFilename.includeDimensions', true);
+const includeDimensions = config.get<boolean>('speckitForHumans.imageFilename.includeDimensions', true);
 webview.postMessage({
   type: 'update',
   content: transformedContent,
@@ -184,7 +184,7 @@ webview.postMessage({
 });
 
 // In handleResizeImage() around line 600
-const includeDimensions = config.get<boolean>('markdownForHumans.imageFilename.includeDimensions', true);
+const includeDimensions = config.get<boolean>('speckitForHumans.imageFilename.includeDimensions', true);
 let newFilename: string;
 if (includeDimensions) {
   newFilename = updateFilenameDimensions(path.basename(absolutePath), newWidth, newHeight);

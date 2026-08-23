@@ -36,7 +36,7 @@
 
 - [ ] **Scroll sync** - When scrolling in WYSIWYG, scroll source view to same line (and vice versa)
 - [ ] **Cursor sync** - When clicking in WYSIWYG, move source cursor to corresponding line
-- [ ] **Command palette entry** - `Markdown for Humans: Open Source View` for discoverability
+- [ ] **Command palette entry** - `Speckit for Humans: Open Source View` for discoverability
 - [ ] **Status bar indicator** - Show "Split View Active" when source is open
 - [ ] Toolbar `</>` button continues to work (already implemented)
 - [ ] Source view uses VS Code's native markdown editor (already implemented)
@@ -63,7 +63,7 @@
   - Location: [BubbleMenuView.ts:243-249](src/webview/BubbleMenuView.ts#L243-L249)
 
 **To add:**
-- 🔲 **Command Palette** - `Markdown for Humans: Open Source View`
+- 🔲 **Command Palette** - `Speckit for Humans: Open Source View`
   - Same behavior as toolbar button (open split view)
   - Purpose: Discoverability, keyboard-first users, searchable
   - Why: VS Code users expect features in command palette (searchable, namespaced)
@@ -197,7 +197,7 @@ case 'cursorUpdate':
 
 ```typescript
 // In extension.ts
-vscode.commands.registerCommand('markdown-for-humans.openSourceView', () => {
+vscode.commands.registerCommand('speckit-for-humans.openSourceView', () => {
   // Get active WYSIWYG editor
   // Send 'openSourceView' message to webview
   // Same behavior as toolbar button
@@ -206,9 +206,9 @@ vscode.commands.registerCommand('markdown-for-humans.openSourceView', () => {
 // In package.json
 "commands": [
   {
-    "command": "markdown-for-humans.openSourceView",
+    "command": "speckit-for-humans.openSourceView",
     "title": "Open Source View",
-    "category": "Markdown for Humans"
+    "category": "Speckit for Humans"
   }
 ]
 ```
@@ -221,7 +221,7 @@ const statusBarItem = vscode.window.createStatusBarItem(
   vscode.StatusBarAlignment.Right, 100
 );
 statusBarItem.text = "$(split-horizontal) Split View Active";
-statusBarItem.command = "markdown-for-humans.closeSourceView";
+statusBarItem.command = "speckit-for-humans.closeSourceView";
 statusBarItem.tooltip = "Click to close source view";
 
 // Show when source opens, hide when closed
@@ -275,7 +275,7 @@ statusBarItem.tooltip = "Click to close source view";
 
 ## 7. Decisions Made
 
-### Q: Should we add a config option `markdown-for-humans.defaultMode`?
+### Q: Should we add a config option `speckit-for-humans.defaultMode`?
 **A:** Not needed. The config would let users choose whether files open in WYSIWYG or source mode by default. Since split view is on-demand (not a persistent mode), this isn't applicable. WYSIWYG is always the default; users open source view when needed.
 
 ### Q: Should we support split view in MVP?

@@ -8,7 +8,7 @@ todos: []
 
 ## Overview
 
-Add a configuration option `markdownForHumans.imageFilename.includeDimensions` (default: `true`) that controls whether image filenames include dimension suffixes like `_1000x563px`. When disabled, images will be named without dimensions (e.g., `image.png` instead of `image_1000x563px.png`).
+Add a configuration option `speckitForHumans.imageFilename.includeDimensions` (default: `true`) that controls whether image filenames include dimension suffixes like `_1000x563px`. When disabled, images will be named without dimensions (e.g., `image.png` instead of `image_1000x563px.png`).
 
 ## Current Behavior
 
@@ -26,7 +26,7 @@ Currently, dimensions are always added to filenames:
 Add new config option in `contributes.configuration.properties`:
 
 ```json
-"markdownForHumans.imageFilename.includeDimensions": {
+"speckitForHumans.imageFilename.includeDimensions": {
   "type": "boolean",
   "default": true,
   "description": "Include image dimensions in filenames (e.g., image_1000x563px.png). When disabled, images are named without dimensions (e.g., image.png)."
@@ -109,7 +109,7 @@ In `handleResizeImage()` method (around line 600):
 ```typescript
 // In handleResizeImage()
 const config = vscode.workspace.getConfiguration();
-const includeDimensions = config.get<boolean>('markdownForHumans.imageFilename.includeDimensions', true);
+const includeDimensions = config.get<boolean>('speckitForHumans.imageFilename.includeDimensions', true);
 
 let newFilename: string;
 if (includeDimensions) {

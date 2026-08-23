@@ -392,11 +392,11 @@ If missing: open Step 2 dialog →
 
 1. **Restored missing configuration settings ([package.json:114-138](package.json:114-138)):**
    ```json
-   "markdownForHumans.enableMath": { "type": "boolean", "default": true, ... }
-   "markdownForHumans.enableDiagrams": { "type": "boolean", "default": true, ... }
-   "markdownForHumans.autoSave": { "type": "boolean", "default": true, ... }
-   "markdownForHumans.imagePath": { "type": "string", "default": "images", ... }
-   "markdownForHumans.chromePath": { ... } // Already present
+   "speckitForHumans.enableMath": { "type": "boolean", "default": true, ... }
+   "speckitForHumans.enableDiagrams": { "type": "boolean", "default": true, ... }
+   "speckitForHumans.autoSave": { "type": "boolean", "default": true, ... }
+   "speckitForHumans.imagePath": { "type": "string", "default": "images", ... }
+   "speckitForHumans.chromePath": { ... } // Already present
    ```
 
    **Note:** `exportTheme` setting was intentionally NOT restored - export theme is always 'light' (hardcoded in [documentExport.ts:44](src/features/documentExport.ts:44))
@@ -448,8 +448,8 @@ These items stay on the existing Chrome-CLI path (no new runtime deps) and build
 |----------|------|-------|
 | P0 | **Make image embedding fully robust** | Re-introduce `convertImagesToDataUrls(html, document)` before `exportToPDF()`. Use the image regex + MIME helpers validated in `imageConversion.test.ts`. Ensure local relative images and remote `https` images are converted to data URLs, while skipping images already in `data:` form (e.g. Mermaid PNGs). |
 | P0 | **Clarify behavior for offline/remote images** | Decide and document expected behavior when remote images cannot be fetched (e.g., offline, 404). Likely: log a warning, keep the export going, and optionally show a non-blocking error toast summarizing skipped images. |
-| P1 | **Expose basic PDF layout options via settings** | Add a small `markdownForHumans.pdf` config group (e.g. `pageSize: "A4" | "Letter"`, `orientation: "portrait" | "landscape"`, `margins: "normal" | "narrow" | "wide"`). Implement via CSS `@page` rules in `getExportStyles()` so we do not depend on Puppeteer APIs. |
-| P1 | **Introduce an `exportTheme` setting (light vs editor)** | Add `markdownForHumans.exportTheme` with values like `"light"` (default) and `"editor"`. Thread this through `exportDocument()` into `getExportStyles(theme)` so PDF styling can match the current editor theme when desired, while keeping light as the safe default. |
+| P1 | **Expose basic PDF layout options via settings** | Add a small `speckitForHumans.pdf` config group (e.g. `pageSize: "A4" | "Letter"`, `orientation: "portrait" | "landscape"`, `margins: "normal" | "narrow" | "wide"`). Implement via CSS `@page` rules in `getExportStyles()` so we do not depend on Puppeteer APIs. |
+| P1 | **Introduce an `exportTheme` setting (light vs editor)** | Add `speckitForHumans.exportTheme` with values like `"light"` (default) and `"editor"`. Thread this through `exportDocument()` into `getExportStyles(theme)` so PDF styling can match the current editor theme when desired, while keeping light as the safe default. |
 | P1 | **Document PDF behavior and troubleshooting** | Update `task-document-export.md` and user docs to describe: required Chrome version, where Chrome path is read from, how images are resolved (local vs remote vs data URLs), and common failure modes (invalid path, missing Chrome, blocked remote URLs). |
 
 Implementation notes:
@@ -467,7 +467,7 @@ user-provided Chrome/Edge executable and respects the `chromePath` work done in 
 
 **High-level idea (future task, not implemented yet):**
 
-- Add a config switch, e.g. `markdownForHumans.pdf.engine: "chromeCli" | "puppeteer"`.
+- Add a config switch, e.g. `speckitForHumans.pdf.engine: "chromeCli" | "puppeteer"`.
 - When set to `"puppeteer"`:
   - Use `puppeteer-core` with `executablePath` pointing to the validated `chromePath`.
   - Reuse the same HTML+CSS from `buildExportHTML()` to keep rendering identical.

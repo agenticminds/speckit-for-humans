@@ -172,7 +172,7 @@ ls -lh dist/
 1. Always test the actual .vsix file before publishing:
    ```bash
    bun run package
-   code --install-extension markdown-for-humans-0.1.0.vsix
+   code --install-extension speckit-for-humans-0.1.0.vsix
    ```
 
 2. Check browser console in webview (Help > Toggle Developer Tools)
@@ -186,7 +186,7 @@ ls -lh dist/
 ```bash
 # Download your published .vsix
 # Extract and check bundle
-unzip markdown-for-humans-0.1.0.vsix
+unzip speckit-for-humans-0.1.0.vsix
 grep "myBrokenFeature" extension/dist/webview.js
 ```
 
@@ -203,7 +203,7 @@ npm version patch
 
 # Package and test locally
 bun run package
-code --install-extension markdown-for-humans-0.1.1.vsix
+code --install-extension speckit-for-humans-0.1.1.vsix
 
 # Test thoroughly, then publish
 vsce publish patch  # Auto-bumps version and publishes
@@ -288,7 +288,7 @@ If you're still stuck:
 ## Reference: File Structure
 
 ```
-markdown-for-humans/
+speckit-for-humans/
 ├── src/
 │   ├── extension.ts          # Extension entry point
 │   ├── editor/               # Extension backend code

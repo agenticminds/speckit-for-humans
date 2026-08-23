@@ -102,7 +102,7 @@
 | Status | Task | Notes |
 |--------|------|-------|
 | `done` | **Update feature-inventory.md** | Add to "In Progress" section ⚠️ DO FIRST |
-| `done` | Add export config to package.json | Add `markdownForHumans.exportTheme` setting |
+| `done` | Add export config to package.json | Add `speckitForHumans.exportTheme` setting |
 | `done` | Create settings overlay UI | `src/webview/features/exportSettings.ts` (pattern: tocOverlay) |
 | `done` | Add settings button to toolbar | Update `BubbleMenuView.ts` buttons array |
 | `done` | Add export button to toolbar | Dropdown with PDF/Word options in `BubbleMenuView.ts` |
@@ -127,7 +127,7 @@
 
 **Add export config to package.json:**
 1. Open VS Code settings (Cmd+,)
-2. Search "Markdown for Humans: Export Theme"
+2. Search "Speckit for Humans: Export Theme"
 3. Confirm: Setting appears with options (Light, Use Editor Theme)
 
 **Create settings overlay UI:**

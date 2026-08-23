@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2026 Concret.io
+ * Copyright (c) 2025-2026 Agentic Minds
  *
  * Licensed under the MIT License. See LICENSE file in the project root for details.
  */
@@ -252,11 +252,11 @@ const aiContextRefCallbacks = new Map<
 // Webview-only "remember choice for this session" preference for the
 // copy-AI-context save dialog. Cleared whenever the webview is reloaded.
 let aiContextSessionSkipSave = false;
-// Mirrors the user setting `markdownForHumans.copyAiContextRef.skipSaveWarning`,
+// Mirrors the user setting `speckitForHumans.copyAiContextRef.skipSaveWarning`,
 // kept in sync via `update` and `settingsUpdate` messages from the host.
 let aiContextSkipSaveWarningSetting = false;
 let blankLineMode: BlankLineMode = 'strip';
-// Mirrors `markdownForHumans.formattingShortcuts.enabled`. When false, the
+// Mirrors `speckitForHumans.formattingShortcuts.enabled`. When false, the
 // editor stops intercepting Cmd/Ctrl+B/I/U so those chords reach VS Code's own
 // keybindings instead of toggling bold/italic/underline in-editor.
 let formattingShortcutsEnabled = true;
@@ -2014,7 +2014,7 @@ window.addEventListener('insertMath', (event: Event) => {
   if (!enableMath) {
     void import('./features/auditOverlay').then(({ showToast }) => {
       showToast(
-        'Math rendering is disabled. Enable "markdownForHumans.enableMath" in settings.',
+        'Math rendering is disabled. Enable "speckitForHumans.enableMath" in settings.',
         'info'
       );
     });
@@ -2034,7 +2034,7 @@ window.addEventListener('openExtensionSettings', () => {
   vscode.postMessage({ type: 'openExtensionSettings' });
 });
 
-// Zoom: applies zoom level from markdownForHumans.zoom setting (percentage, 100 = default).
+// Zoom: applies zoom level from speckitForHumans.zoom setting (percentage, 100 = default).
 // We use a CSS calc() expression so the override stays live — if the user later changes
 // their VS Code editor font size, --md-base-size-override recomputes automatically
 // instead of being locked to the pixel value captured at call time.
@@ -2058,7 +2058,7 @@ const FORMATTING_SHORTCUT_KEYS = [
 /**
  * Whether a Cmd/Ctrl+B/I/U keydown should be captured here (and its
  * propagation to VS Code stopped) so TipTap can handle it natively, per the
- * `markdownForHumans.formattingShortcuts.enabled` setting.
+ * `speckitForHumans.formattingShortcuts.enabled` setting.
  */
 function shouldInterceptFormattingShortcut(
   key: string,

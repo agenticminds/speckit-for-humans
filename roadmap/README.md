@@ -1,6 +1,6 @@
 # Roadmap
 
-This directory tracks feature planning and completed work for `markdown-for-humans`.
+This directory tracks feature planning and completed work for `speckit-for-humans`.
 
 ## Structure
 

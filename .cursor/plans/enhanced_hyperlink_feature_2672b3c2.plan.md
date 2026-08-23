@@ -532,7 +532,7 @@ function generateHeadingSlug(text: string, existingSlugs: Set<string>): string {
 
 ### State Persistence
 
-- Store filter checkbox state in `localStorage` (key: `markdownForHumans.linkFileFilters`)
+- Store filter checkbox state in `localStorage` (key: `speckitForHumans.linkFileFilters`)
 - Restore on dialog open
 - Default: All checkboxes checked
 

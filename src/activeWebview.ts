@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2026 Concret.io
+ * Copyright (c) 2025-2026 Agentic Minds
  *
  * Licensed under the MIT License. See LICENSE file in the project root for details.
  */
@@ -13,7 +13,7 @@ const activeChangeEmitter = new vscode.EventEmitter<void>();
 export const onDidChangeActiveWebview = activeChangeEmitter.event;
 
 function setActiveContext(isActive: boolean) {
-  vscode.commands.executeCommand('setContext', 'markdownForHumans.isActive', isActive);
+  vscode.commands.executeCommand('setContext', 'speckitForHumans.isActive', isActive);
 }
 
 export function setActiveWebviewPanel(

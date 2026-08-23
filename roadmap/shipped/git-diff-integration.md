@@ -8,7 +8,7 @@
 
 - Confirmed custom editor only applies to `file` scheme URIs so Git diff views continue to use the built-in text diff.
 - Verified TextDocument remains the single source of truth and syncs correctly between webview and file.
-- Added SCM context menu entry for opening markdown files in Markdown for Humans.
+- Added SCM context menu entry for opening markdown files in Speckit for Humans.
 - See detailed task log:
   - `./task-git-diff-integration.md`
 

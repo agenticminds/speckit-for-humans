@@ -1,6 +1,6 @@
 # Environment Context – VS Code Extension
 
-> **Distilled technical context** for LLMs implementing features in `markdown-for-humans`.
+> **Distilled technical context** for LLMs implementing features in `speckit-for-humans`.
 >
 > This file is intentionally lean (~130 lines). For deep dives, see `docs/ARCHITECTURE.md`.
 >

@@ -17,7 +17,7 @@ CRITICAL: Read source code before defining tasks. Documentation can be stale.
 Use task-discovery.md "Codebase Exploration" table to find related files.
 -->
 
-> **Canonical structure** for task files in `markdown-for-humans`.
+> **Canonical structure** for task files in `speckit-for-humans`.
 >
 > **One file = one task.** Combines discovery, planning, and changelog.
 >

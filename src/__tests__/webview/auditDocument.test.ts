@@ -145,7 +145,7 @@ describe('Audit Document Feature', () => {
   });
 
   it('should treat image with empty alt + valid URL as a real image (regression)', async () => {
-    // Regression for https://github.com/concretios/markdown-for-humans/issues
+    // Regression for https://github.com/agenticminds/speckit-for-humans/issues
     // — previously the lexer normaliser demoted any image with empty alt to
     // literal text, breaking both rendering and audit URL checks. The fix
     // keeps `![](url)` as a real image node and routes it through the URL

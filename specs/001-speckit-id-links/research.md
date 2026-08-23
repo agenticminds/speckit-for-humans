@@ -155,7 +155,7 @@ Flow:
 
 1. New branch in `handleLinkClick` posts the message (R-009).
 2. Host resolves `path` → `Uri`, reusing the two-step document-relative → workspace-relative resolution at `MarkdownEditorProvider.ts:3053-3086`.
-3. Host runs `vscode.commands.executeCommand('vscode.openWith', uri, 'markdownForHumans.editor')`.
+3. Host runs `vscode.commands.executeCommand('vscode.openWith', uri, 'speckitForHumans.editor')`.
 4. Host looks the panel up in the URI-keyed `openPanels` map (`:233-236`, populated `:486`, cleaned `:621-623`) and posts `{ type: 'revealSpeckitDefinition', id }`. If the panel is absent or not yet ready, it parks the request in a new `pendingReveals` map and flushes on `case 'ready'` (`:759`).
 5. The target webview scans its own doc for the definition and calls the generalized reveal (R-010).
 
@@ -163,7 +163,7 @@ Flow:
 
 An ID token is exact to the item, survives a dirty target buffer, writes nothing to disk (FR-024), and reuses the definition scanner that FR-013 requires building anyway.
 
-**Editor choice**: the target opens in the WYSIWYG editor. `package.json` sets `contributes.customEditors[0].priority: "option"`, so `.md` does not open in this editor by default and users opt in per file — which is exactly why `handleOpenFileLink`'s `showTextDocument` yields the plain text editor today. The one existing way in is `vscode.commands.executeCommand('vscode.openWith', uri, 'markdownForHumans.editor')`, used by `markdownForHumans.openFile` (`src/extension.ts:44-80`, specifically `:73-77`). With `supportsMultipleEditorsPerDocument: false` (`MarkdownEditorProvider.ts:301-311`), an already-open tab for that URI is focused rather than duplicated.
+**Editor choice**: the target opens in the WYSIWYG editor. `package.json` sets `contributes.customEditors[0].priority: "option"`, so `.md` does not open in this editor by default and users opt in per file — which is exactly why `handleOpenFileLink`'s `showTextDocument` yields the plain text editor today. The one existing way in is `vscode.commands.executeCommand('vscode.openWith', uri, 'speckitForHumans.editor')`, used by `speckitForHumans.openFile` (`src/extension.ts:44-80`, specifically `:73-77`). With `supportsMultipleEditorsPerDocument: false` (`MarkdownEditorProvider.ts:301-311`), an already-open tab for that URI is focused rather than duplicated.
 
 This was a product decision, not a finding: opening in the WYSIWYG editor means a user who never opted in gets a WYSIWYG tab. Accepted deliberately — it is the only way to land on a list item or table row, and `handleOpenFileAtLocation` (`:2082`) remains available as graceful degradation for non-`file` schemes or when the scanner cannot find the definition.
 

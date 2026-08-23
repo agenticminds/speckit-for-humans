@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Markdown for Humans will be documented in this file.
+All notable changes to Speckit for Humans will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -15,13 +15,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### What's New
 
 #### Auto-Save
-New opt-in `markdownForHumans.autoSave.enabled` setting saves the document a short delay after you stop typing, independent of VS Code's built-in `files.autoSave`. Off by default, so nothing changes unless you turn it on.
+New opt-in `speckitForHumans.autoSave.enabled` setting saves the document a short delay after you stop typing, independent of VS Code's built-in `files.autoSave`. Off by default, so nothing changes unless you turn it on.
 
 #### Formatting-Shortcut Control
-Cmd/Ctrl+B/I/U were previously hardcoded to stay inside the editor, which could permanently shadow a VS Code keybinding bound to the same chord. New `markdownForHumans.formattingShortcuts.enabled` setting (default on) lets you opt out, with a matching command and keybinding (Cmd/Ctrl+Alt+B) to toggle it without opening settings.
+Cmd/Ctrl+B/I/U were previously hardcoded to stay inside the editor, which could permanently shadow a VS Code keybinding bound to the same chord. New `speckitForHumans.formattingShortcuts.enabled` setting (default on) lets you opt out, with a matching command and keybinding (Cmd/Ctrl+Alt+B) to toggle it without opening settings.
 
 #### Editor Theme Override
-New `markdownForHumans.display.editorTheme` setting (Follow VS Code theme / Always light / Always dark) plus a toolbar toggle next to the gear icon, so the editor's color mode no longer has to follow your OS/VS Code theme.
+New `speckitForHumans.display.editorTheme` setting (Follow VS Code theme / Always light / Always dark) plus a toolbar toggle next to the gear icon, so the editor's color mode no longer has to follow your OS/VS Code theme.
 
 #### Toolbar & Paste Improvements
 - Copy button added to code blocks
@@ -67,8 +67,8 @@ A six-dot handle now appears on any block, letting you drag it to a new position
 
 #### Paragraph Spacing and Zoom Level
 Two new settings give you fine control over the editor appearance:
-- `markdownForHumans.paragraphSpacing` — adjust spacing between paragraphs
-- `markdownForHumans.zoomLevel` — zoom editor content without OS-level zoom
+- `speckitForHumans.paragraphSpacing` — adjust spacing between paragraphs
+- `speckitForHumans.zoomLevel` — zoom editor content without OS-level zoom
 - Heading-to-paragraph spacing now honors the paragraph spacing setting
 
 #### AI Coding Tool Reference
@@ -77,8 +77,8 @@ New "Copy AI Ref" button in the formatting toolbar:
 - Useful for feeding document context into AI coding tools (Claude Code, Cursor, etc.)
 - Enhanced handling for AI context references across the audit panel
 
-#### Open with Markdown for Humans (Context Menu)
-Right-click any editor tab to open the file in the Markdown for Humans WYSIWYG editor,
+#### Open with Speckit for Humans (Context Menu)
+Right-click any editor tab to open the file in the Speckit for Humans WYSIWYG editor,
 without changing it as your default editor.
 
 #### Markdown Serialization Improvements
@@ -113,7 +113,7 @@ without changing it as your default editor.
 
 ### Fixed
 
-- Image context menu (resize, align, copy) is now accessible even when the image hover overlay is disabled via settings. Previously, turning off `markdownForHumans.imagePreview.hover.enabled` also hid the menu button, making images uneditable.
+- Image context menu (resize, align, copy) is now accessible even when the image hover overlay is disabled via settings. Previously, turning off `speckitForHumans.imagePreview.hover.enabled` also hid the menu button, making images uneditable.
 
 ---
 
@@ -168,7 +168,7 @@ New image overlay feature (contributed by @tomarsuraj13):
 
 ### Changed
 
-- Updated display name to "Markdown for Humans: WYSIWYG Editor" for better brand clarity and search ranking
+- Updated display name to "Speckit for Humans: WYSIWYG Editor" for better brand clarity and search ranking
 - Expanded keywords from 6 to 30 terms for improved marketplace discoverability
 - Updated marketplace description to highlight key features for SEO
 
@@ -190,7 +190,7 @@ New image overlay feature (contributed by @tomarsuraj13):
 - **Better Navigation**: Fixed image and file link clicking - images now open in VS Code's preview, files open correctly in both development and packaged builds
 
 #### Documentation & Discovery
-- **Enhanced README:** Added comparison table showing how Markdown for Humans differs from other markdown editors
+- **Enhanced README:** Added comparison table showing how Speckit for Humans differs from other markdown editors
 - **Improved Marketplace Listing:** Better keywords and descriptions to help users discover the extension more easily
 
 ### 🛠️ Technical Improvements
@@ -232,7 +232,7 @@ This release includes several under-the-hood improvements that make the extensio
 
 ### Changed
 
-- Enhanced marketplace discoverability: Updated displayName to "Markdown for Humans: WYSIWYG Editor" to improve brand clarity while maintaining search ranking for "markdown editor" and "wysiwyg markdown" queries
+- Enhanced marketplace discoverability: Updated displayName to "Speckit for Humans: WYSIWYG Editor" to improve brand clarity while maintaining search ranking for "markdown editor" and "wysiwyg markdown" queries
 - Expanded keywords from 6 to 30 terms for better marketplace visibility (includes: notion-like, writing, documentation, formatting, syntax-highlighting, live-preview, full-screen, distraction-free, cover-images, image-resizing, export, html, pdf, docx, human-friendly, and more)
 - Updated package.json description to SEO-optimized version highlighting key features
 - Restructured README with comparison table ("What Makes It Different") and improved SEO positioning
@@ -301,12 +301,12 @@ This release includes several under-the-hood improvements that make the extensio
 
 ---
 
-[Unreleased]: https://github.com/concretios/markdown-for-humans/compare/v0.2.1...HEAD
-[0.2.1]: https://github.com/concretios/markdown-for-humans/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/concretios/markdown-for-humans/compare/v0.1.7...v0.2.0
-[0.1.7]: https://github.com/concretios/markdown-for-humans/compare/v0.1.6...v0.1.7
-[0.1.6]: https://github.com/concretios/markdown-for-humans/compare/v0.1.5...v0.1.6
-[0.1.5]: https://github.com/concretios/markdown-for-humans/compare/v0.1.4...v0.1.5
-[0.1.4]: https://github.com/concretios/markdown-for-humans/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/concretios/markdown-for-humans/compare/v0.1.0...v0.1.3
-[0.1.0]: https://github.com/concretios/markdown-for-humans/releases/tag/v0.1.0
+[Unreleased]: https://github.com/agenticminds/speckit-for-humans/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/agenticminds/speckit-for-humans/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.7...v0.2.0
+[0.1.7]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.6...v0.1.7
+[0.1.6]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.5...v0.1.6
+[0.1.5]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.4...v0.1.5
+[0.1.4]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.0...v0.1.3
+[0.1.0]: https://github.com/agenticminds/speckit-for-humans/releases/tag/v0.1.0

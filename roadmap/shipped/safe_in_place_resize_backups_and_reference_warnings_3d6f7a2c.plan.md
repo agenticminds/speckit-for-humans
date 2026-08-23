@@ -12,7 +12,7 @@ todos:
     content: Make `saveImage` collision-safe (never overwrite silently; auto-suffix `-2/-3/...` or prompt) and add tests
     status: completed
   - id: remove-include-dimensions-config
-    content: Remove `markdownForHumans.imageFilename.includeDimensions` and migrate all naming/resize logic to the new “clean primary filename” rules
+    content: Remove `speckitForHumans.imageFilename.includeDimensions` and migrate all naming/resize logic to the new “clean primary filename” rules
     status: completed
   - id: define-backup-path-and-gitignore
     content: Define `.md4h/image-backups/` location and add it to `.gitignore` (and document behavior)
@@ -85,7 +85,7 @@ These are image-related UX fixes we implemented in the same timeframe, but they 
 
 ## Configuration Audit (Current → New Plan)
 
-### `markdownForHumans.imagePath`
+### `speckitForHumans.imagePath`
 
 - **Current:** controls where dropped/pasted images are saved (relative to the document base path).
 - **New plan:** keep `imagePath` as the folder path, but interpret it relative to a new base mode:
@@ -94,7 +94,7 @@ These are image-related UX fixes we implemented in the same timeframe, but they 
 - **Backup note:** backups still go under `.md4h/image-backups/` and should be anchored to the workspace folder when available (so `.md4h/` is not created in every nested doc folder).
 - **Untitled behavior (decision):** if the document is untitled, default to workspace-level saves (equivalent to `imagePathBase=workspaceFolder`) because we don’t know where the markdown file will end up.
 
-### (New) `markdownForHumans.imagePathBase`
+### (New) `speckitForHumans.imagePathBase`
 
 - **Purpose:** choose where `imagePath` is rooted.
 - **Proposed values:**
@@ -102,13 +102,13 @@ These are image-related UX fixes we implemented in the same timeframe, but they 
   - `workspaceFolder` (shared assets folder per workspace folder)
 - **Markdown insertion rule:** always compute the markdown link as a relative path from the current markdown file directory to the saved image file (so `../assets/foo.png` works correctly).
 
-### `markdownForHumans.imageResize.skipWarning`
+### `speckitForHumans.imageResize.skipWarning`
 
 - **Current:** skips a second “warning dialog” before a resize is applied.
 - **New plan:** the resize is safer (always backed up), but still has a blast radius when the image is referenced elsewhere.
 - **Recommendation:** keep the setting for “skip extra confirmation” but still show reference impact information when the image is referenced beyond the current file.
 
-### Remove: `markdownForHumans.imageFilename.includeDimensions`
+### Remove: `speckitForHumans.imageFilename.includeDimensions`
 
 - **Current:** controls whether automatic image filenames include source prefix and dimensions in some code paths.
 - **New plan:** primary filenames should never contain resolution, and resize must not rename the primary file. This makes `includeDimensions` a poor fit and it should be removed.

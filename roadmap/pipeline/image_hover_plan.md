@@ -1,6 +1,6 @@
 ## Plan: Implement User-Configurable Image Hover Overlay Toggle
 
-**TL;DR** - Add a new VS Code configuration setting `markdownForHumans.imagePreview.hover.enabled` (default: true) that allows users to disable the image hover overlay (shading + metadata display) to reduce visual distraction. Follow existing configuration patterns for seamless integration.
+**TL;DR** - Add a new VS Code configuration setting `speckitForHumans.imagePreview.hover.enabled` (default: true) that allows users to disable the image hover overlay (shading + metadata display) to reduce visual distraction. Follow existing configuration patterns for seamless integration.
 
 **Steps**
 1. Add configuration schema to `package.json` defining the new boolean setting with default true and descriptive text.
@@ -35,7 +35,7 @@
 6. Read a 3000+ word document for 10+ minutes with setting on/off to verify no UX regressions.
 
 **Decisions**
-- Setting name: `markdownForHumans.imagePreview.hover.enabled` to match user's request and extension naming convention.
+- Setting name: `speckitForHumans.imagePreview.hover.enabled` to match user's request and extension naming convention.
 - Default: `true` to maintain current behavior for existing users.
 - Implementation approach: Follow existing pattern (global window variable, conditional logic in features) for consistency.
 - Scope: Toggle affects both shading backdrop and metadata footer/menu button display.
@@ -53,7 +53,7 @@
 ### Configuration Schema
 Add to `package.json` contributes.configuration.properties:
 ```json
-"markdownForHumans.imagePreview.hover.enabled": {
+"speckitForHumans.imagePreview.hover.enabled": {
   "type": "boolean",
   "default": true,
   "description": "Enable the image hover overlay that shades images and displays metadata (resolution, file size, etc.) on hover."
@@ -61,7 +61,7 @@ Add to `package.json` contributes.configuration.properties:
 ```
 
 ### State Management
-- **Extension Layer**: Read via `vscode.workspace.getConfiguration('markdownForHumans.imagePreview.hover.enabled')`
+- **Extension Layer**: Read via `vscode.workspace.getConfiguration('speckitForHumans.imagePreview.hover.enabled')`
 - **Message Passing**: Include `showImageHoverOverlay: boolean` in `update` and `settingsUpdate` message payloads
 - **Webview Layer**: Store as `(window as any).showImageHoverOverlay = message.showImageHoverOverlay;`
 - **Feature Layer**: Check `if (!(window as any).showImageHoverOverlay) return;` before applying hover effects
@@ -92,4 +92,4 @@ Add to `package.json` contributes.configuration.properties:
 - No changes to TipTap/ProseMirror architecture
 - Maintains performance: setting check is lightweight global read
 - Backward compatible: default true preserves current behavior</content>
-<parameter name="filePath">c:\Users\sstom\Desktop\markdown-for-humans\roadmap\pipeline\image_hover_plan.md
+<parameter name="filePath">c:\Users\sstom\Desktop\speckit-for-humans\roadmap\pipeline\image_hover_plan.md

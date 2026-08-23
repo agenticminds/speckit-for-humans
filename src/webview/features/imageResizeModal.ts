@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2026 Concret.io
+ * Copyright (c) 2025-2026 Agentic Minds
  *
  * Licensed under the MIT License. See LICENSE file in the project root for details.
  */
@@ -1008,7 +1008,7 @@ function showResizeModalForLocalImage(
         // Also save to VS Code settings (use captured reference)
         vscodeApi.postMessage({
           type: 'updateSetting',
-          key: 'markdownForHumans.imageResize.skipWarning',
+          key: 'speckitForHumans.imageResize.skipWarning',
           value: true,
         });
       }

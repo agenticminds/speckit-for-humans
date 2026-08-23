@@ -4,11 +4,11 @@
 
 ## Acceptance of Terms
 
-Welcome to Markdown for Humans. By accessing, downloading, installing, or using the Markdown for Humans extension ("Extension") for Visual Studio Code, you agree to be bound by these Terms of Use ("Terms"). If you do not agree to these Terms, do not use the Extension.
+Welcome to Speckit for Humans. By accessing, downloading, installing, or using the Speckit for Humans extension ("Extension") for Visual Studio Code, you agree to be bound by these Terms of Use ("Terms"). If you do not agree to these Terms, do not use the Extension.
 
 ## Description of Service
 
-Markdown for Humans is a free, open-source Visual Studio Code extension that provides WYSIWYG (What You See Is What You Get) markdown editing capabilities. The Extension is provided "as is" without any warranties or guarantees.
+Speckit for Humans is a free, open-source Visual Studio Code extension that provides WYSIWYG (What You See Is What You Get) markdown editing capabilities. The Extension is provided "as is" without any warranties or guarantees.
 
 ## Use License
 
@@ -29,25 +29,25 @@ You agree to use the Extension only for lawful purposes and in accordance with t
 3. **Reverse Engineering:** Reverse engineer, decompile, or disassemble the Extension for malicious purposes
 4. **Interference:** Interfere with or disrupt the operation of the Extension or any related services
 5. **Unauthorized Access:** Attempt to gain unauthorized access to any systems or networks
-6. **Impersonation:** Impersonate or misrepresent your affiliation with Concret.io or any other entity
+6. **Impersonation:** Impersonate or misrepresent your affiliation with Agentic Minds or any other entity
 
 ## Intellectual Property
 
-The Extension and its original content, features, and functionality are owned by Concret.io and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+The Extension and its original content, features, and functionality are owned by Agentic Minds and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
 
 ## User Content and File Processing
 
 **IMPORTANT:** The Extension directly accesses, processes, and modifies files on your local system. By using the Extension, you acknowledge and agree that:
 
 - **YOU ARE SOLELY RESPONSIBLE** for all content, files, and data processed by the Extension
-- **YOU RETAIN ALL RIGHTS** to your content, and Concret.io does not claim any ownership rights
+- **YOU RETAIN ALL RIGHTS** to your content, and Agentic Minds does not claim any ownership rights
 - **YOU REPRESENT AND WARRANT** that you have all necessary rights, licenses, and permissions to use, process, and modify your content
 - **YOU ARE SOLELY RESPONSIBLE** for maintaining backups, version control, and copies of all files before using the Extension
 - **YOU ASSUME ALL RISK** of data loss, file corruption, content modification, or other damage to your files
-- Concret.io is **NOT RESPONSIBLE** for any loss, corruption, deletion, or modification of your files, data, or content
+- Agentic Minds is **NOT RESPONSIBLE** for any loss, corruption, deletion, or modification of your files, data, or content
 - The Extension may modify file formatting, structure, markdown syntax, images, or other content in ways that may not be reversible
 - You should **ALWAYS** use version control (e.g., Git) or maintain backup copies of important files
-- Concret.io does not guarantee that file modifications will preserve original formatting, structure, or content
+- Agentic Minds does not guarantee that file modifications will preserve original formatting, structure, or content
 
 ## Disclaimer of Warranties
 
@@ -95,7 +95,7 @@ The Extension and its original content, features, and functionality are owned by
 
 ## Modifications to Terms
 
-Concret.io reserves the right to modify these Terms at any time. We will notify users of material changes by:
+Agentic Minds reserves the right to modify these Terms at any time. We will notify users of material changes by:
 - Updating the "Last Updated" date
 - Posting a notice in the Extension's repository
 - Including a notice in Extension updates (when applicable)
@@ -104,12 +104,12 @@ Your continued use of the Extension after changes constitutes acceptance of the 
 
 ## Termination
 
-Concret.io may terminate or suspend your access to the Extension immediately, without prior notice or liability, for any reason, including if you breach these Terms. Upon termination, your right to use the Extension will cease immediately.
+Agentic Minds may terminate or suspend your access to the Extension immediately, without prior notice or liability, for any reason, including if you breach these Terms. Upon termination, your right to use the Extension will cease immediately.
 
 ## Open Source Contributions
 
 The Extension is open source. If you contribute code, documentation, or other materials:
-- You grant Concret.io and users a perpetual, worldwide, non-exclusive license to use your contributions under the MIT License
+- You grant Agentic Minds and users a perpetual, worldwide, non-exclusive license to use your contributions under the MIT License
 - You represent that you have the right to grant such license
 - You agree that your contributions will be subject to the same Terms and License as the Extension
 
@@ -138,20 +138,20 @@ If any provision of these Terms is found to be unenforceable or invalid, that pr
 
 ## Entire Agreement
 
-These Terms, together with the EULA (EULA.md) and Privacy Policy (PRIVACY_POLICY.md), constitute the entire agreement between you and Concret.io regarding the Extension.
+These Terms, together with the EULA (EULA.md) and Privacy Policy (PRIVACY_POLICY.md), constitute the entire agreement between you and Agentic Minds regarding the Extension.
 
 ## Contact Information
 
 For questions about these Terms, please contact:
 
-**Concret.io**  
-**Email:** legal@concret.io  
-**Website:** https://concret.io  
-**GitHub:** https://github.com/concretios/markdown-for-humans
+**Agentic Minds**  
+**Email:** legal@agenticminds.ai  
+**Website:** https://agenticminds.ai  
+**GitHub:** https://github.com/agenticminds/speckit-for-humans
 
 ---
 
 **By using the Extension, you acknowledge that you have read, understood, and agree to be bound by these Terms of Use.**
 
-**Concret.io**  
-© 2025-2026 Concret.io. All rights reserved.
+**Agentic Minds**  
+© 2025-2026 Agentic Minds. All rights reserved.

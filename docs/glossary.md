@@ -40,7 +40,7 @@ Ordered by topic, not alphabetically, because related terms explain each other.
 
 **`postMessage`** — the only channel between the extension host and the webview. Every piece of data crossing between them travels this way.
 
-**Custom text editor** — the VS Code mechanism that lets an extension replace the normal text editor for a file type while VS Code still owns saving and undo. This project's is registered under the identifier `markdownForHumans.editor`.
+**Custom text editor** — the VS Code mechanism that lets an extension replace the normal text editor for a file type while VS Code still owns saving and undo. This project's is registered under the identifier `speckitForHumans.editor`.
 
 **Priority `option`** — a setting on a custom editor meaning "do not open by default". Because this project uses it, `.md` files open in the normal text editor unless the user explicitly chooses otherwise.
 

@@ -528,7 +528,7 @@ describe.skip('Document Export Integration', () => {
         'Cancel'
       );
 
-      const config = vscode.workspace.getConfiguration('markdownForHumans');
+      const config = vscode.workspace.getConfiguration('speckitForHumans');
       expect(config.update).toHaveBeenCalledWith(
         'chromePath',
         expect.stringContaining('Chrome'),
@@ -558,7 +558,7 @@ describe.skip('Document Export Integration', () => {
         expect.any(String)
       );
 
-      const config = vscode.workspace.getConfiguration('markdownForHumans');
+      const config = vscode.workspace.getConfiguration('speckitForHumans');
       expect(config.update).not.toHaveBeenCalled();
     });
 

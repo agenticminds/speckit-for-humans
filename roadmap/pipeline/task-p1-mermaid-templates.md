@@ -66,7 +66,7 @@
 ## 4. UX & Behavior
 
 **Entry points:**
-- **Command palette:** `Cmd/Ctrl+Shift+P` → "Markdown for Humans: Insert Mermaid Template"
+- **Command palette:** `Cmd/Ctrl+Shift+P` → "Speckit for Humans: Insert Mermaid Template"
 - **Toolbar button:** New "Templates" dropdown next to Mermaid diagram button (when in diagram block)
 - **Context menu:** Right-click in Mermaid code block → "Insert Template..."
 - **Keyboard shortcut:** `Ctrl+Shift+T` → opens template picker (when in Mermaid block)

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "markdown-for-humans",
+      "name": "speckit-for-humans",
       "dependencies": {
         "@tiptap/core": "^3.0.0",
         "@tiptap/extension-code-block-lowlight": "^3.0.0",

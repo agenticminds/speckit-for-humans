@@ -526,7 +526,7 @@ describe('MarkdownEditorProvider - In-Memory File Support', () => {
       });
       (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue({
         get: jest.fn((key: string, defaultValue?: unknown) => {
-          if (key === 'markdownForHumans.imagePathBase') return 'relativeToDocument';
+          if (key === 'speckitForHumans.imagePathBase') return 'relativeToDocument';
           return defaultValue;
         }),
         update: jest.fn(),
@@ -579,7 +579,7 @@ describe('MarkdownEditorProvider - In-Memory File Support', () => {
       });
       (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue({
         get: jest.fn((key: string, defaultValue?: unknown) => {
-          if (key === 'markdownForHumans.imagePathBase') return 'workspaceFolder';
+          if (key === 'speckitForHumans.imagePathBase') return 'workspaceFolder';
           return defaultValue;
         }),
         update: jest.fn(),
@@ -799,7 +799,7 @@ describe('MarkdownEditorProvider - In-Memory File Support', () => {
       });
       (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue({
         get: jest.fn((key: string, defaultValue?: unknown) => {
-          if (key === 'markdownForHumans.imagePathBase') return 'workspaceFolder';
+          if (key === 'speckitForHumans.imagePathBase') return 'workspaceFolder';
           return defaultValue;
         }),
         update: jest.fn(),

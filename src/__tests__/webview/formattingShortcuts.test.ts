@@ -1,5 +1,5 @@
 /**
- * Regression tests for the `markdownForHumans.formattingShortcuts.enabled` setting.
+ * Regression tests for the `speckitForHumans.formattingShortcuts.enabled` setting.
  *
  * We avoid initializing TipTap by mocking document.readyState as "loading"
  * so initializeEditor is never invoked during module import (same harness as

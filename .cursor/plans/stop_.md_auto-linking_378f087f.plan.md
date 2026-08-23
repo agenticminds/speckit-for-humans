@@ -25,7 +25,7 @@ Prevent plain `.MD` text from being auto-converted into links by tightening link
 
 **Finding:** The issue is in TipTap's `@tiptap/extension-link` extension, which uses [linkifyjs](https://linkify.js.org) for autolink detection. By default, `autolink: true` means any text resembling a TLD (like `.MD`, `.io`, `.com`) can trigger link creation.
 
-**Code Location:** [src/webview/editor.ts#L432-L437](file:///Users/abhinav/code/markdown-for-humans-public/src/webview/editor.ts#L432-L437)
+**Code Location:** [src/webview/editor.ts#L432-L437](file:///Users/abhinav/code/speckit-for-humans-public/src/webview/editor.ts#L432-L437)
 
 ```typescript
 Link.configure({

@@ -1,8 +1,8 @@
-# Markdown for Humans: WYSIWYG Editor
+# Speckit for Humans: WYSIWYG Editor
 
 **Seamless WYSIWYG markdown editing for VS Code** — Write markdown the way humans think.
 
-![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/concretio.markdown-for-humans?label=VS%20Code%20Marketplace&logo=visual-studio-code) ![Open VSX](https://img.shields.io/open-vsx/v/concretio/markdown-for-humans?label=Open%20VSX&logo=eclipse) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/concretio.speckit-for-humans?label=VS%20Code%20Marketplace&logo=visual-studio-code) ![Open VSX](https://img.shields.io/open-vsx/v/concretio/speckit-for-humans?label=Open%20VSX&logo=eclipse) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
 ---
 
@@ -10,7 +10,7 @@
 
 > We also support standard shortcuts like `CTRL/CMD + B`, etc
 
-![Markdown for Humans Overview](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/basic_overview_of_features.gif)
+![Speckit for Humans Overview](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/basic_overview_of_features.gif)
 
 *Experience seamless WYSIWYG markdown editing with visual table editing, image management, and more—all in VS Code.*
 
@@ -20,7 +20,7 @@
 
 **Tired of manually writing table syntax? Struggling with image paths, resizing, renaming? Or you dont like memorising Markdown Syntax.** 
 
-Most markdown editors force you to memorize syntax, fight with split panes, or manually manage files. **Markdown for Humans solves the biggest pain points** that make markdown editing frustrating.
+Most markdown editors force you to memorize syntax, fight with split panes, or manually manage files. **Speckit for Humans solves the biggest pain points** that make markdown editing frustrating.
 
 > **📌 100% free. No trials. No limits. No paywalls, ever.**
 
@@ -30,7 +30,7 @@ Most markdown editors force you to memorize syntax, fight with split panes, or m
 
 As natural as it gets in Microsoft Word or Google Docs etc. 
 
-![Table Editing](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/table_operations_with_right_click_menu.gif)
+![Table Editing](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/table_operations_with_right_click_menu.gif)
 
 **Drag column borders to resize. Right-click to add rows. No syntax to memorize.**
 
@@ -47,7 +47,7 @@ As natural as it gets in Microsoft Word or Google Docs etc.
 
 > Press shift while dragging images, in case your face issues on drag drop in editor
 
-![Large Size Image Suggestion](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/large_size_image_size_suggestion.gif)
+![Large Size Image Suggestion](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/large_size_image_size_suggestion.gif)
 
 **Drag images in. Resize with handles. Rename inline. No manual file operations.**
 
@@ -62,7 +62,7 @@ As natural as it gets in Microsoft Word or Google Docs etc.
 
 *Adjust image width with intuitive resize handles for perfect layout control.*
 
-![Image Rename Functionality](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/image_rename_functionality.gif)
+![Image Rename Functionality](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/image_rename_functionality.gif)
 
 *Rename images directly from the editor to keep your assets organized.*
 
@@ -71,7 +71,7 @@ As natural as it gets in Microsoft Word or Google Docs etc.
 ## Built on True WYSIWYG Editing
 Humans work that way.
 
-![WYSIWYG Editing](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/basic_introduction.gif)
+![WYSIWYG Editing](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/basic_introduction.gif)
 
 **See your formatted output as you type. No split panes. No preview mode. Just write.**
 
@@ -87,7 +87,7 @@ Built on TipTap with a **human-first design philosophy**:
 ## ✨ What Makes It Different
 
 
-| Feature                 | Markdown for Humans          | Markdown All in One | Standard Editors  |
+| Feature                 | Speckit for Humans          | Markdown All in One | Standard Editors  |
 | ----------------------- | ---------------------------- | ------------------- | ----------------- |
 | **WYSIWYG Editing**     | ✅ Full-screen, no split pane | ❌ Split pane only   | ❌ Plain text      |
 | **Visual Table Editor** | ✅ Drag, resize, edit cells   | ⚠️ Basic syntax     | ❌ Manual syntax   |
@@ -105,13 +105,13 @@ Built on TipTap with a **human-first design philosophy**:
 
 **Option 1: Via Marketplace (Recommended)**
 
-1. Visit [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=concretio.markdown-for-humans)
+1. Visit [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=concretio.speckit-for-humans)
 2. Click "Install"
 
 **Option 2: Within VS Code**
 
 1. Open Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-2. Search for "Markdown for Humans" or use the extension ID: `concretio.markdown-for-humans`
+2. Search for "Speckit for Humans" or use the extension ID: `concretio.speckit-for-humans`
 3. Click Install
 
 **Cursor / Windsurf / VSCodium / Other Open VSX IDEs**
@@ -119,10 +119,10 @@ Built on TipTap with a **human-first design philosophy**:
 **Via Open VSX Registry:**
 
 1. Open Extensions panel
-2. Search for "Markdown for Humans" or use the extension ID: `concretio.markdown-for-humans`
-3. Install (automatically pulls from [Open VSX Registry](https://open-vsx.org/extension/concretio/markdown-for-humans))
+2. Search for "Speckit for Humans" or use the extension ID: `concretio.speckit-for-humans`
+3. Install (automatically pulls from [Open VSX Registry](https://open-vsx.org/extension/concretio/speckit-for-humans))
 
-**Direct Link:** [Open VSX Registry](https://open-vsx.org/extension/concretio/markdown-for-humans)
+**Direct Link:** [Open VSX Registry](https://open-vsx.org/extension/concretio/speckit-for-humans)
 
 **Supported IDEs:**
 
@@ -133,11 +133,11 @@ Built on TipTap with a **human-first design philosophy**:
 - [Eclipse Theia](https://theia-ide.org/)
 - Other Open VSX-compatible IDEs
 
-> 💡 **Pro Tip:** For precise results, search using the extension ID `concretio.markdown-for-humans` in the Extensions panel of any IDE.
+> 💡 **Pro Tip:** For precise results, search using the extension ID `concretio.speckit-for-humans` in the Extensions panel of any IDE.
 
 ### Usage
 
-1. Open any `.md` file → Right-click → **"Open with Markdown for Humans"**
+1. Open any `.md` file → Right-click → **"Open with Speckit for Humans"**
 2. Start writing!
 
 **Toggle between WYSIWYG and source**: Click the `</>` Source button in the toolbar
@@ -146,26 +146,26 @@ Built on TipTap with a **human-first design philosophy**:
 
 ## ⚙️ Configuration
 
-Customize the editor behavior through VS Code settings. Access via `Ctrl+,` (Settings) and search for "Markdown for Humans".
+Customize the editor behavior through VS Code settings. Access via `Ctrl+,` (Settings) and search for "Speckit for Humans".
 
 ### Image Settings
 
-- **`markdownForHumans.imagePreview.hover.enabled`** (default: `true`)
+- **`speckitForHumans.imagePreview.hover.enabled`** (default: `true`)
   - Enable the image hover overlay that shades images and displays metadata (resolution, file size, etc.) on hover
   - Set to `false` to disable hover effects and reduce visual distraction
 
-- **`markdownForHumans.imagePath`** (default: `"images"`)
-  - Folder path for saved images. Interpreted relative to `markdownForHumans.imagePathBase`.
+- **`speckitForHumans.imagePath`** (default: `"images"`)
+  - Folder path for saved images. Interpreted relative to `speckitForHumans.imagePathBase`.
 
-- **`markdownForHumans.imagePathBase`** (default: `"relativeToDocument"`)
+- **`speckitForHumans.imagePathBase`** (default: `"relativeToDocument"`)
   - Controls whether Image Path is relative to the current markdown file folder or the workspace folder.
 
-- **`markdownForHumans.imageResize.skipWarning`** (default: `false`)
+- **`speckitForHumans.imageResize.skipWarning`** (default: `false`)
   - Skip the warning dialog when resizing images. When enabled, images will be resized immediately without confirmation.
 
 ### PDF Export Settings
 
-- **`markdownForHumans.chromePath`** (default: `""`)
+- **`speckitForHumans.chromePath`** (default: `""`)
   - Path to Google Chrome or Chromium executable for PDF export. Leave empty to auto-detect.
 
 ---
@@ -174,19 +174,19 @@ Customize the editor behavior through VS Code settings. Access via `Ctrl+,` (Set
 
 ### Enhanced Link Dialog
 
-![Enhanced Link Feature](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/hyperlink_feature.gif)
+![Enhanced Link Feature](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/hyperlink_feature.gif)
 
 *Create links easily with support for URLs, file linking, heading links, and more—all through an intuitive dialog interface.*
 
 ### Mermaid Diagrams
 
-![Mermaid Diagrams](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/mermaid_diagram_with_one_diagram_only.gif)
+![Mermaid Diagrams](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/mermaid_diagram_with_one_diagram_only.gif)
 
 *Create flowcharts, sequence diagrams, Gantt charts, and more with 15 built-in templates.*
 
 ### Document Outline
 
-![Document Outline](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/outline_feature_with_sidebar_display.gif)
+![Document Outline](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/outline_feature_with_sidebar_display.gif)
 
 *Navigate your document quickly with sidebar outline showing all headings for instant access.*
 
@@ -222,7 +222,7 @@ text with no link wrapper. Nothing needs to be enabled, indexed, or configured.
 
 ### GitHub Alerts
 
-![GitHub Alerts](https://raw.githubusercontent.com/concretios/markdown-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/github_alerts.gif)
+![GitHub Alerts](https://raw.githubusercontent.com/agenticminds/speckit-for-humans/4bf7defb6a3e7ee56b34e6dd9dc0a55e471740ec/marketplace-assets/gifs/github_alerts.gif)
 
 *Create beautiful GitHub-style alert boxes for notes, warnings, tips, and important information.*
 
@@ -230,7 +230,7 @@ text with no link wrapper. Nothing needs to be enabled, indexed, or configured.
 
 ## What's Included
 
-Markdown for Humans includes everything you need for a modern writing experience:
+Speckit for Humans includes everything you need for a modern writing experience:
 
 - **True WYSIWYG editing** powered by TipTap—see your formatted output as you type
 - **Advanced table editing** with drag-to-resize columns, context menus, and toolbar controls
@@ -244,7 +244,7 @@ Markdown for Humans includes everything you need for a modern writing experience
 - **Spec Kit ID links** turning `FR-001`, `T042` and seventeen more identifier families into
   navigation, without writing a single byte into your files
 
-[Full feature list → Wiki](https://github.com/concretios/markdown-for-humans/wiki)
+[Full feature list → Wiki](https://github.com/agenticminds/speckit-for-humans/wiki)
 
 ---
 
@@ -254,7 +254,7 @@ Markdown for Humans includes everything you need for a modern writing experience
 
 Existing markdown editors force writers to choose between split-pane previews that waste screen space, plain text editing that requires memorizing syntax, standalone apps that don't integrate with your workflow, or command-heavy interfaces that bury actions in overloaded palettes.
 
-We built Markdown for Humans to solve the **real pain points**—tables and images—that make markdown editing frustrating, while keeping the underlying file as plain markdown (so Git diffs, tooling, and other editors still work).
+We built Speckit for Humans to solve the **real pain points**—tables and images—that make markdown editing frustrating, while keeping the underlying file as plain markdown (so Git diffs, tooling, and other editors still work).
 
 ---
 
@@ -262,9 +262,9 @@ We built Markdown for Humans to solve the **real pain points**—tables and imag
 
 ### For Users
 
-- [User Guide](https://github.com/concretios/markdown-for-humans/wiki)
+- [User Guide](https://github.com/agenticminds/speckit-for-humans/wiki)
 - [Known Issues](./KNOWN_ISSUES.md) - Known issues and workarounds
-- [Report Issues](https://github.com/concretios/markdown-for-humans/issues)
+- [Report Issues](https://github.com/agenticminds/speckit-for-humans/issues)
 
 ### For Developers
 
@@ -284,7 +284,7 @@ We built Markdown for Humans to solve the **real pain points**—tables and imag
 ## Contributing
 
 > **⚡ Built on open source, for the community.**  
-> Markdown for Humans exists because open source software empowers everyone. We believe that the best tools should be built, improved, and maintained by the whole community—not limited by a few. By embracing collaboration and transparency, we keep innovation moving forward for everyone.
+> Speckit for Humans exists because open source software empowers everyone. We believe that the best tools should be built, improved, and maintained by the whole community—not limited by a few. By embracing collaboration and transparency, we keep innovation moving forward for everyone.
 
 We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
@@ -312,7 +312,7 @@ Countless hours went into vibe-coded wireframes, user experience design, and pol
 
 ## License
 
-MIT © [Concret.io](https://concret.io)
+MIT © [Agentic Minds](https://agenticminds.ai)
 
 ---
 
@@ -327,4 +327,4 @@ Built with:
 
 ---
 
-**Made with ❤️ for Markdown lovers, by Team [Concret.io**](https://concret.io)
+**Made with ❤️ for Markdown lovers, by Team [Agentic Minds**](https://agenticminds.ai)

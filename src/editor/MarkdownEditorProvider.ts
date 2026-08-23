@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2026 Concret.io
+ * Copyright (c) 2025-2026 Agentic Minds
  *
  * Licensed under the MIT License. See LICENSE file in the project root for details.
  */
@@ -60,7 +60,7 @@ const PENDING_REVEAL_TTL_MS = 30_000;
  * VS Code's plain text editor instead — where a bullet or a table row cannot be
  * revealed at all (C-msg-3d).
  */
-const SPECKIT_EDITOR_VIEW_TYPE = 'markdownForHumans.editor';
+const SPECKIT_EDITOR_VIEW_TYPE = 'speckitForHumans.editor';
 
 /**
  * Coerce text to end with exactly one `\n` (markdownlint MD047). An empty
@@ -196,7 +196,7 @@ export function updateFilenameDimensions(
  * Provides WYSIWYG editing using TipTap in a webview
  */
 export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
-  private static readonly MD012_MANAGED_STATE_KEY = 'markdownForHumans.blankLines.managedMd012';
+  private static readonly MD012_MANAGED_STATE_KEY = 'speckitForHumans.blankLines.managedMd012';
 
   // Dedup the "Save the file to see the changes." prompt across panels.
   // A single blank-line-mode change fires `onDidChangeConfiguration` for every
@@ -205,7 +205,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
   private getBlankLineMode(): BlankLineMode {
     const config = vscode.workspace.getConfiguration();
-    const value = config.get<string>('markdownForHumans.blankLines.mode', 'strip');
+    const value = config.get<string>('speckitForHumans.blankLines.mode', 'strip');
     return value === 'preserve' ? 'preserve' : 'strip';
   }
 
@@ -302,7 +302,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   // first time a custom editor opens so tests that never call `resolveCustomTextEditor`
   // don't need this VS Code API on their mock.
   private windowStateListener: vscode.Disposable | undefined;
-  // Debounce timers for `markdownForHumans.autoSave.enabled`, keyed by document
+  // Debounce timers for `speckitForHumans.autoSave.enabled`, keyed by document
   // URI. This setting is independent of VS Code's own `files.autoSave` — it's
   // MFH saving on the user's behalf a short delay after typing stops, separate
   // from the `flushAndSaveIfDirty` bridge (which only fires on focus/window
@@ -363,7 +363,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   public static register(context: vscode.ExtensionContext): vscode.Disposable {
     const provider = new MarkdownEditorProvider(context);
     const providerRegistration = vscode.window.registerCustomEditorProvider(
-      'markdownForHumans.editor',
+      'speckitForHumans.editor',
       provider,
       {
         webviewOptions: {
@@ -488,7 +488,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   private getImageStorageBasePath(document: vscode.TextDocument): string | null {
     const config = vscode.workspace.getConfiguration();
     const imagePathBase = config.get<string>(
-      'markdownForHumans.imagePathBase',
+      'speckitForHumans.imagePathBase',
       'relativeToDocument'
     );
 
@@ -610,49 +610,49 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // Listen for configuration changes and update webview
     const configChangeSubscription = vscode.workspace.onDidChangeConfiguration(e => {
       if (
-        e.affectsConfiguration('markdownForHumans.imageResize.skipWarning') ||
-        e.affectsConfiguration('markdownForHumans.copyAiContextRef.skipSaveWarning') ||
-        e.affectsConfiguration('markdownForHumans.imagePath') ||
-        e.affectsConfiguration('markdownForHumans.imagePathBase') ||
-        e.affectsConfiguration('markdownForHumans.imagePreview.hover.enabled') ||
-        e.affectsConfiguration('markdownForHumans.blankLines.mode') ||
-        e.affectsConfiguration('markdownForHumans.paragraph.spacingBefore') ||
-        e.affectsConfiguration('markdownForHumans.paragraph.spacingAfter') ||
-        e.affectsConfiguration('markdownForHumans.zoom') ||
-        e.affectsConfiguration('markdownForHumans.enableMath') ||
-        e.affectsConfiguration('markdownForHumans.formattingShortcuts.enabled')
+        e.affectsConfiguration('speckitForHumans.imageResize.skipWarning') ||
+        e.affectsConfiguration('speckitForHumans.copyAiContextRef.skipSaveWarning') ||
+        e.affectsConfiguration('speckitForHumans.imagePath') ||
+        e.affectsConfiguration('speckitForHumans.imagePathBase') ||
+        e.affectsConfiguration('speckitForHumans.imagePreview.hover.enabled') ||
+        e.affectsConfiguration('speckitForHumans.blankLines.mode') ||
+        e.affectsConfiguration('speckitForHumans.paragraph.spacingBefore') ||
+        e.affectsConfiguration('speckitForHumans.paragraph.spacingAfter') ||
+        e.affectsConfiguration('speckitForHumans.zoom') ||
+        e.affectsConfiguration('speckitForHumans.enableMath') ||
+        e.affectsConfiguration('speckitForHumans.formattingShortcuts.enabled')
       ) {
         const config = vscode.workspace.getConfiguration();
-        const skipWarning = config.get<boolean>('markdownForHumans.imageResize.skipWarning', false);
+        const skipWarning = config.get<boolean>('speckitForHumans.imageResize.skipWarning', false);
         const skipAiContextSaveWarning = config.get<boolean>(
-          'markdownForHumans.copyAiContextRef.skipSaveWarning',
+          'speckitForHumans.copyAiContextRef.skipSaveWarning',
           false
         );
-        const imagePath = config.get<string>('markdownForHumans.imagePath', 'images');
+        const imagePath = config.get<string>('speckitForHumans.imagePath', 'images');
         const imagePathBase = config.get<string>(
-          'markdownForHumans.imagePathBase',
+          'speckitForHumans.imagePathBase',
           'relativeToDocument'
         );
         const showImageHoverOverlay = config.get<boolean>(
-          'markdownForHumans.imagePreview.hover.enabled',
+          'speckitForHumans.imagePreview.hover.enabled',
           true
         );
         const paragraphSpacingBefore = config.get<number>(
-          'markdownForHumans.paragraph.spacingBefore',
+          'speckitForHumans.paragraph.spacingBefore',
           0
         );
         const paragraphSpacingAfter = config.get<number>(
-          'markdownForHumans.paragraph.spacingAfter',
+          'speckitForHumans.paragraph.spacingAfter',
           0
         );
-        const zoom = config.get<number>('markdownForHumans.zoom', 100);
+        const zoom = config.get<number>('speckitForHumans.zoom', 100);
         const formattingShortcutsEnabled = config.get<boolean>(
-          'markdownForHumans.formattingShortcuts.enabled',
+          'speckitForHumans.formattingShortcuts.enabled',
           true
         );
         const blankLineMode = this.getBlankLineMode();
-        const enableMath = config.get<boolean>('markdownForHumans.enableMath', true);
-        if (e.affectsConfiguration('markdownForHumans.blankLines.mode')) {
+        const enableMath = config.get<boolean>('speckitForHumans.enableMath', true);
+        if (e.affectsConfiguration('speckitForHumans.blankLines.mode')) {
           void this.syncMarkdownlintMd012(blankLineMode).catch(error => {
             console.warn('[MD4H] Failed syncing markdownlint MD012 rule:', error);
           });
@@ -762,32 +762,32 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
     // Get skip warning setting
     const config = vscode.workspace.getConfiguration();
-    const skipWarning = config.get<boolean>('markdownForHumans.imageResize.skipWarning', false);
+    const skipWarning = config.get<boolean>('speckitForHumans.imageResize.skipWarning', false);
     const skipAiContextSaveWarning = config.get<boolean>(
-      'markdownForHumans.copyAiContextRef.skipSaveWarning',
+      'speckitForHumans.copyAiContextRef.skipSaveWarning',
       false
     );
-    const imagePath = config.get<string>('markdownForHumans.imagePath', 'images');
+    const imagePath = config.get<string>('speckitForHumans.imagePath', 'images');
     const imagePathBase = config.get<string>(
-      'markdownForHumans.imagePathBase',
+      'speckitForHumans.imagePathBase',
       'relativeToDocument'
     );
     const showImageHoverOverlay = config.get<boolean>(
-      'markdownForHumans.imagePreview.hover.enabled',
+      'speckitForHumans.imagePreview.hover.enabled',
       true
     );
     const paragraphSpacingBefore = config.get<number>(
-      'markdownForHumans.paragraph.spacingBefore',
+      'speckitForHumans.paragraph.spacingBefore',
       0
     );
-    const paragraphSpacingAfter = config.get<number>('markdownForHumans.paragraph.spacingAfter', 0);
-    const zoom = config.get<number>('markdownForHumans.zoom', 100);
+    const paragraphSpacingAfter = config.get<number>('speckitForHumans.paragraph.spacingAfter', 0);
+    const zoom = config.get<number>('speckitForHumans.zoom', 100);
     const formattingShortcutsEnabled = config.get<boolean>(
-      'markdownForHumans.formattingShortcuts.enabled',
+      'speckitForHumans.formattingShortcuts.enabled',
       true
     );
     const blankLineMode = this.getBlankLineMode();
-    const enableMath = config.get<boolean>('markdownForHumans.enableMath', true);
+    const enableMath = config.get<boolean>('speckitForHumans.enableMath', true);
 
     webview.postMessage({
       type: 'update',
@@ -832,7 +832,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         // it before persisting; otherwise an in-flight WorkspaceEdit could
         // land after save() and the saved bytes would be stale.
         this.inFlightApplyEdits.set(docUri, editPromise);
-        // `markdownForHumans.autoSave.enabled` debounced save — only for
+        // `speckitForHumans.autoSave.enabled` debounced save — only for
         // ordinary typing edits. Save-policy-enforce edits are already saved
         // (or prompted for) by `handleBlankLineModeSavePolicy`.
         if (editReason === 'typing') {
@@ -877,35 +877,35 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         void this.pushSpeckitIndex(document, webview);
         // Also send settings separately
         const config = vscode.workspace.getConfiguration();
-        const skipWarning = config.get<boolean>('markdownForHumans.imageResize.skipWarning', false);
+        const skipWarning = config.get<boolean>('speckitForHumans.imageResize.skipWarning', false);
         const skipAiContextSaveWarning = config.get<boolean>(
-          'markdownForHumans.copyAiContextRef.skipSaveWarning',
+          'speckitForHumans.copyAiContextRef.skipSaveWarning',
           false
         );
-        const imagePath = config.get<string>('markdownForHumans.imagePath', 'images');
+        const imagePath = config.get<string>('speckitForHumans.imagePath', 'images');
         const imagePathBase = config.get<string>(
-          'markdownForHumans.imagePathBase',
+          'speckitForHumans.imagePathBase',
           'relativeToDocument'
         );
         const showImageHoverOverlay = config.get<boolean>(
-          'markdownForHumans.imagePreview.hover.enabled',
+          'speckitForHumans.imagePreview.hover.enabled',
           true
         );
         const paragraphSpacingBefore = config.get<number>(
-          'markdownForHumans.paragraph.spacingBefore',
+          'speckitForHumans.paragraph.spacingBefore',
           0
         );
         const paragraphSpacingAfter = config.get<number>(
-          'markdownForHumans.paragraph.spacingAfter',
+          'speckitForHumans.paragraph.spacingAfter',
           0
         );
-        const zoom = config.get<number>('markdownForHumans.zoom', 100);
+        const zoom = config.get<number>('speckitForHumans.zoom', 100);
         const formattingShortcutsEnabled = config.get<boolean>(
-          'markdownForHumans.formattingShortcuts.enabled',
+          'speckitForHumans.formattingShortcuts.enabled',
           true
         );
         const blankLineMode = this.getBlankLineMode();
-        const enableMath = config.get<boolean>('markdownForHumans.enableMath', true);
+        const enableMath = config.get<boolean>('speckitForHumans.enableMath', true);
         webview.postMessage({
           type: 'settingsUpdate',
           skipResizeWarning: skipWarning,
@@ -959,7 +959,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       case 'openExtensionSettings':
         vscode.commands.executeCommand(
           'workbench.action.openSettings',
-          '@ext:concretio.markdown-for-humans'
+          '@ext:concretio.speckit-for-humans'
         );
         break;
       case 'exportDocument':
@@ -1437,7 +1437,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         hostname: safeAddress,
         headers: {
           Host: parsed.host,
-          'User-Agent': 'MarkdownForHumans-LinkChecker/1.0',
+          'User-Agent': 'SpeckitForHumans-LinkChecker/1.0',
         } as Record<string, string>,
         servername: parsed.hostname,
         path: parsed.pathname + parsed.search,
@@ -1643,7 +1643,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
 
         const config = vscode.workspace.getConfiguration();
-        const imageFolderName = config.get<string>('markdownForHumans.imagePath', 'images');
+        const imageFolderName = config.get<string>('speckitForHumans.imagePath', 'images');
         const imagesDir = path.join(saveBasePath, imageFolderName);
 
         // Create folder if needed
@@ -3634,10 +3634,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
       // Immediately notify webview of the setting change
       // This ensures the setting takes effect right away without waiting for next update
-      const skipWarning = config.get<boolean>('markdownForHumans.imageResize.skipWarning', false);
-      const imagePath = config.get<string>('markdownForHumans.imagePath', 'images');
+      const skipWarning = config.get<boolean>('speckitForHumans.imageResize.skipWarning', false);
+      const imagePath = config.get<string>('speckitForHumans.imagePath', 'images');
       const imagePathBase = config.get<string>(
-        'markdownForHumans.imagePathBase',
+        'speckitForHumans.imagePathBase',
         'relativeToDocument'
       );
       webview.postMessage({
@@ -3734,7 +3734,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   }
 
   /**
-   * Debounced save for `markdownForHumans.autoSave.enabled`. Unlike
+   * Debounced save for `speckitForHumans.autoSave.enabled`. Unlike
    * `flushAndSaveIfDirty` (which bridges VS Code's own `files.autoSave` focus
    * events), this setting is MFH-specific: it saves a short delay after the
    * user stops typing, regardless of focus and regardless of `files.autoSave`.
@@ -3747,7 +3747,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     if (document.uri.scheme === 'untitled') return;
 
     const config = vscode.workspace.getConfiguration();
-    const enabled = config.get<boolean>('markdownForHumans.autoSave.enabled', false);
+    const enabled = config.get<boolean>('speckitForHumans.autoSave.enabled', false);
     if (!enabled) return;
 
     const docUri = document.uri.toString();
@@ -3990,7 +3990,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
                        img-src ${webview.cspSource} https: data: blob:;">
         
         <link href="${styleUri}" rel="stylesheet">
-        <title>Markdown for Humans</title>
+        <title>Speckit for Humans</title>
       </head>
       <body>
         <div id="editor"></div>

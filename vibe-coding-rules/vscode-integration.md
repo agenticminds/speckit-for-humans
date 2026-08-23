@@ -8,7 +8,7 @@
 ## Extension Activation
 
 **Principles:**
-- Activate only when needed (`onCustomEditor:markdownForHumans.editor`)
+- Activate only when needed (`onCustomEditor:speckitForHumans.editor`)
 - Register commands once in `activate()`
 - Clean up in `deactivate()` (dispose subscriptions)
 - Keep extension.ts minimal (delegate to specialized classes)
@@ -47,14 +47,14 @@ vscode.postMessage({
 // In package.json
 "commands": [
   {
-    "command": "markdownForHumans.openFile",
-    "title": "Open with Markdown for Humans",
-    "category": "Markdown for Humans"  // Always categorize
+    "command": "speckitForHumans.openFile",
+    "title": "Open with Speckit for Humans",
+    "category": "Speckit for Humans"  // Always categorize
   }
 ]
 
 // In extension.ts
-vscode.commands.registerCommand('markdownForHumans.openFile', () => {
+vscode.commands.registerCommand('speckitForHumans.openFile', () => {
   // Implementation
 });
 ```
@@ -65,7 +65,7 @@ vscode.commands.registerCommand('markdownForHumans.openFile', () => {
 - Add `when` clauses to limit scope
 - Document all shortcuts in README
 
-**Palette Hygiene:** Prefer toolbar/inline affordances. If palette entry needed, scope with `when: activeCustomEditorId == markdownForHumans.editor`
+**Palette Hygiene:** Prefer toolbar/inline affordances. If palette entry needed, scope with `when: activeCustomEditorId == speckitForHumans.editor`
 
 ---
 
@@ -76,7 +76,7 @@ vscode.commands.registerCommand('markdownForHumans.openFile', () => {
 // package.json
 "configuration": {
   "properties": {
-    "markdownForHumans.theme": {
+    "speckitForHumans.theme": {
       "type": "string",
       "enum": ["auto", "light", "dark", "sepia"],
       "default": "auto",
@@ -176,5 +176,5 @@ Extension (Node.js) ←→ WebView (Browser)
 ### Config Option
 **Files:** `package.json` + `MarkdownEditorProvider.ts`
 1. Add to `package.json` contributes.configuration
-2. Read: `vscode.workspace.getConfiguration('markdownForHumans')`
+2. Read: `vscode.workspace.getConfiguration('speckitForHumans')`
 3. Pass to webview via message

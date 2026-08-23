@@ -90,7 +90,7 @@ describe('MarkdownEditorProvider frontmatter rendering', () => {
 // frontmatter and dropping fields. The fix lengthens the wrapper fence to be
 // longer than any backtick run inside the frontmatter (CommonMark then forbids
 // the inner run from closing it) and teaches the unwrapper to accept the longer
-// fence. See: QA finding FM-19, .concret.io/goal/qa-adversarial-ai-ctx/.
+// fence. See: QA finding FM-19, .agenticminds.ai/goal/qa-adversarial-ai-ctx/.
 //
 // Why these tests assert the two halves (fence length on wrap; recognition on
 // unwrap) rather than a full editor round-trip: the corruption is introduced by

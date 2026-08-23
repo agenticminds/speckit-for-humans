@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2026 Concret.io
+ * Copyright (c) 2025-2026 Agentic Minds
  *
  * Licensed under the MIT License. See LICENSE file in the project root for details.
  */
@@ -15,20 +15,20 @@ export function activate(context: vscode.ExtensionContext) {
   const provider = MarkdownEditorProvider.register(context);
   context.subscriptions.push(provider);
 
-  // Clear active context when switching to non-markdown-for-humans editors
+  // Clear active context when switching to non-speckit-for-humans editors
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(editor => {
       // Custom editors appear as undefined in activeTextEditor, so if we get a text editor here, disable context
       if (editor && editor.document.languageId !== 'markdown') {
         // If a regular text editor is active, clear our active context
         // Note: markdown languageId for default text editor; webview handled via view state events
-        vscode.commands.executeCommand('setContext', 'markdownForHumans.isActive', false);
+        vscode.commands.executeCommand('setContext', 'speckitForHumans.isActive', false);
       }
     })
   );
 
   // Register outline tree view provider (Explorer)
-  const outlineTreeView = vscode.window.createTreeView('markdownForHumansOutline', {
+  const outlineTreeView = vscode.window.createTreeView('speckitForHumansOutline', {
     treeDataProvider: outlineViewProvider,
     showCollapseAll: true,
   });
@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.openFile', async (uri?: vscode.Uri) => {
+    vscode.commands.registerCommand('speckitForHumans.openFile', async (uri?: vscode.Uri) => {
       let targetUri = uri;
 
       const activeEditor = vscode.window.activeTextEditor;
@@ -73,14 +73,14 @@ export function activate(context: vscode.ExtensionContext) {
         await vscode.commands.executeCommand(
           'vscode.openWith',
           targetUri,
-          'markdownForHumans.editor'
+          'speckitForHumans.editor'
         );
       }
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.toggleSource', () => {
+    vscode.commands.registerCommand('speckitForHumans.toggleSource', () => {
       // This will be handled by the webview
       vscode.window.activeTextEditor?.show();
     })
@@ -88,14 +88,14 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register word count detailed stats command
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.showDetailedStats', () => {
+    vscode.commands.registerCommand('speckitForHumans.showDetailedStats', () => {
       wordCount.showDetailedStats();
     })
   );
 
   // Register TOC outline toggle command (Option 2 - TOC Overlay)
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.toggleTocOutlineView', () => {
+    vscode.commands.registerCommand('speckitForHumans.toggleTocOutlineView', () => {
       const panel = getActiveWebviewPanel();
       if (panel) {
         panel.webview.postMessage({ type: 'toggleTocOutlineView' });
@@ -105,7 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Navigate to heading from outline tree
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.navigateToHeading', (pos: number) => {
+    vscode.commands.registerCommand('speckitForHumans.navigateToHeading', (pos: number) => {
       const panel = getActiveWebviewPanel();
       if (panel) {
         panel.webview.postMessage({ type: 'navigateToHeading', pos });
@@ -114,19 +114,19 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.outline.revealCurrent', () => {
+    vscode.commands.registerCommand('speckitForHumans.outline.revealCurrent', () => {
       outlineViewProvider.revealActive(outlineTreeView);
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.outline.filter', () => {
+    vscode.commands.registerCommand('speckitForHumans.outline.filter', () => {
       outlineViewProvider.showFilterInput();
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.outline.clearFilter', () => {
+    vscode.commands.registerCommand('speckitForHumans.outline.clearFilter', () => {
       outlineViewProvider.clearFilter();
     })
   );
@@ -135,7 +135,7 @@ export function activate(context: vscode.ExtensionContext) {
   // as the toolbar button. The webview owns the selection state, so the host
   // command stays a thin trigger.
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.copyAiContextRef', () => {
+    vscode.commands.registerCommand('speckitForHumans.copyAiContextRef', () => {
       const panel = getActiveWebviewPanel();
       if (panel) {
         panel.webview.postMessage({ type: 'triggerCopyAiContextRef' });
@@ -147,16 +147,16 @@ export function activate(context: vscode.ExtensionContext) {
   // reloads and stays in sync with settings.json, reusing the same
   // onDidChangeConfiguration -> postMessage sync path the setting already has.
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownForHumans.toggleFormattingShortcuts', async () => {
+    vscode.commands.registerCommand('speckitForHumans.toggleFormattingShortcuts', async () => {
       const config = vscode.workspace.getConfiguration();
-      const current = config.get<boolean>('markdownForHumans.formattingShortcuts.enabled', true);
+      const current = config.get<boolean>('speckitForHumans.formattingShortcuts.enabled', true);
       await config.update(
-        'markdownForHumans.formattingShortcuts.enabled',
+        'speckitForHumans.formattingShortcuts.enabled',
         !current,
         vscode.ConfigurationTarget.Global
       );
       vscode.window.setStatusBarMessage(
-        `Markdown for Humans: formatting shortcuts ${!current ? 'enabled' : 'disabled'}`,
+        `Speckit for Humans: formatting shortcuts ${!current ? 'enabled' : 'disabled'}`,
         3000
       );
     })

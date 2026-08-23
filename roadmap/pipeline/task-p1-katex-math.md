@@ -203,7 +203,7 @@
 
 ### Flow 8: Disabling math rendering
 1. User opens settings
-2. Sets `markdownForHumans.enableMath: false`
+2. Sets `speckitForHumans.enableMath: false`
 3. Math equations show as plain text: `$E = mc^2$`
 4. User re-enables → equations render again
 

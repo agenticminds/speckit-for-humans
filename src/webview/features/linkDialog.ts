@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2026 Concret.io
+ * Copyright (c) 2025-2026 Agentic Minds
  *
  * Licensed under the MIT License. See LICENSE file in the project root for details.
  */
@@ -86,7 +86,7 @@ function generateHeadingSlug(text: string, existingSlugs: Set<string>): string {
  */
 function loadFilterState(): FileFilterState {
   try {
-    const stored = localStorage.getItem('markdownForHumans.linkFileFilters');
+    const stored = localStorage.getItem('speckitForHumans.linkFileFilters');
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<FileFilterState>;
       return {
@@ -108,7 +108,7 @@ function loadFilterState(): FileFilterState {
  */
 function saveFilterState(state: FileFilterState): void {
   try {
-    localStorage.setItem('markdownForHumans.linkFileFilters', JSON.stringify(state));
+    localStorage.setItem('speckitForHumans.linkFileFilters', JSON.stringify(state));
   } catch (error) {
     console.warn('[MD4H] Failed to save filter state to localStorage', error);
   }
