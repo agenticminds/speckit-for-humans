@@ -8,10 +8,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+---
+
+## [0.4.0] - 2026-08-23
+
 ### What's New
 
 #### Flow Text for Soft Breaks
 New opt-in `speckitForHumans.softBreaks.renderAsSpace` setting draws a single newline inside a paragraph as a space, so hard-wrapped prose flows instead of showing a line break at every wrap point. A blank line still starts a new paragraph. Presentation only - the newlines stay in the saved file, so it still reads well in a plain text editor. Off by default.
+
+### Changed
+
+#### Now Published by Agentic Minds
+The extension ships under the `agenticminds` publisher. The install ID is now
+`agenticminds.speckit-for-humans`. Remaining references to the previous company
+and to the old `Markdown for Humans` / `MD4H` naming were removed from the
+README, the publishing docs and the console log tags.
+
+### Technical Improvements
+
+- Every tagged release now attaches the packaged `.vsix` to a GitHub Release,
+  so the extension can be sideloaded without going through a marketplace.
 
 ---
 
