@@ -10,6 +10,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.5.0] - 2026-08-23
+
+### What's New
+
+#### Go to Spec-Kit ID from Anywhere
+New command **Speckit for Humans: Go to Spec-Kit ID**, bound to `Ctrl+Alt+G`
+(`Cmd+Alt+G` on Mac). Select an identifier like `T042` or `FR-003` anywhere in
+VS Code - a terminal, an AI assistant panel, a plain text file - press the key,
+and land on its definition.
+
+The editor already turns identifiers into clickable links in the documents it
+renders. This covers everything it cannot render. It reads the selection first,
+falls back to the clipboard, and uses the same recognition grammar the links
+use, so `see T042 and FR-003` finds both.
+
+One clean match jumps straight there with no dialog. Anything ambiguous opens a
+picker seeded with what you copied, which doubles as a way to browse every
+identifier in the feature.
+
+To find the right feature folder it widens its search in four steps: the active
+document, the last spec-kit document you had open, spec-kit's own
+`.specify/feature.json` pointer, then every feature folder under `specs/`.
+Spec Kit itself stops at step three and errors; a picker listing everything is a
+better answer than a refusal.
+
+---
+
 ## [0.4.0] - 2026-08-23
 
 ### What's New

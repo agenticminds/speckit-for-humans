@@ -9,11 +9,12 @@ import { MarkdownEditorProvider } from './editor/MarkdownEditorProvider';
 import { WordCountFeature } from './features/wordCount';
 import { getActiveWebviewPanel } from './activeWebview';
 import { outlineViewProvider } from './features/outlineView';
+import { registerGoToIdCommand } from './features/goToId/command';
 
 export function activate(context: vscode.ExtensionContext) {
   // Register the custom editor provider
-  const provider = MarkdownEditorProvider.register(context);
-  context.subscriptions.push(provider);
+  const { registration, provider } = MarkdownEditorProvider.register(context);
+  context.subscriptions.push(registration);
 
   // Clear active context when switching to non-speckit-for-humans editors
   context.subscriptions.push(
@@ -159,6 +160,17 @@ export function activate(context: vscode.ExtensionContext) {
         `Speckit for Humans: formatting shortcuts ${!current ? 'enabled' : 'disabled'}`,
         3000
       );
+    })
+  );
+
+  // Jump to an identifier's definition from a selection or the clipboard. The
+  // editor's own links only work on text this editor renders; this is the way
+  // in from a terminal or an AI assistant panel, which no extension can
+  // decorate.
+  context.subscriptions.push(
+    registerGoToIdCommand({
+      indexStore: provider.speckitIndex,
+      revealDefinition: site => provider.revealDefinition(site),
     })
   );
 }

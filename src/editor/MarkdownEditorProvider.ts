@@ -24,6 +24,7 @@ import {
 } from '../features/speckitIndex/discovery';
 import { SpeckitIndexStore } from '../features/speckitIndex';
 import { SpeckitFreshnessWatcher } from '../features/speckitIndex/watch';
+import { rememberFeatureRoot } from '../features/goToId/lastScope';
 import { recognize } from '../shared/speckitIds/expand';
 import { collectQualifierCandidates } from '../shared/speckitIds/qualifiers';
 
@@ -360,8 +361,30 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     );
   }
 
-  public static register(context: vscode.ExtensionContext): vscode.Disposable {
+  /**
+   * The provider this window is using.
+   *
+   * There is one custom editor provider per extension host, and commands
+   * registered in `activate` need to reach its index store. Module-level state
+   * matching `activeWebview` and `outlineViewProvider` next door, rather than
+   * threading the instance through every registration.
+   */
+  public static active: MarkdownEditorProvider | undefined;
+
+  /**
+   * Register the custom editor and hand back both halves.
+   *
+   * The registration is the disposable to subscribe; the provider is what
+   * commands need in order to reach the shared spec-kit index. Returning only
+   * the disposable would force every caller through the static `active`, which
+   * is typed optional and would put a non-null assertion in `activate`.
+   */
+  public static register(context: vscode.ExtensionContext): {
+    registration: vscode.Disposable;
+    provider: MarkdownEditorProvider;
+  } {
     const provider = new MarkdownEditorProvider(context);
+    MarkdownEditorProvider.active = provider;
     const providerRegistration = vscode.window.registerCustomEditorProvider(
       'speckitForHumans.editor',
       provider,
@@ -373,7 +396,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         supportsMultipleEditorsPerDocument: false,
       }
     );
-    return providerRegistration;
+    return { registration: providerRegistration, provider };
   }
 
   constructor(private readonly context: vscode.ExtensionContext) {}
@@ -585,7 +608,12 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // Watch this document's feature folder and the shared briefs folder, so an
     // edit anywhere in them refreshes THIS panel even though nobody touched it
     // (FR-025, C-msg-2f).
-    this.ensureSpeckitWatcher().watch(discoverFeatureScope(document.uri));
+    const openedScope = discoverFeatureScope(document.uri);
+    this.ensureSpeckitWatcher().watch(openedScope);
+    // Remember where we are, so "Go to Spec-Kit ID" still has a feature folder
+    // to search after focus moves to a terminal or an assistant panel and
+    // `activeTextEditor` goes empty.
+    rememberFeatureRoot(openedScope.featureRoot);
 
     // Update webview when document changes
     const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
@@ -3396,6 +3424,49 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       // Logged, never surfaced. SC-007 counts dialogs, not log lines.
       console.warn('[Speckit] Spec-kit definition open failed:', error);
     }
+  }
+
+  /**
+   * The spec-kit definition index, for callers outside the webview protocol.
+   *
+   * Shared rather than rebuilt so the "Go to Spec-Kit ID" command reads a
+   * feature folder that is already warm from being displayed, instead of paying
+   * for a second walk of the same artifacts.
+   */
+  public get speckitIndex(): SpeckitIndexStore {
+    return this.speckitIndexStore;
+  }
+
+  /**
+   * Open an artifact and reveal a definition inside it, addressed by its site
+   * rather than by a webview message.
+   *
+   * The command-palette and keybinding entry point into the same machinery
+   * `handleOpenSpeckitDefinition` uses. It skips the containment check that
+   * handler performs, and correctly so: this caller did not receive a path from
+   * a webview, it read one out of the index it owns, so there is no untrusted
+   * input to gate.
+   */
+  public async revealDefinition(site: {
+    id: string;
+    fsPath: string;
+    kind: string;
+    headingText?: string;
+  }): Promise<void> {
+    const target = vscode.Uri.file(site.fsPath);
+    const reveal: SpeckitRevealMessage = {
+      type: 'revealSpeckitDefinition',
+      id: site.id,
+      kind: site.kind,
+      ...(site.headingText === undefined ? {} : { headingText: site.headingText }),
+    };
+    // Queue BEFORE opening, for the same reason as the message path: a panel
+    // that does not exist yet cannot be sent to.
+    this.dispatchSpeckitReveal(target, reveal);
+    // `vscode.openWith`, not `showTextDocument` - this editor's priority is
+    // `option`, and a bullet or table row cannot be revealed in a plain text
+    // editor at all (C-msg-3d).
+    await vscode.commands.executeCommand('vscode.openWith', target, SPECKIT_EDITOR_VIEW_TYPE);
   }
 
   /**

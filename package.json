@@ -1,8 +1,8 @@
 {
   "name": "speckit-for-humans",
   "displayName": "Speckit for Humans: WYSIWYG Editor",
-  "description": "A full-featured WYSIWYG Markdown editor with visual table editing, drag-and-drop images, Mermaid diagrams, and distraction-free writing—all inside VS Code.",
-  "version": "0.4.0",
+  "description": "A full-featured WYSIWYG Markdown editor with visual table editing, drag-and-drop images, Mermaid diagrams, and distraction-free writing\u2014all inside VS Code.",
+  "version": "0.5.0",
   "publisher": "agenticminds",
   "author": {
     "name": "Agentic Minds",
@@ -116,6 +116,10 @@
       {
         "command": "speckitForHumans.toggleFormattingShortcuts",
         "title": "Speckit for Humans: Toggle Formatting Shortcuts (Cmd/Ctrl+B/I/U)"
+      },
+      {
+        "command": "speckitForHumans.goToId",
+        "title": "Speckit for Humans: Go to Spec-Kit ID (from selection or clipboard)"
       }
     ],
     "keybindings": [
@@ -130,6 +134,11 @@
         "key": "ctrl+alt+b",
         "mac": "cmd+alt+b",
         "when": "activeCustomEditorId == 'speckitForHumans.editor'"
+      },
+      {
+        "command": "speckitForHumans.goToId",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g"
       }
     ],
     "views": {
