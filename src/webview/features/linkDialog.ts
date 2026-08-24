@@ -98,7 +98,7 @@ function loadFilterState(): FileFilterState {
       };
     }
   } catch (error) {
-    console.warn('[MD4H] Failed to load filter state from localStorage', error);
+    console.warn('[Speckit] Failed to load filter state from localStorage', error);
   }
   return { all: true, md: true, images: true, code: true, config: true };
 }
@@ -110,7 +110,7 @@ function saveFilterState(state: FileFilterState): void {
   try {
     localStorage.setItem('speckitForHumans.linkFileFilters', JSON.stringify(state));
   } catch (error) {
-    console.warn('[MD4H] Failed to save filter state to localStorage', error);
+    console.warn('[Speckit] Failed to save filter state to localStorage', error);
   }
 }
 
@@ -317,7 +317,7 @@ function focusEditor(editor: Editor | null) {
       maybeFocused.run();
     }
   } catch (error) {
-    console.warn('[MD4H] Failed to restore focus to editor after link dialog', error);
+    console.warn('[Speckit] Failed to restore focus to editor after link dialog', error);
   }
 }
 
@@ -326,7 +326,7 @@ const setSelectionHighlight = (range: Range | null) => {
   try {
     currentEditor.commands.setTextSelection({ from: range.from, to: range.to });
   } catch (error) {
-    console.warn('[MD4H] Failed to set selection highlight for link dialog', error);
+    console.warn('[Speckit] Failed to set selection highlight for link dialog', error);
   }
 };
 
@@ -600,7 +600,7 @@ function handleFileSearch(query: string, filters: FileFilterState): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const vscode = (window as any).vscode;
     if (vscode && typeof vscode.postMessage === 'function') {
-      console.log('[MD4H] Sending file search request:', {
+      console.log('[Speckit] Sending file search request:', {
         query: trimmedQuery,
         filters,
         requestId,
@@ -612,7 +612,7 @@ function handleFileSearch(query: string, filters: FileFilterState): void {
         requestId,
       });
     } else {
-      console.warn('[MD4H] vscode API not available for file search');
+      console.warn('[Speckit] vscode API not available for file search');
     }
   }, 300);
 }
@@ -644,7 +644,7 @@ function handleHeadingExtraction(editor: Editor, query: string, urlInput: HTMLIn
       updateAutocompleteDropdown(autocompleteDropdown, limited, urlInput);
     }
   } catch (error) {
-    console.error('[MD4H] Failed to extract headings', error);
+    console.error('[Speckit] Failed to extract headings', error);
     closeAutocomplete();
   }
 }
@@ -1228,7 +1228,7 @@ export function hideLinkDialog(): void {
         to: originalSelection.to,
       });
     } catch (error) {
-      console.warn('[MD4H] Failed to restore selection after link dialog', error);
+      console.warn('[Speckit] Failed to restore selection after link dialog', error);
     }
   }
 
@@ -1251,28 +1251,28 @@ export function isLinkDialogVisible(): boolean {
  * Handle file search results from extension
  */
 export function handleFileSearchResults(results: FileSearchResult[], requestId: number): void {
-  console.log('[MD4H] Received file search results:', {
+  console.log('[Speckit] Received file search results:', {
     resultsCount: results.length,
     requestId,
     currentRequestId: fileSearchRequestId,
   });
 
   if (requestId !== fileSearchRequestId) {
-    console.log('[MD4H] Ignoring outdated search results (requestId mismatch)');
+    console.log('[Speckit] Ignoring outdated search results (requestId mismatch)');
     return;
   }
 
   if (!autocompleteDropdown || !linkDialogElement) {
-    console.warn('[MD4H] Autocomplete dropdown or dialog element not available');
+    console.warn('[Speckit] Autocomplete dropdown or dialog element not available');
     return;
   }
 
   const urlInput = linkDialogElement.querySelector('#link-url-input') as HTMLInputElement;
   if (!urlInput) {
-    console.warn('[MD4H] URL input not found');
+    console.warn('[Speckit] URL input not found');
     return;
   }
 
-  console.log('[MD4H] Updating autocomplete dropdown with', results.length, 'results');
+  console.log('[Speckit] Updating autocomplete dropdown with', results.length, 'results');
   updateAutocompleteDropdown(autocompleteDropdown, results, urlInput);
 }

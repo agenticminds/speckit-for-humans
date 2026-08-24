@@ -369,7 +369,7 @@ export async function copyAiContextReference(
     if (result.ok) {
       range = result.range;
     } else {
-      console.warn('[MD4H][aiContextRef]', result);
+      console.warn('[Speckit][aiContextRef]', result);
       range = null;
     }
   }

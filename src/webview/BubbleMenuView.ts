@@ -552,11 +552,11 @@ export function createFormattingToolbar(editor: Editor): HTMLElement {
         const vscodeApi = window.vscode;
         if (vscodeApi && editor) {
           showImageInsertDialog(editor, vscodeApi).catch(error => {
-            console.error('[MD4H] Failed to show image insert dialog:', error);
+            console.error('[Speckit] Failed to show image insert dialog:', error);
           });
         } else {
           console.warn(
-            '[MD4H] Cannot show image insert dialog: vscode API or editor not available'
+            '[Speckit] Cannot show image insert dialog: vscode API or editor not available'
           );
         }
       },

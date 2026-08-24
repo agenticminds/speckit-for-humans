@@ -36,7 +36,7 @@ function focusEditor(editor: Editor | null) {
       maybeFocused.run();
     }
   } catch (error) {
-    console.warn('[MD4H] Failed to restore focus to editor after table dialog', error);
+    console.warn('[Speckit] Failed to restore focus to editor after table dialog', error);
   }
 }
 

@@ -152,7 +152,7 @@ function applySearchDecorations(
     const tr = editor.state.tr.setMeta(searchPluginKey, decorationSet);
     editor.view.dispatch(tr);
   } catch (error) {
-    console.warn('[MD4H] Skipping search decorations:', error);
+    console.warn('[Speckit] Skipping search decorations:', error);
   }
 }
 

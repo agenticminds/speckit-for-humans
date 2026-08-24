@@ -205,7 +205,7 @@ export function showImageMenu(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (window as any).showImageRenameDialog(img, vscodeApi);
         } else {
-          console.warn('[MD4H] Rename dialog not available yet');
+          console.warn('[Speckit] Rename dialog not available yet');
         }
       } else if (action === 'openInFinder') {
         hideImageMenu(menu);

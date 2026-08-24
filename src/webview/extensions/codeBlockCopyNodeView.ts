@@ -59,7 +59,7 @@ async function copyCodeText(text: string): Promise<boolean> {
       return true;
     }
   } catch (error) {
-    console.warn('[MD4H] Clipboard API unavailable, using copy fallback:', error);
+    console.warn('[Speckit] Clipboard API unavailable, using copy fallback:', error);
   }
 
   return copyWithExecCommand(text);
@@ -151,7 +151,7 @@ export function createCodeBlockCopyNodeView(
         }, COPY_FEEDBACK_MS);
       })
       .catch(error => {
-        console.error('[MD4H] Failed to copy code block:', error);
+        console.error('[Speckit] Failed to copy code block:', error);
       });
   });
 

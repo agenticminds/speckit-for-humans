@@ -252,7 +252,7 @@ export const Mermaid = Node.create({
         try {
           editor.chain().setNodeSelection(pos).run();
         } catch (err) {
-          console.warn('[MD4H] Failed to set mermaid node selection:', err);
+          console.warn('[Speckit] Failed to set mermaid node selection:', err);
         }
       };
 

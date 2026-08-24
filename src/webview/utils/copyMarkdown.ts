@@ -55,7 +55,7 @@ export function getSelectionAsMarkdown(editor: Editor): string | null {
     // Fallback: Convert to basic markdown by analyzing node types
     return sliceToBasicMarkdown(editor, from, to);
   } catch (error) {
-    console.error('[MD4H] Error getting selection as markdown:', error);
+    console.error('[Speckit] Error getting selection as markdown:', error);
     // Fallback to plain text
     return editor.state.doc.textBetween(from, to, '\n\n', '\n');
   }
@@ -139,7 +139,7 @@ export async function copyToClipboard(markdown: string): Promise<CopyResult> {
       await navigator.clipboard.writeText(markdown);
       return { success: true, markdown };
     } catch (err) {
-      console.warn('[MD4H] Clipboard API failed, trying fallback:', err);
+      console.warn('[Speckit] Clipboard API failed, trying fallback:', err);
     }
   }
 
@@ -212,9 +212,9 @@ export async function copySelectionAsMarkdown(editor: Editor): Promise<CopyResul
   showCopyFeedback(result.success);
 
   if (result.success) {
-    console.log('[MD4H] Copied to clipboard:', markdown.substring(0, 100) + '...');
+    console.log('[Speckit] Copied to clipboard:', markdown.substring(0, 100) + '...');
   } else {
-    console.error('[MD4H] Copy failed:', result.error);
+    console.error('[Speckit] Copy failed:', result.error);
   }
 
   return result;

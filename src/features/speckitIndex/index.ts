@@ -496,7 +496,7 @@ function flatten(files: Map<string, DefinitionSite[]>, featureRoot: string): Def
   all.push(...keyed.map(entry => entry.site));
   if (all.length > DEFINITION_CAP) {
     console.warn(
-      `[MD4H] Spec-kit definition cap reached: ${all.length} found, keeping ${DEFINITION_CAP}. ` +
+      `[Speckit] Spec-kit definition cap reached: ${all.length} found, keeping ${DEFINITION_CAP}. ` +
         'Identifiers beyond the cap will read as undefined.'
     );
     return all.slice(0, DEFINITION_CAP);

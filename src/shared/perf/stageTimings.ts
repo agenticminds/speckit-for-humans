@@ -173,7 +173,7 @@ export class StageTimings {
         `${stage}=${sample.totalMs.toFixed(2)}ms/${sample.calls} (max ${sample.maxMs.toFixed(2)}ms)`
       );
     }
-    return `[MD4H] speckit timings ${label}: ${parts.length > 0 ? parts.join(' ') : 'nothing recorded'}`;
+    return `[Speckit] speckit timings ${label}: ${parts.length > 0 ? parts.join(' ') : 'nothing recorded'}`;
   }
 
   /**

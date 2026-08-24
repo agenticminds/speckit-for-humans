@@ -143,7 +143,7 @@ code --install-extension speckit-for-humans-0.1.0.vsix
 **Recommended approach (auto-bumps version):**
 ```bash
 # Login to marketplace (one-time per session)
-vsce login concretio
+vsce login agenticminds
 
 # Choose version type and publish
 vsce publish patch  # Bug fixes: 0.1.0 → 0.1.1
@@ -174,7 +174,7 @@ bun add -g ovsx
 # Get personal access token from https://open-vsx.org/user-settings/tokens
 
 # Create namespace (first publish only)
-ovsx create-namespace concretio -p <your-token>
+ovsx create-namespace agenticminds -p <your-token>
 ```
 
 **Publish:**
@@ -183,7 +183,7 @@ ovsx create-namespace concretio -p <your-token>
 ovsx publish -p <your-token>
 
 # Verify
-# https://open-vsx.org/extension/concretio/speckit-for-humans
+# https://open-vsx.org/extension/agenticminds/speckit-for-humans
 ```
 
 **Result:** Extension becomes available in:
@@ -654,7 +654,7 @@ Test these features manually:
 ### 4. Publish
 ```bash
 # Login to marketplace
-vsce login concretio
+vsce login agenticminds
 
 # Publish with automatic version bump (recommended)
 vsce publish patch  # or minor/major
@@ -707,7 +707,7 @@ bun run package:release    # Release package (via vscode:prepublish hook)
 vsce publish patch         # Publish to VS Code Marketplace (auto-bumps version)
 bun run publish:release    # Or use: bun run publish:release (runs vsce publish)
 bun run publish:ovsx:release  # Publish to Open VSX (for Cursor & Windsurf)
-                           # First time: ovsx create-namespace concretio -p <token>
+                           # First time: ovsx create-namespace agenticminds -p <token>
 ```
 
 ### Expected Bundle Sizes

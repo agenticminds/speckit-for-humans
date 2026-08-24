@@ -11,7 +11,7 @@ Per constitution principle 6, **build success and passing unit tests are not evi
 ## Prerequisites
 
 ```bash
-cd /Users/marty/am/speckit-for-humans
+cd /path/to/speckit-for-humans
 bun install
 ```
 

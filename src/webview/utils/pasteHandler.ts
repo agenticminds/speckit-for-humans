@@ -122,7 +122,7 @@ export function htmlToMarkdown(html: string): string {
         .trim()
     );
   } catch (error) {
-    console.error('[MD4H] Error converting HTML to markdown:', error);
+    console.error('[Speckit] Error converting HTML to markdown:', error);
     // Return empty string on error - caller should fall back to plain text
     throw error;
   }

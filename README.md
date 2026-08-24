@@ -2,7 +2,7 @@
 
 **Seamless WYSIWYG markdown editing for VS Code** — Write markdown the way humans think.
 
-![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/concretio.speckit-for-humans?label=VS%20Code%20Marketplace&logo=visual-studio-code) ![Open VSX](https://img.shields.io/open-vsx/v/concretio/speckit-for-humans?label=Open%20VSX&logo=eclipse) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/agenticminds.speckit-for-humans?label=VS%20Code%20Marketplace&logo=visual-studio-code) ![Open VSX](https://img.shields.io/open-vsx/v/agenticminds/speckit-for-humans?label=Open%20VSX&logo=eclipse) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
 ---
 
@@ -105,13 +105,13 @@ Built on TipTap with a **human-first design philosophy**:
 
 **Option 1: Via Marketplace (Recommended)**
 
-1. Visit [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=concretio.speckit-for-humans)
+1. Visit [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=agenticminds.speckit-for-humans)
 2. Click "Install"
 
 **Option 2: Within VS Code**
 
 1. Open Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-2. Search for "Speckit for Humans" or use the extension ID: `concretio.speckit-for-humans`
+2. Search for "Speckit for Humans" or use the extension ID: `agenticminds.speckit-for-humans`
 3. Click Install
 
 **Cursor / Windsurf / VSCodium / Other Open VSX IDEs**
@@ -119,10 +119,10 @@ Built on TipTap with a **human-first design philosophy**:
 **Via Open VSX Registry:**
 
 1. Open Extensions panel
-2. Search for "Speckit for Humans" or use the extension ID: `concretio.speckit-for-humans`
-3. Install (automatically pulls from [Open VSX Registry](https://open-vsx.org/extension/concretio/speckit-for-humans))
+2. Search for "Speckit for Humans" or use the extension ID: `agenticminds.speckit-for-humans`
+3. Install (automatically pulls from [Open VSX Registry](https://open-vsx.org/extension/agenticminds/speckit-for-humans))
 
-**Direct Link:** [Open VSX Registry](https://open-vsx.org/extension/concretio/speckit-for-humans)
+**Direct Link:** [Open VSX Registry](https://open-vsx.org/extension/agenticminds/speckit-for-humans)
 
 **Supported IDEs:**
 
@@ -133,7 +133,7 @@ Built on TipTap with a **human-first design philosophy**:
 - [Eclipse Theia](https://theia-ide.org/)
 - Other Open VSX-compatible IDEs
 
-> 💡 **Pro Tip:** For precise results, search using the extension ID `concretio.speckit-for-humans` in the Extensions panel of any IDE.
+> 💡 **Pro Tip:** For precise results, search using the extension ID `agenticminds.speckit-for-humans` in the Extensions panel of any IDE.
 
 ### Usage
 

@@ -28,11 +28,11 @@ git commit -m "chore: prepare release"
 git push
 
 # 5. Publish to VS Code Marketplace (auto-bumps version)
-vsce login concretio
+vsce login agenticminds
 vsce publish patch  # Choose: patch, minor, or major
 
 # 6. Publish to Open VSX Registry (for Cursor & Windsurf)
-# First time only: ovsx create-namespace concretio -p <your-token>
+# First time only: ovsx create-namespace agenticminds -p <your-token>
 ovsx publish -p <your-token>
 
 # 7. Create git tag AFTER publish
@@ -101,7 +101,7 @@ git push origin --tags
 ### Publish to VS Code Marketplace
 
 **Recommended: Automatic version bump + publish**
-- [ ] Login: `vsce login concretio`
+- [ ] Login: `vsce login agenticminds`
 - [ ] Choose version type and publish:
   - `vsce publish patch` — Bug fixes (0.1.0 → 0.1.1)
   - `vsce publish minor` — New features (0.1.1 → 0.2.0)
@@ -128,13 +128,13 @@ git push origin --tags
 **One-Time Setup (First Publish Only):**
 - [ ] Install ovsx CLI: `bun add -g ovsx`
 - [ ] Get token from https://open-vsx.org/user-settings/tokens
-- [ ] Create namespace: `ovsx create-namespace concretio -p <your-token>`
+- [ ] Create namespace: `ovsx create-namespace agenticminds -p <your-token>`
   - ⚠️ **Required before first publish** - namespace must match publisher in package.json
   - Only needed once per publisher
 
 **Every Release:**
 - [ ] Publish: `ovsx publish -p <your-token>`
-- [ ] Verify at https://open-vsx.org/extension/concretio/speckit-for-humans
+- [ ] Verify at https://open-vsx.org/extension/agenticminds/speckit-for-humans
 
 ### Git Tag & GitHub Release (Post-Publish)
 
@@ -155,14 +155,14 @@ git push origin --tags
 ## Post-Release
 
 ### Verify VS Code Marketplace
-- [ ] Extension appears: https://marketplace.visualstudio.com/items?itemName=concretio.speckit-for-humans
+- [ ] Extension appears: https://marketplace.visualstudio.com/items?itemName=agenticminds.speckit-for-humans
 - [ ] All metadata correct
 - [ ] Screenshots display correctly
 - [ ] Links work
 - [ ] Test installation from VS Code
 
 ### Verify Open VSX Registry
-- [ ] Extension appears: https://open-vsx.org/extension/concretio/speckit-for-humans
+- [ ] Extension appears: https://open-vsx.org/extension/agenticminds/speckit-for-humans
 - [ ] All metadata correct
 - [ ] Test installation from at least one Open VSX-compatible IDE:
   - [ ] Cursor IDE
@@ -178,13 +178,13 @@ git push origin --tags
 bun run lint:fix && bun run test && bun run build:release && bun run package:release
 
 # Publish to VS Code Marketplace
-vsce login concretio
+vsce login agenticminds
 vsce publish patch  # For bug fixes (0.1.0 → 0.1.1)
 # or: vsce publish minor  # For new features (0.1.1 → 0.2.0)
 # or: vsce publish major  # For breaking changes (0.2.0 → 1.0.0)
 
 # Publish to Open VSX (for Cursor, Windsurf, VSCodium & more)
-# First time only: ovsx create-namespace concretio -p <your-token>
+# First time only: ovsx create-namespace agenticminds -p <your-token>
 ovsx publish -p <your-token>
 
 # After publishing, create git tag
@@ -194,5 +194,5 @@ git push origin --tags
 
 **Notes:**
 - Get Open VSX token from https://open-vsx.org/user-settings/tokens
-- First publish requires creating namespace: `ovsx create-namespace concretio -p <your-token>`
+- First publish requires creating namespace: `ovsx create-namespace agenticminds -p <your-token>`
 

@@ -206,7 +206,7 @@ export class SpeckitFreshnessWatcher implements vscode.Disposable {
       } catch (error) {
         // An unreadable artifact degrades to "that identifier is undefined",
         // never to a dialog (FR-010, SC-007).
-        console.warn('[MD4H] Spec-kit index refresh failed:', error);
+        console.warn('[Speckit] Spec-kit index refresh failed:', error);
       }
     }
 
