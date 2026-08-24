@@ -211,6 +211,63 @@ const signalReady = () => {
   hasSentReadySignal = true;
 };
 
+// The host sends exactly one `update` per open, and that message is the only
+// thing that builds the editor. If it never arrives the pane stays an empty
+// <div>, which reads as an empty document rather than as a failure. Ask again a
+// bounded number of times, then say so out loud.
+const CONTENT_WATCHDOG_MS = 1500;
+const CONTENT_WATCHDOG_MAX_ATTEMPTS = 3;
+let hasReceivedContent = false;
+let contentWatchdogTimer: number | null = null;
+let contentWatchdogAttempts = 0;
+
+function showEditorFailure(title: string, detail: string): void {
+  const host = document.querySelector('#editor') as HTMLElement | null;
+  if (!host) return;
+  host.textContent = '';
+  const box = document.createElement('div');
+  box.style.color = 'red';
+  box.style.padding = '20px';
+  box.style.fontFamily = 'monospace';
+  const heading = document.createElement('h3');
+  heading.textContent = title;
+  const body = document.createElement('p');
+  body.textContent = detail;
+  box.append(heading, body);
+  host.append(box);
+}
+
+function disarmContentWatchdog(): void {
+  hasReceivedContent = true;
+  if (contentWatchdogTimer !== null) {
+    window.clearTimeout(contentWatchdogTimer);
+    contentWatchdogTimer = null;
+  }
+}
+
+function armContentWatchdog(): void {
+  if (hasReceivedContent || contentWatchdogTimer !== null) return;
+  contentWatchdogTimer = window.setTimeout(() => {
+    contentWatchdogTimer = null;
+    if (hasReceivedContent) return;
+    contentWatchdogAttempts += 1;
+    if (contentWatchdogAttempts <= CONTENT_WATCHDOG_MAX_ATTEMPTS) {
+      console.warn(
+        `[Speckit] No content ${CONTENT_WATCHDOG_MS}ms after ready — re-requesting ` +
+          `(attempt ${contentWatchdogAttempts}/${CONTENT_WATCHDOG_MAX_ATTEMPTS})`
+      );
+      vscode.postMessage({ type: 'requestContent' });
+      armContentWatchdog();
+      return;
+    }
+    showEditorFailure(
+      'Could not load this document',
+      'The editor never received the file contents. Close this tab and reopen it. ' +
+        'If it keeps happening, please report it with the Webview Developer Tools console output.'
+    );
+  }, CONTENT_WATCHDOG_MS);
+}
+
 /**
  * Track content we're about to send to prevent echo updates
  */
@@ -1253,6 +1310,9 @@ window.addEventListener('message', (event: MessageEvent) => {
 
     switch (message.type) {
       case 'update':
+        // Content arrived; stop the watchdog whatever happens next. Init
+        // failures paint their own error box (see initializeEditor's catch).
+        disarmContentWatchdog();
         // Record the document's own path. The webview cannot discover this for
         // itself, and spec-kit feature-folder resolution needs it. Null means
         // the document has no path on disk, so nothing in it may be linked.
@@ -1805,6 +1865,14 @@ window.addEventListener('message', (event: MessageEvent) => {
     }
   } catch (error) {
     console.error('[Speckit] Error handling message:', error);
+    // A throw while handling the FIRST `update` aborts initialization before
+    // initializeEditor's own catch can paint anything, and nothing retries.
+    if (!editor) {
+      showEditorFailure(
+        'Could not load this document',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
+    }
   }
 });
 
@@ -1942,6 +2010,7 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     isDomReady = true;
     signalReady();
+    armContentWatchdog();
 
     if (!editor && pendingInitialContent !== null) {
       initializeEditor(pendingInitialContent);
@@ -1951,6 +2020,7 @@ if (document.readyState === 'loading') {
 } else {
   isDomReady = true;
   signalReady();
+  armContentWatchdog();
   if (!editor && pendingInitialContent !== null) {
     initializeEditor(pendingInitialContent);
     pendingInitialContent = null;
@@ -2294,5 +2364,22 @@ export const __testing = {
   },
   isPasteTargetedAtEditorForTests(target: EventTarget | null) {
     return isPasteTargetedAtEditor(target);
+  },
+  armContentWatchdogForTests() {
+    armContentWatchdog();
+  },
+  disarmContentWatchdogForTests() {
+    disarmContentWatchdog();
+  },
+  resetContentWatchdogForTests() {
+    if (contentWatchdogTimer !== null) {
+      window.clearTimeout(contentWatchdogTimer);
+      contentWatchdogTimer = null;
+    }
+    hasReceivedContent = false;
+    contentWatchdogAttempts = 0;
+  },
+  getContentWatchdogAttemptsForTests() {
+    return contentWatchdogAttempts;
   },
 };

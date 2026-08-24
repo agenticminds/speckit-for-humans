@@ -632,7 +632,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // Track active panel
     setActiveWebviewPanel(webviewPanel, document);
 
-    // Send initial content to webview
+    // Optimistic fast path ONLY — never the authoritative send. The webview's
+    // script has not run yet (see `ready: false` above), so this may be dropped
+    // (C-msg-4e); the forced resend in `case 'ready'` is what guarantees
+    // delivery. Do not add logic that assumes this landed.
     this.updateWebview(document, webviewPanel.webview);
 
     // Listen for configuration changes and update webview
@@ -770,24 +773,37 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   /**
    * Send document content to webview
    * Skips update if it's from a recent webview edit (avoid feedback loop)
+   *
+   * `force` skips BOTH dedupe guards, and is only for a webview that has just
+   * told us it holds nothing (`ready` / `requestContent`). Both guards exist to
+   * stop content the WEBVIEW already has from being echoed back at it; a webview
+   * whose script has just started has no content, so there is no echo to
+   * suppress and no loop to re-enter — while suppressing here is fatal, because
+   * `update` is the only message that constructs the editor (C-msg-4e).
    */
-  private updateWebview(document: vscode.TextDocument, webview: vscode.Webview) {
+  private updateWebview(
+    document: vscode.TextDocument,
+    webview: vscode.Webview,
+    options?: { force?: boolean }
+  ) {
     const docUri = document.uri.toString();
     const lastEditTime = this.pendingEdits.get(docUri);
     const mode = this.getBlankLineMode();
     const rawContent = document.getText();
     const currentContent = applyBlankLinePolicy(rawContent, mode);
 
-    // Skip update if content matches what we already sent from the webview
-    const lastSentContent = this.lastWebviewContent.get(docUri);
-    if (lastSentContent !== undefined && lastSentContent === currentContent) {
-      return;
-    }
+    if (!options?.force) {
+      // Skip update if content matches what we already sent from the webview
+      const lastSentContent = this.lastWebviewContent.get(docUri);
+      if (lastSentContent !== undefined && lastSentContent === currentContent) {
+        return;
+      }
 
-    // Skip update if this change came from webview within last 100ms
-    // This prevents feedback loops while allowing external Git changes to sync
-    if (lastEditTime && Date.now() - lastEditTime < 100) {
-      return;
+      // Skip update if this change came from webview within last 100ms
+      // This prevents feedback loops while allowing external Git changes to sync
+      if (lastEditTime && Date.now() - lastEditTime < 100) {
+        return;
+      }
     }
 
     // Transform content for webview (wrap frontmatter in code block)
@@ -902,14 +918,26 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
         break;
       }
+      // `requestContent` is the webview's content watchdog re-asking after no
+      // `update` ever arrived. It shares this body because every step here is
+      // idempotent; `ready` itself still fires exactly once per webview
+      // lifetime, so C-msg-4e's flush semantics are unchanged.
+      case 'requestContent':
       case 'ready': {
         // The webview's script is running, so messages posted to it now arrive.
         // A reloaded webview signals ready again in a fresh script context,
         // which is why this is a plain assignment and the flush below covers the
         // reload case without needing to detect it (C-msg-4e).
         this.markPanelReady(document);
-        // Webview is ready, send initial content and settings
-        this.updateWebview(document, webview);
+        // Webview is ready, send initial content and settings.
+        //
+        // `force` is load-bearing, not defensive. The optimistic push in
+        // `resolveCustomTextEditor` has already cached this exact content, so an
+        // unforced call returns at the equality guard and posts nothing — and a
+        // webview that missed that pre-ready push would then stay blank for the
+        // life of the tab, with no error and no retry. Forcing also makes the
+        // reload case above actually true for content, not just for reveals.
+        this.updateWebview(document, webview, { force: true });
         // The definition index, as its own message type. NEVER folded into
         // `update` (C-msg-2a): three separate layers would swallow it — the
         // content-equality guard and the 100ms echo suppressor in
