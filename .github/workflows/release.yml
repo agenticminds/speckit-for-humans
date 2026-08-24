@@ -1,0 +1,87 @@
+name: Release
+
+# Publishes a GitHub Release with the packaged .vsix attached as a download.
+#
+# Trigger: push a version tag, e.g.
+#   git tag v0.4.0 && git push origin v0.4.0
+#
+# Or run it by hand from the Actions tab (workflow_dispatch) against a tag.
+#
+# All third-party actions are pinned to commit SHAs (not tags) to defend
+# against tag-hijack supply-chain attacks. When bumping versions, resolve
+# the new SHA via:
+#   gh api repos/<owner>/<repo>/git/refs/tags/<tag> --jq .object.sha
+#
+# The release itself is created with the preinstalled `gh` CLI rather than a
+# third-party release action, so no extra action needs trusting or pinning.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Default to no permissions; the single job opts in to exactly what it needs.
+permissions: {}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # required to create the release and upload the .vsix
+
+    steps:
+      # actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 24.x
+        # actions/setup-node@v4
+        # Node is still required: the build scripts are invoked as `node scripts/*.js`.
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24.x
+
+      - name: Use Bun
+        # oven-sh/setup-bun@v2.2.0
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run linter
+        run: bun run lint
+
+      - name: Run tests
+        run: bun run test
+
+      - name: Package extension
+        # Runs vscode:prepublish -> build:release -> verify-build, then vsce package.
+        run: bun run package:release
+
+      - name: Verify tag matches package.json version
+        # A tag of v0.4.0 must package speckit-for-humans-0.4.0.vsix. If they
+        # disagree the release would ship a mislabelled artifact, so fail loudly.
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          pkg_version="$(node -p "require('./package.json').version")"
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [ "$pkg_version" != "$tag_version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json version $pkg_version"
+            exit 1
+          fi
+
+      - name: Create GitHub release with .vsix attached
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          vsix="$(ls -1 ./*.vsix | head -n 1)"
+          echo "Attaching $vsix"
+          gh release create "$GITHUB_REF_NAME" "$vsix" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$GITHUB_REF_NAME" \
+            --notes "Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=agenticminds.speckit-for-humans), the [Open VSX Registry](https://open-vsx.org/extension/agenticminds/speckit-for-humans), or download the \`.vsix\` below and run \`code --install-extension <file>.vsix\`.
+
+          See [CHANGELOG.md](https://github.com/$GITHUB_REPOSITORY/blob/main/CHANGELOG.md) for what changed." \
+            --verify-tag
