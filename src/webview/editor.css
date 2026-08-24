@@ -3527,3 +3527,26 @@ body.saving-feedback {
   outline: 1px solid var(--vscode-focusBorder);
   outline-offset: 1px;
 }
+
+/* ============================================
+   Flow text (soft breaks render as a space)
+   ============================================ */
+
+/* A single newline inside a markdown paragraph is a soft wrap, so CommonMark
+   renders it as a space; only a blank line starts a new paragraph. That newline
+   stays inside the ProseMirror text node, and prosemirror-view's own stylesheet
+   sets `white-space: break-spaces` on the editor, which draws it as a real line
+   break. When `speckitForHumans.softBreaks.renderAsSpace` is on, the webview
+   adds `md4h-flow-text` to <body> and this rule relaxes white-space so those
+   newlines collapse to spaces and prose flows.
+
+   Code blocks are unaffected: prosemirror-view's `.ProseMirror pre` rule sets
+   `white-space: pre-wrap` on the <pre> element itself, which wins over an
+   inherited value from the editor root. Same for `.mermaid-source` and the math
+   sources, which carry their own `white-space` declarations.
+
+   Nothing is rewritten on disk - the newline survives the round-trip, so the
+   file still reads well in a plain text editor. */
+body.md4h-flow-text .markdown-editor {
+  white-space: normal;
+}

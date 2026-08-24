@@ -3,7 +3,7 @@
   "displayName": "Speckit for Humans: WYSIWYG Editor",
   "description": "A full-featured WYSIWYG Markdown editor with visual table editing, drag-and-drop images, Mermaid diagrams, and distraction-free writing—all inside VS Code.",
   "version": "0.3.0",
-  "publisher": "concretio",
+  "publisher": "agenticminds",
   "author": {
     "name": "Agentic Minds",
     "email": "support@agenticminds.ai"
@@ -214,6 +214,12 @@
           ],
           "default": "strip",
           "description": "Controls whether extra blank lines are preserved or removed in the editor and saved file."
+        },
+        "speckitForHumans.softBreaks.renderAsSpace": {
+          "type": "boolean",
+          "default": false,
+          "description": "Render a single newline inside a paragraph as a space so text flows, instead of drawing it as a line break. The newline stays in the saved file, so plain-text readability is unchanged. Only a blank line starts a new paragraph either way.",
+          "scope": "application"
         },
         "speckitForHumans.imagePreview.hover.enabled": {
           "type": "boolean",

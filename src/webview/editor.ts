@@ -41,6 +41,7 @@ import {
   type SpeckitRevealTarget,
 } from './extensions/speckitIdLinks';
 import { scrollToPos } from './utils/scrollToPos';
+import { applySoftBreakFlow } from './utils/softBreakFlow';
 import { DocumentAuditExtension } from './features/auditDocument';
 import { createFormattingToolbar, createTableMenu, updateToolbarStates } from './BubbleMenuView';
 import { getEditorMarkdownForSync } from './utils/markdownSerialization';
@@ -141,7 +142,7 @@ interface WebviewMessage {
   [key: string]: any;
 }
 
-// Extended window interface for MD4H globals
+// Extended window interface for Speckit globals
 declare global {
   interface Window {
     vscode?: VsCodeApi;
@@ -224,7 +225,7 @@ const pushOutlineUpdate = () => {
     const outline = buildOutlineFromEditor(editor);
     vscode.postMessage({ type: 'outlineUpdated', outline });
   } catch (error) {
-    console.warn('[MD4H] Failed to build outline:', error);
+    console.warn('[Speckit] Failed to build outline:', error);
   }
 };
 
@@ -298,7 +299,7 @@ async function insertAndEditMath(editorInstance: Editor, mode: 'inline' | 'block
   const typeName = mode === 'block' ? 'mathBlock' : 'inlineMath';
   const nodeType = editorInstance.schema.nodes[typeName];
   if (!nodeType) {
-    console.warn(`[MD4H] Math node type "${typeName}" is not registered`);
+    console.warn(`[Speckit] Math node type "${typeName}" is not registered`);
     return;
   }
 
@@ -462,13 +463,13 @@ window.setupImageResize = function (
 ): void {
   const editorToUse = editorInstance || editor;
   if (!editorToUse) {
-    console.warn('[MD4H] setupImageResize called before editor is ready');
+    console.warn('[Speckit] setupImageResize called before editor is ready');
     return;
   }
 
   const apiToUse = vscodeApi || vscode;
   void showImageResizeModal(img, editorToUse, apiToUse).catch(error => {
-    console.error('[MD4H] Failed to open image resize modal:', error);
+    console.error('[Speckit] Failed to open image resize modal:', error);
     apiToUse.postMessage({
       type: 'showError',
       message: 'Failed to open the image resize dialog. Please reload the editor and try again.',
@@ -496,7 +497,7 @@ function immediateUpdate() {
     allowNextHostSyncDespiteRecentEdit = true;
     allowNextHostSyncDespiteEchoHash = true;
 
-    console.log('[MD4H] Immediate save triggered');
+    console.log('[Speckit] Immediate save triggered');
 
     // Send edit first
     vscode.postMessage({
@@ -512,7 +513,7 @@ function immediateUpdate() {
       });
     }, 50); // Small delay to ensure edit is processed first
   } catch (error) {
-    console.error('[MD4H] Error in immediate save:', error);
+    console.error('[Speckit] Error in immediate save:', error);
   }
 }
 
@@ -527,7 +528,7 @@ function debouncedUpdate(markdown: string) {
       // Check if any images are currently being saved
       if (hasPendingImageSaves()) {
         const count = getPendingImageCount();
-        console.log(`[MD4H] Delaying document sync - ${count} image(s) still being saved`);
+        console.log(`[Speckit] Delaying document sync - ${count} image(s) still being saved`);
         // Reschedule the update to check again
         debouncedUpdate(markdown);
         return;
@@ -542,7 +543,7 @@ function debouncedUpdate(markdown: string) {
         editReason: 'typing',
       });
     } catch (error) {
-      console.error('[MD4H] Error sending update:', error);
+      console.error('[Speckit] Error sending update:', error);
     }
   }, DEBOUNCE_SYNC_MS);
 }
@@ -580,17 +581,17 @@ function setupCodeBlockLanguageBadges(editorInstance: Editor) {
 function initializeEditor(initialContent: string) {
   try {
     if (editor) {
-      console.warn('[MD4H] Editor already initialized, skipping re-init');
+      console.warn('[Speckit] Editor already initialized, skipping re-init');
       return;
     }
 
     const editorElement = document.querySelector('#editor') as HTMLElement;
     if (!editorElement) {
-      console.error('[MD4H] Editor element not found');
+      console.error('[Speckit] Editor element not found');
       return;
     }
 
-    console.log('[MD4H] Initializing editor...');
+    console.log('[Speckit] Initializing editor...');
 
     const mathExtensions = enableMath ? [InlineMath, MathBlock, MathSlashCommand] : [];
     mathFeatureRegistered = enableMath;
@@ -750,7 +751,7 @@ function initializeEditor(initialContent: string) {
           debouncedUpdate(markdown);
           scheduleOutlineUpdate();
         } catch (error) {
-          console.error('[MD4H] Error in onUpdate:', error);
+          console.error('[Speckit] Error in onUpdate:', error);
         }
       },
       onSelectionUpdate: ({ editor }) => {
@@ -758,14 +759,14 @@ function initializeEditor(initialContent: string) {
           const { from } = editor.state.selection;
           vscode.postMessage({ type: 'selectionChange', pos: from });
         } catch (error) {
-          console.warn('[MD4H] Selection update failed:', error);
+          console.warn('[Speckit] Selection update failed:', error);
         }
       },
       onCreate: () => {
-        console.log('[MD4H] Editor created successfully');
+        console.log('[Speckit] Editor created successfully');
       },
       onDestroy: () => {
-        console.log('[MD4H] Editor destroyed');
+        console.log('[Speckit] Editor destroyed');
       },
     });
 
@@ -786,7 +787,7 @@ function initializeEditor(initialContent: string) {
         installBlankLineLexerNormalizer(markedInstance);
       }
     } catch (error) {
-      console.warn('[MD4H] Failed to install blank-line lexer normalizer:', error);
+      console.warn('[Speckit] Failed to install blank-line lexer normalizer:', error);
     }
 
     // Set initial content as markdown (Tiptap v3 requires explicit contentType)
@@ -844,7 +845,7 @@ function initializeEditor(initialContent: string) {
       const { from } = editorInstance.state.selection;
       vscode.postMessage({ type: 'selectionChange', pos: from });
     } catch (error) {
-      console.warn('[MD4H] Initial selection sync failed:', error);
+      console.warn('[Speckit] Initial selection sync failed:', error);
     }
 
     // Setup code block language badges
@@ -869,7 +870,7 @@ function initializeEditor(initialContent: string) {
           tableMenu.style.display = 'none';
         }
       } catch (error) {
-        console.error('[MD4H] Error in context menu:', error);
+        console.error('[Speckit] Error in context menu:', error);
       }
     };
 
@@ -1032,10 +1033,10 @@ function initializeEditor(initialContent: string) {
       if (!link) return;
 
       const href = link.getAttribute('href');
-      console.log('[MD4H Webview] Link clicked:', href);
+      console.log('[Speckit Webview] Link clicked:', href);
 
       if (!href) {
-        console.warn('[MD4H Webview] Link has no href attribute');
+        console.warn('[Speckit Webview] Link has no href attribute');
         return;
       }
 
@@ -1044,7 +1045,7 @@ function initializeEditor(initialContent: string) {
 
       // External URLs
       if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
-        console.log('[MD4H Webview] Sending openExternalLink message');
+        console.log('[Speckit Webview] Sending openExternalLink message');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const vscode = (window as any).vscode;
         if (vscode && typeof vscode.postMessage === 'function') {
@@ -1053,14 +1054,14 @@ function initializeEditor(initialContent: string) {
             url: href,
           });
         } else {
-          console.warn('[MD4H Webview] vscode.postMessage not available');
+          console.warn('[Speckit Webview] vscode.postMessage not available');
         }
         return;
       }
 
       // Anchor links (heading links)
       if (href.startsWith('#')) {
-        console.log('[MD4H Webview] Handling anchor link:', href);
+        console.log('[Speckit Webview] Handling anchor link:', href);
         const slug = href.slice(1);
         if (editorInstance) {
           // Find heading by slug
@@ -1075,10 +1076,10 @@ function initializeEditor(initialContent: string) {
 
           const headingPos = headingMap.get(slug);
           if (headingPos !== undefined) {
-            console.log('[MD4H Webview] Scrolling to heading at position:', headingPos);
+            console.log('[Speckit Webview] Scrolling to heading at position:', headingPos);
             scrollToHeading(editorInstance, headingPos);
           } else {
-            console.warn('[MD4H Webview] Heading not found for slug:', slug);
+            console.warn('[Speckit Webview] Heading not found for slug:', slug);
           }
         }
         return;
@@ -1089,7 +1090,7 @@ function initializeEditor(initialContent: string) {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[MD4H Webview] Image link clicked, sending openImage message');
+        console.log('[Speckit Webview] Image link clicked, sending openImage message');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const vscode = (window as any).vscode;
         if (vscode && typeof vscode.postMessage === 'function') {
@@ -1098,13 +1099,13 @@ function initializeEditor(initialContent: string) {
             path: href,
           });
         } else {
-          console.warn('[MD4H Webview] vscode.postMessage not available');
+          console.warn('[Speckit Webview] vscode.postMessage not available');
         }
         return;
       }
 
       // Local file links (non-image)
-      console.log('[MD4H Webview] Sending openFileLink message');
+      console.log('[Speckit Webview] Sending openFileLink message');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const vscode = (window as any).vscode;
       if (vscode && typeof vscode.postMessage === 'function') {
@@ -1113,7 +1114,7 @@ function initializeEditor(initialContent: string) {
           path: href,
         });
       } else {
-        console.warn('[MD4H Webview] vscode.postMessage not available');
+        console.warn('[Speckit Webview] vscode.postMessage not available');
       }
     };
 
@@ -1142,12 +1143,12 @@ function initializeEditor(initialContent: string) {
       document.removeEventListener('click', documentClickHandler);
       document.removeEventListener('keydown', keydownHandler);
       editorInstance.view.dom.removeEventListener('click', handleLinkClick);
-      console.log('[MD4H] Editor destroyed, global listeners cleaned up');
+      console.log('[Speckit] Editor destroyed, global listeners cleaned up');
     });
 
-    console.log('[MD4H] Editor initialization complete');
+    console.log('[Speckit] Editor initialization complete');
   } catch (error) {
-    console.error('[MD4H] Fatal error initializing editor:', error);
+    console.error('[Speckit] Fatal error initializing editor:', error);
     const editorElement = document.querySelector('#editor') as HTMLElement;
     if (editorElement) {
       editorElement.innerHTML = `
@@ -1222,7 +1223,7 @@ function revealSpeckitDefinition(target: SpeckitRevealTarget): void {
 function openSpeckitDefinitionAsText(id: string): void {
   const request = speckitRevealFallback(id);
   if (!request) {
-    console.log('[MD4H] Spec-kit definition not found in this document:', id);
+    console.log('[Speckit] Spec-kit definition not found in this document:', id);
     return;
   }
 
@@ -1618,7 +1619,7 @@ window.addEventListener('message', (event: MessageEvent) => {
         }
 
         if (!imgElement) {
-          console.warn('[MD4H] Could not find image element for local image copy');
+          console.warn('[Speckit] Could not find image element for local image copy');
           break;
         }
 
@@ -1626,7 +1627,7 @@ window.addEventListener('message', (event: MessageEvent) => {
         const pos = editor.view.posAtDOM(imgElement, 0);
 
         if (pos === undefined || pos === null) {
-          console.warn('[MD4H] Could not find position for image in editor');
+          console.warn('[Speckit] Could not find position for image in editor');
           break;
         }
 
@@ -1634,7 +1635,7 @@ window.addEventListener('message', (event: MessageEvent) => {
         const node = editor.state.doc.nodeAt(pos);
 
         if (!node || node.type.name !== 'image') {
-          console.warn(`[MD4H] Node at position ${pos} is not an image: ${node?.type.name}`);
+          console.warn(`[Speckit] Node at position ${pos} is not an image: ${node?.type.name}`);
           break;
         }
 
@@ -1693,14 +1694,14 @@ window.addEventListener('message', (event: MessageEvent) => {
             }
           }
         } catch (error) {
-          console.error('[MD4H] Failed to update image node after copy:', error);
+          console.error('[Speckit] Failed to update image node after copy:', error);
         }
         break;
       }
       case 'localImageCopyError': {
         // Local image copy failed
         const error = message.error as string;
-        console.error('[MD4H] Local image copy failed:', error);
+        console.error('[Speckit] Local image copy failed:', error);
         // Error already shown by extension, just clean up any pending state
         const images = document.querySelectorAll('.markdown-image');
         for (const img of images) {
@@ -1765,7 +1766,7 @@ window.addEventListener('message', (event: MessageEvent) => {
             });
           }
         } catch (error) {
-          console.error('[MD4H] flushPendingEdit failed:', error);
+          console.error('[Speckit] flushPendingEdit failed:', error);
         }
         vscode.postMessage({ type: 'flushPendingEditAck', requestId });
         break;
@@ -1800,10 +1801,10 @@ window.addEventListener('message', (event: MessageEvent) => {
         break;
       }
       default:
-        console.warn('[MD4H] Unknown message type:', message.type);
+        console.warn('[Speckit] Unknown message type:', message.type);
     }
   } catch (error) {
-    console.error('[MD4H] Error handling message:', error);
+    console.error('[Speckit] Error handling message:', error);
   }
 });
 
@@ -1812,7 +1813,7 @@ window.addEventListener('message', (event: MessageEvent) => {
  */
 function updateEditorContent(markdown: string) {
   if (!editor) {
-    console.error('[MD4H] Editor not initialized');
+    console.error('[Speckit] Editor not initialized');
     return;
   }
 
@@ -1823,7 +1824,7 @@ function updateEditorContent(markdown: string) {
       // Also check timestamp to allow legitimate identical content after a delay
       const timeSinceLastSend = Date.now() - lastSentTimestamp;
       if (timeSinceLastSend < SYNC_ECHO_TIMEOUT_MS) {
-        console.log('[MD4H] Ignoring update (matches content we just sent)');
+        console.log('[Speckit] Ignoring update (matches content we just sent)');
         return;
       }
     }
@@ -1832,7 +1833,7 @@ function updateEditorContent(markdown: string) {
     // Don't update if user edited recently to prevent cursor jumping (m3)
     const timeSinceLastEdit = Date.now() - lastUserEditTime;
     if (timeSinceLastEdit < RECENT_EDIT_THRESHOLD_MS && !allowNextHostSyncDespiteRecentEdit) {
-      console.log(`[MD4H] Skipping update - user recently edited (${timeSinceLastEdit}ms ago)`);
+      console.log(`[Speckit] Skipping update - user recently edited (${timeSinceLastEdit}ms ago)`);
       return;
     }
     allowNextHostSyncDespiteRecentEdit = false;
@@ -1842,18 +1843,18 @@ function updateEditorContent(markdown: string) {
     const startTime = performance.now();
     const docSize = markdown.length;
 
-    console.log(`[MD4H] Updating content (${docSize} chars)...`);
+    console.log(`[Speckit] Updating content (${docSize} chars)...`);
 
     // Skip if content is already in sync
     const currentMarkdown = getEditorMarkdownForSync(editor, blankLineMode);
     if (currentMarkdown === markdown) {
-      console.log('[MD4H] Update skipped (content unchanged)');
+      console.log('[Speckit] Update skipped (content unchanged)');
       return;
     }
 
     // Save cursor position
     const { from, to } = editor.state.selection;
-    console.log(`[MD4H] Saving cursor position: ${from}-${to}`);
+    console.log(`[Speckit] Saving cursor position: ${from}-${to}`);
 
     // Set content
     editor.commands.setContent(markdown, { contentType: 'markdown' });
@@ -1861,9 +1862,9 @@ function updateEditorContent(markdown: string) {
     // Restore cursor position
     try {
       editor.commands.setTextSelection({ from, to });
-      console.log(`[MD4H] Restored cursor position: ${from}-${to}`);
+      console.log(`[Speckit] Restored cursor position: ${from}-${to}`);
     } catch {
-      console.warn('[MD4H] Could not restore exact cursor position, using safe position');
+      console.warn('[Speckit] Could not restore exact cursor position, using safe position');
       // If exact position fails, move to end of document
       const endPos = editor.state.doc.content.size;
       editor.commands.setTextSelection(Math.min(from, endPos));
@@ -1872,14 +1873,14 @@ function updateEditorContent(markdown: string) {
     pushOutlineUpdate();
 
     const duration = performance.now() - startTime;
-    console.log(`[MD4H] Content updated in ${duration.toFixed(2)}ms`);
+    console.log(`[Speckit] Content updated in ${duration.toFixed(2)}ms`);
 
     if (duration > 1000) {
-      console.warn(`[MD4H] Slow update: ${duration.toFixed(2)}ms for ${docSize} chars`);
+      console.warn(`[Speckit] Slow update: ${duration.toFixed(2)}ms for ${docSize} chars`);
     }
   } catch (error) {
-    console.error('[MD4H] Error updating content:', error);
-    console.error('[MD4H] Document size:', markdown.length, 'chars');
+    console.error('[Speckit] Error updating content:', error);
+    console.error('[Speckit] Document size:', markdown.length, 'chars');
   } finally {
     isUpdating = false;
   }
@@ -1967,7 +1968,7 @@ window.addEventListener('toggleTocOutline', () => {
 // Handle custom event for document audit from toolbar button
 window.addEventListener('auditDocument', async () => {
   if (!editor) return;
-  console.log('[MD4H] Running document audit...');
+  console.log('[Speckit] Running document audit...');
   try {
     const { runAudit, auditPluginKey } = await import('./features/auditDocument');
     const { showAuditOverlay, showToast, dismissToast } = await import('./features/auditOverlay');
@@ -1979,7 +1980,7 @@ window.addEventListener('auditDocument', async () => {
     const loadingToastId = showToast('Auditing document...', 'loading');
 
     const issues = await runAudit(editor);
-    console.log('[MD4H] Audit complete, issues found:', issues.length);
+    console.log('[Speckit] Audit complete, issues found:', issues.length);
 
     // Dismiss loading toast
     dismissToast(loadingToastId);
@@ -1991,7 +1992,7 @@ window.addEventListener('auditDocument', async () => {
       editor.view.dispatch(editor.state.tr.setMeta(auditPluginKey, issues));
     }
   } catch (error) {
-    console.error('[MD4H] Audit failed:', error);
+    console.error('[Speckit] Audit failed:', error);
   }
 });
 
@@ -2025,7 +2026,7 @@ window.addEventListener('insertMath', (event: Event) => {
 
 // Handle open source view from toolbar button
 window.addEventListener('openSourceView', () => {
-  console.log('[MD4H] Opening source view...');
+  console.log('[Speckit] Opening source view...');
   vscode.postMessage({ type: 'openSourceView' });
 });
 
@@ -2105,6 +2106,9 @@ function applyEditorSettings(message: Record<string, any>) {
       `${message.paragraphSpacingAfter}pt`
     );
   }
+  if (typeof message.softBreaksRenderAsSpace === 'boolean') {
+    applySoftBreakFlow(message.softBreaksRenderAsSpace);
+  }
   if (typeof message.zoom === 'number') {
     applyZoomLevel(message.zoom);
   }
@@ -2120,7 +2124,7 @@ window.addEventListener('exportDocument', async (event: Event) => {
   const customEvent = event as CustomEvent;
   const format = customEvent.detail?.format || 'pdf';
 
-  console.log(`[MD4H] Exporting document as ${format}...`);
+  console.log(`[Speckit] Exporting document as ${format}...`);
 
   try {
     // Collect content and convert Mermaid to PNG
@@ -2136,7 +2140,7 @@ window.addEventListener('exportDocument', async (event: Event) => {
       title,
     });
   } catch (error) {
-    console.error('[MD4H] Export failed:', error);
+    console.error('[Speckit] Export failed:', error);
     vscode.postMessage({
       type: 'showError',
       message: 'Failed to prepare document for export. See console for details.',
@@ -2230,11 +2234,11 @@ document.addEventListener(
 
 // Global error handler
 window.addEventListener('error', event => {
-  console.error('[MD4H] Uncaught error:', event.error);
+  console.error('[Speckit] Uncaught error:', event.error);
 });
 
 window.addEventListener('unhandledrejection', event => {
-  console.error('[MD4H] Unhandled promise rejection:', event.reason);
+  console.error('[Speckit] Unhandled promise rejection:', event.reason);
 });
 
 // Testing hooks (not used in production UI)

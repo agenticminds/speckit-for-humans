@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### What's New
+
+#### Flow Text for Soft Breaks
+New opt-in `speckitForHumans.softBreaks.renderAsSpace` setting draws a single newline inside a paragraph as a space, so hard-wrapped prose flows instead of showing a line break at every wrap point. A blank line still starts a new paragraph. Presentation only - the newlines stay in the saved file, so it still reads well in a plain text editor. Off by default.
+
 ---
 
 ## [0.3.0] - 2026-08-07

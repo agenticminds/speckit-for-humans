@@ -570,7 +570,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // Set webview HTML
     webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
     void this.syncMarkdownlintMd012(this.getBlankLineMode()).catch(error => {
-      console.warn('[MD4H] Failed syncing markdownlint MD012 rule:', error);
+      console.warn('[Speckit] Failed syncing markdownlint MD012 rule:', error);
     });
 
     // Register this panel for the autosave bridge. The window-state listener
@@ -615,6 +615,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         e.affectsConfiguration('speckitForHumans.imagePath') ||
         e.affectsConfiguration('speckitForHumans.imagePathBase') ||
         e.affectsConfiguration('speckitForHumans.imagePreview.hover.enabled') ||
+        e.affectsConfiguration('speckitForHumans.softBreaks.renderAsSpace') ||
         e.affectsConfiguration('speckitForHumans.blankLines.mode') ||
         e.affectsConfiguration('speckitForHumans.paragraph.spacingBefore') ||
         e.affectsConfiguration('speckitForHumans.paragraph.spacingAfter') ||
@@ -637,6 +638,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           'speckitForHumans.imagePreview.hover.enabled',
           true
         );
+        const softBreaksRenderAsSpace = config.get<boolean>(
+          'speckitForHumans.softBreaks.renderAsSpace',
+          false
+        );
         const paragraphSpacingBefore = config.get<number>(
           'speckitForHumans.paragraph.spacingBefore',
           0
@@ -654,7 +659,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         const enableMath = config.get<boolean>('speckitForHumans.enableMath', true);
         if (e.affectsConfiguration('speckitForHumans.blankLines.mode')) {
           void this.syncMarkdownlintMd012(blankLineMode).catch(error => {
-            console.warn('[MD4H] Failed syncing markdownlint MD012 rule:', error);
+            console.warn('[Speckit] Failed syncing markdownlint MD012 rule:', error);
           });
           // After the policy rewrites the buffer, either persist the change
           // (autosave on) or tell the user it's pending (autosave off). The
@@ -663,7 +668,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           void this.syncTextDocumentBlankLinePolicy(document)
             .then(() => this.handleBlankLineModeSavePolicy(document, webviewPanel))
             .catch(error => {
-              console.error('[MD4H] Failed to sync blank-line policy to document buffer:', error);
+              console.error(
+                '[Speckit] Failed to sync blank-line policy to document buffer:',
+                error
+              );
             });
         }
         webviewPanel.webview.postMessage({
@@ -673,6 +681,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           imagePath: imagePath,
           imagePathBase: imagePathBase,
           showImageHoverOverlay: showImageHoverOverlay,
+          softBreaksRenderAsSpace: softBreaksRenderAsSpace,
           paragraphSpacingBefore: paragraphSpacingBefore,
           paragraphSpacingAfter: paragraphSpacingAfter,
           zoom: zoom,
@@ -699,7 +708,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         const autoSave = vscode.workspace.getConfiguration('files').get<string>('autoSave', 'off');
         if (autoSave === 'onFocusChange' || autoSave === 'onWindowChange') {
           void this.flushAndSaveIfDirty(document, webviewPanel.webview).catch(error => {
-            console.error('[MD4H] Autosave on view-state change failed:', error);
+            console.error('[Speckit] Autosave on view-state change failed:', error);
           });
         }
       }
@@ -776,6 +785,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       'speckitForHumans.imagePreview.hover.enabled',
       true
     );
+    const softBreaksRenderAsSpace = config.get<boolean>(
+      'speckitForHumans.softBreaks.renderAsSpace',
+      false
+    );
     const paragraphSpacingBefore = config.get<number>(
       'speckitForHumans.paragraph.spacingBefore',
       0
@@ -797,6 +810,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       imagePath: imagePath,
       imagePathBase: imagePathBase,
       showImageHoverOverlay: showImageHoverOverlay,
+      softBreaksRenderAsSpace: softBreaksRenderAsSpace,
       paragraphSpacingBefore: paragraphSpacingBefore,
       paragraphSpacingAfter: paragraphSpacingAfter,
       zoom: zoom,
@@ -891,6 +905,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           'speckitForHumans.imagePreview.hover.enabled',
           true
         );
+        const softBreaksRenderAsSpace = config.get<boolean>(
+          'speckitForHumans.softBreaks.renderAsSpace',
+          false
+        );
         const paragraphSpacingBefore = config.get<number>(
           'speckitForHumans.paragraph.spacingBefore',
           0
@@ -913,6 +931,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           imagePath: imagePath,
           imagePathBase: imagePathBase,
           showImageHoverOverlay: showImageHoverOverlay,
+          softBreaksRenderAsSpace: softBreaksRenderAsSpace,
           paragraphSpacingBefore: paragraphSpacingBefore,
           paragraphSpacingAfter: paragraphSpacingAfter,
           zoom: zoom,
@@ -959,7 +978,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       case 'openExtensionSettings':
         vscode.commands.executeCommand(
           'workbench.action.openSettings',
-          '@ext:concretio.speckit-for-humans'
+          '@ext:agenticminds.speckit-for-humans'
         );
         break;
       case 'exportDocument':
@@ -1211,7 +1230,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
             try {
               extensionFiles = await vscode.workspace.findFiles(extensionPattern, searchExclude, 3);
             } catch (e) {
-              console.warn('[MD4H] Error finding extension files for audit suggestions:', e);
+              console.warn('[Speckit] Error finding extension files for audit suggestions:', e);
             }
           }
 
@@ -1250,7 +1269,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           suggestions.push(...uniqueSuggestions.slice(0, 5));
         }
       } catch (e) {
-        console.warn('[MD4H] Error finding audit file suggestions:', e);
+        console.warn('[Speckit] Error finding audit file suggestions:', e);
       }
 
       webview.postMessage({
@@ -1336,7 +1355,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }
       webview.postMessage({ type: 'auditPickFileResult', requestId, selectedPath: relativePath });
     } catch (e) {
-      console.error('[MD4H] handleAuditPickFile error:', e);
+      console.error('[Speckit] handleAuditPickFile error:', e);
       webview.postMessage({ type: 'auditPickFileResult', requestId, selectedPath: null });
     }
   }
@@ -1481,7 +1500,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         reachable,
       });
     } catch (e) {
-      console.warn('[MD4H] URL check failed', e);
+      console.warn('[Speckit] URL check failed', e);
       webview.postMessage({
         type: 'auditCheckUrlResult',
         requestId,
@@ -1598,12 +1617,12 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const fileName = message.fileName as string;
     const insertPosition = message.insertPosition as number | undefined;
 
-    console.warn(`[MD4H] Handling workspace image: ${sourcePath}`);
+    console.warn(`[Speckit] Handling workspace image: ${sourcePath}`);
 
     // Get the document base path
     const basePath = this.getImageBasePath(document);
     if (!basePath) {
-      console.error(`[MD4H] Cannot compute relative path: no base directory available`);
+      console.error(`[Speckit] Cannot compute relative path: no base directory available`);
       return;
     }
 
@@ -1626,7 +1645,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // If path is invalid or image is outside workspace, copy it to workspace
     if (!isValidPath || !withinWorkspace) {
       console.warn(
-        `[MD4H] Image is outside workspace or has invalid path, copying to workspace...`
+        `[Speckit] Image is outside workspace or has invalid path, copying to workspace...`
       );
 
       try {
@@ -1702,7 +1721,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           copiedRelativePath = './' + copiedRelativePath;
         }
 
-        console.warn(`[MD4H] Image copied to workspace. Path: ${copiedRelativePath}`);
+        console.warn(`[Speckit] Image copied to workspace. Path: ${copiedRelativePath}`);
 
         // Extract alt text from filename (remove extension)
         const altText = fileName.replace(/\.[^.]+$/, '');
@@ -1717,7 +1736,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error(`[MD4H] Failed to copy workspace image: ${errorMessage}`);
+        console.error(`[Speckit] Failed to copy workspace image: ${errorMessage}`);
         vscode.window.showErrorMessage(`Failed to copy image: ${errorMessage}`);
       }
       return;
@@ -1729,7 +1748,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       relativePath = './' + relativePath;
     }
 
-    console.warn(`[MD4H] Computed relative path: ${relativePath}`);
+    console.warn(`[Speckit] Computed relative path: ${relativePath}`);
 
     // Extract alt text from filename (remove extension)
     const altText = fileName.replace(/\.[^.]+$/, '');
@@ -1780,7 +1799,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       return;
     }
 
-    console.warn(`[MD4H] Saving image "${name}" to folder: ${imagesDir}`);
+    console.warn(`[Speckit] Saving image "${name}" to folder: ${imagesDir}`);
 
     try {
       // Create folder if needed
@@ -1839,7 +1858,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         relativePath = './' + relativePath;
       }
 
-      console.warn(`[MD4H] Image saved successfully. Path: ${relativePath}`);
+      console.warn(`[Speckit] Image saved successfully. Path: ${relativePath}`);
 
       webview.postMessage({
         type: 'imageSaved',
@@ -1879,7 +1898,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const originalHeight = message.originalHeight as number | undefined;
     const imageData = message.imageData as string; // base64 data URL
 
-    console.warn(`[MD4H] Resizing image: ${imagePath} to ${newWidth}x${newHeight}`);
+    console.warn(`[Speckit] Resizing image: ${imagePath} to ${newWidth}x${newHeight}`);
 
     try {
       // If absolute path provided (edit in place), use it directly
@@ -1963,7 +1982,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       );
 
       await vscode.workspace.fs.writeFile(vscode.Uri.file(finalBackupPath), originalData);
-      console.warn(`[MD4H] Backup created: ${finalBackupPath}`);
+      console.warn(`[Speckit] Backup created: ${finalBackupPath}`);
 
       // Convert base64 data URL to buffer
       const base64Data = imageData.split(',')[1]; // Remove data:image/png;base64, prefix
@@ -1971,7 +1990,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
       // Overwrite the original file in place (path remains unchanged).
       await vscode.workspace.fs.writeFile(imageUri, buffer);
-      console.warn(`[MD4H] Image resized in-place: ${absolutePath}`);
+      console.warn(`[Speckit] Image resized in-place: ${absolutePath}`);
 
       const relativeBackupPath = path.relative(basePath, finalBackupPath).replace(/\\/g, '/');
       const normalizedBackupPath =
@@ -1990,7 +2009,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to resize image: ${errorMessage}`);
+      console.error(`[Speckit] Failed to resize image: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to resize image: ${errorMessage}`);
       webview.postMessage({
         type: 'imageResized',
@@ -2012,7 +2031,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const imagePath = message.imagePath as string;
     const backupPath = message.backupPath as string;
 
-    console.warn(`[MD4H] Undoing resize: restoring ${imagePath} from ${backupPath}`);
+    console.warn(`[Speckit] Undoing resize: restoring ${imagePath} from ${backupPath}`);
 
     try {
       // Resolve paths using base path
@@ -2045,7 +2064,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       // Restore from backup
       const backupData = await vscode.workspace.fs.readFile(backupUri);
       await vscode.workspace.fs.writeFile(imageUri, backupData);
-      console.warn(`[MD4H] Image restored from backup`);
+      console.warn(`[Speckit] Image restored from backup`);
 
       webview.postMessage({
         type: 'imageUndoResized',
@@ -2054,7 +2073,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to undo resize: ${errorMessage}`);
+      console.error(`[Speckit] Failed to undo resize: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to undo resize: ${errorMessage}`);
       webview.postMessage({
         type: 'imageUndoResized',
@@ -2078,7 +2097,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const newHeight = message.newHeight as number;
     const imageData = message.imageData as string;
 
-    console.warn(`[MD4H] Redoing resize: ${imagePath} to ${newWidth}x${newHeight}`);
+    console.warn(`[Speckit] Redoing resize: ${imagePath} to ${newWidth}x${newHeight}`);
 
     try {
       // Resolve image path using base path
@@ -2104,7 +2123,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
       // Save resized image
       await vscode.workspace.fs.writeFile(imageUri, buffer);
-      console.warn(`[MD4H] Image resize redone successfully`);
+      console.warn(`[Speckit] Image resize redone successfully`);
 
       webview.postMessage({
         type: 'imageRedoResized',
@@ -2113,7 +2132,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to redo resize: ${errorMessage}`);
+      console.error(`[Speckit] Failed to redo resize: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to redo resize: ${errorMessage}`);
       webview.postMessage({
         type: 'imageRedoResized',
@@ -2189,7 +2208,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to compute image references: ${errorMessage}`);
+      console.error(`[Speckit] Failed to compute image references: ${errorMessage}`);
       webview.postMessage({
         type: 'imageReferences',
         requestId,
@@ -2228,7 +2247,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to open file: ${errorMessage}`);
+      console.error(`[Speckit] Failed to open file: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to open file: ${errorMessage}`);
     }
   }
@@ -2298,7 +2317,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
       } catch (error) {
         // Skip files that can't be read
-        console.warn(`[MD4H] Failed to read file ${file.fsPath}: ${error}`);
+        console.warn(`[Speckit] Failed to read file ${file.fsPath}: ${error}`);
       }
     }
 
@@ -2348,7 +2367,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           filesUpdated++;
         }
       } catch (error) {
-        console.warn(`[MD4H] Failed to update file ${file.fsPath}: ${error}`);
+        console.warn(`[Speckit] Failed to update file ${file.fsPath}: ${error}`);
       }
     }
 
@@ -2410,7 +2429,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to check rename target: ${errorMessage}`);
+      console.error(`[Speckit] Failed to check rename target: ${errorMessage}`);
       webview.postMessage({
         type: 'imageRenameCheck',
         requestId,
@@ -2436,7 +2455,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const updateAllReferences = (message.updateAllReferences as boolean) ?? true;
     const allowOverwrite = (message.allowOverwrite as boolean) ?? false;
 
-    console.warn(`[MD4H] Renaming image: ${oldPath} to ${newName}`);
+    console.warn(`[Speckit] Renaming image: ${oldPath} to ${newName}`);
 
     try {
       // Resolve the old path
@@ -2509,14 +2528,16 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         try {
           await vscode.workspace.fs.delete(newUri, { useTrash: true });
         } catch (error) {
-          console.warn(`[MD4H] Could not move existing file to trash, deleting directly: ${error}`);
+          console.warn(
+            `[Speckit] Could not move existing file to trash, deleting directly: ${error}`
+          );
           await vscode.workspace.fs.delete(newUri);
         }
       }
 
       // Rename the file
       await vscode.workspace.fs.rename(oldUri, newUri);
-      console.warn(`[MD4H] File renamed to: ${newFilename}`);
+      console.warn(`[Speckit] File renamed to: ${newFilename}`);
 
       // Calculate new relative path for markdown
       const newRelativePath = path.relative(basePath, absoluteNewPath).replace(/\\/g, '/');
@@ -2561,7 +2582,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to rename image: ${errorMessage}`);
+      console.error(`[Speckit] Failed to rename image: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to rename image: ${errorMessage}`);
       webview.postMessage({
         type: 'imageRenamed',
@@ -2636,7 +2657,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to check image in workspace: ${errorMessage}`);
+      console.error(`[Speckit] Failed to check image in workspace: ${errorMessage}`);
       webview.postMessage({
         type: 'imageWorkspaceCheck',
         requestId,
@@ -2709,7 +2730,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to get image metadata: ${errorMessage}`);
+      console.error(`[Speckit] Failed to get image metadata: ${errorMessage}`);
       webview.postMessage({
         type: 'imageMetadata',
         requestId,
@@ -2761,7 +2782,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       await vscode.commands.executeCommand('revealFileInOS', fileUri);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to reveal image in OS: ${errorMessage}`);
+      console.error(`[Speckit] Failed to reveal image in OS: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to reveal image: ${errorMessage}`);
     }
   }
@@ -2809,7 +2830,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       await vscode.commands.executeCommand('revealInExplorer', fileUri);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to reveal image in Explorer: ${errorMessage}`);
+      console.error(`[Speckit] Failed to reveal image in Explorer: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to reveal image: ${errorMessage}`);
     }
   }
@@ -2863,10 +2884,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }) || { all: true };
       const requestId = (message.requestId as number) || 0;
 
-      console.warn('[MD4H] File search request:', { query, filters, requestId });
+      console.warn('[Speckit] File search request:', { query, filters, requestId });
 
       if (!query || query.trim().length < 1) {
-        console.warn('[MD4H] Empty query, returning empty results');
+        console.warn('[Speckit] Empty query, returning empty results');
         webview.postMessage({
           type: 'fileSearchResults',
           results: [],
@@ -2877,7 +2898,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
       const workspaceFolders = vscode.workspace.workspaceFolders;
       if (!workspaceFolders || workspaceFolders.length === 0) {
-        console.warn('[MD4H] No workspace folders found');
+        console.warn('[Speckit] No workspace folders found');
         webview.postMessage({
           type: 'fileSearchResults',
           results: [],
@@ -2889,7 +2910,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       // More permissive exclude pattern - only exclude truly unnecessary directories
       const excludePattern =
         '{**/node_modules/**,**/.git/**,**/.vscode/**,**/dist/**,**/build/**,**/.next/**,**/coverage/**}';
-      console.warn('[MD4H] Searching files with pattern:', excludePattern);
+      console.warn('[Speckit] Searching files with pattern:', excludePattern);
 
       // Use a more conservative limit (2000) to prevent memory pressure in massive repositories
       // while still providing enough results for most users.
@@ -2898,7 +2919,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         excludePattern,
         MarkdownEditorProvider.MAX_FILE_SEARCH_RESULTS
       );
-      console.warn('[MD4H] Found', allFiles.length, 'files total');
+      console.warn('[Speckit] Found', allFiles.length, 'files total');
 
       let filteredFiles = allFiles;
       if (!filters.all) {
@@ -2920,7 +2941,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           const ext = path.extname(uri.fsPath).toLowerCase();
           return allowedExtensions.has(ext);
         });
-        console.warn('[MD4H] After filter:', filteredFiles.length, 'files');
+        console.warn('[Speckit] After filter:', filteredFiles.length, 'files');
       }
 
       const queryLower = query.toLowerCase().trim();
@@ -2962,7 +2983,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         return false;
       });
 
-      console.warn('[MD4H] Found', matchingFiles.length, 'matching files');
+      console.warn('[Speckit] Found', matchingFiles.length, 'matching files');
 
       // Sort results: exact filename matches first, then path matches, then partial matches
       const sortedFiles = matchingFiles.sort((a, b) => {
@@ -3008,14 +3029,14 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         };
       });
 
-      console.warn('[MD4H] Sending', results.length, 'results to webview');
+      console.warn('[Speckit] Sending', results.length, 'results to webview');
       webview.postMessage({
         type: 'fileSearchResults',
         results,
         requestId,
       });
     } catch (error) {
-      console.error('[MD4H] Error searching files:', error);
+      console.error('[Speckit] Error searching files:', error);
       const requestId = (message.requestId as number) || 0;
       webview.postMessage({
         type: 'fileSearchResults',
@@ -3051,25 +3072,25 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   }): Promise<void> {
     try {
       const url = (message.url as string) || '';
-      console.warn('[MD4H] handleOpenExternalLink called with URL:', url);
+      console.warn('[Speckit] handleOpenExternalLink called with URL:', url);
 
       if (!url) {
-        console.warn('[MD4H] No URL provided for external link');
+        console.warn('[Speckit] No URL provided for external link');
         return;
       }
 
       // Validate URL format
       if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('mailto:')) {
-        console.warn('[MD4H] Invalid external URL format:', url);
+        console.warn('[Speckit] Invalid external URL format:', url);
         return;
       }
 
-      console.warn('[MD4H] Opening external link:', url);
+      console.warn('[Speckit] Opening external link:', url);
       await vscode.env.openExternal(vscode.Uri.parse(url));
-      console.warn('[MD4H] Successfully opened external link');
+      console.warn('[Speckit] Successfully opened external link');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[MD4H] Failed to open external link:', errorMessage, error);
+      console.error('[Speckit] Failed to open external link:', errorMessage, error);
       vscode.window.showErrorMessage(`Failed to open link: ${errorMessage}`);
     }
   }
@@ -3083,11 +3104,11 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   ): Promise<void> {
     const imagePath = String(message.path || '');
     if (!imagePath) {
-      console.warn('[MD4H] No image path provided');
+      console.warn('[Speckit] No image path provided');
       return;
     }
 
-    console.warn('[MD4H] handleOpenImage called with path:', imagePath);
+    console.warn('[Speckit] handleOpenImage called with path:', imagePath);
 
     // Normalize path: remove ./ prefix if present for path resolution
     const normalizedPath = imagePath.startsWith('./') ? imagePath.slice(2) : imagePath;
@@ -3101,23 +3122,23 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     if (!baseDir) {
-      console.error('[MD4H] Cannot resolve image path: no base directory');
+      console.error('[Speckit] Cannot resolve image path: no base directory');
       vscode.window.showWarningMessage('Cannot resolve image path');
       return;
     }
 
     let imageFullPath = path.resolve(baseDir, normalizedPath);
     let imageUri = vscode.Uri.file(imageFullPath);
-    console.warn('[MD4H] Trying document-relative path:', imageFullPath);
+    console.warn('[Speckit] Trying document-relative path:', imageFullPath);
 
     // Check if file exists at document-relative path
     let fileExists = false;
     try {
       await vscode.workspace.fs.stat(imageUri);
       fileExists = true;
-      console.warn('[MD4H] Image found at document-relative path');
+      console.warn('[Speckit] Image found at document-relative path');
     } catch {
-      console.warn('[MD4H] Image not found at document-relative path, trying workspace root');
+      console.warn('[Speckit] Image not found at document-relative path, trying workspace root');
 
       // Fallback: try workspace root
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -3125,32 +3146,32 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         const workspacePath = workspaceFolder.uri.fsPath;
         imageFullPath = path.resolve(workspacePath, normalizedPath);
         imageUri = vscode.Uri.file(imageFullPath);
-        console.warn('[MD4H] Trying workspace-relative path:', imageFullPath);
+        console.warn('[Speckit] Trying workspace-relative path:', imageFullPath);
 
         try {
           await vscode.workspace.fs.stat(imageUri);
           fileExists = true;
-          console.warn('[MD4H] Image found at workspace-relative path');
+          console.warn('[Speckit] Image found at workspace-relative path');
         } catch {
-          console.warn('[MD4H] Image not found at workspace-relative path either');
+          console.warn('[Speckit] Image not found at workspace-relative path either');
         }
       }
     }
 
     if (!fileExists) {
       const errorMsg = `Image not found: ${imagePath}`;
-      console.error('[MD4H]', errorMsg);
+      console.error('[Speckit]', errorMsg);
       vscode.window.showErrorMessage(errorMsg);
       return;
     }
 
     try {
-      console.warn('[MD4H] Opening image:', imageUri.fsPath);
+      console.warn('[Speckit] Opening image:', imageUri.fsPath);
       await vscode.commands.executeCommand('vscode.open', imageUri);
-      console.warn('[MD4H] Successfully opened image');
+      console.warn('[Speckit] Successfully opened image');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('[MD4H] Failed to open image:', errorMessage, err);
+      console.error('[Speckit] Failed to open image:', errorMessage, err);
       vscode.window.showErrorMessage(`Failed to open image: ${errorMessage}`);
     }
   }
@@ -3164,10 +3185,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   ): Promise<void> {
     try {
       const filePath = (message.path as string) || '';
-      console.warn('[MD4H] handleOpenFileLink called with path:', filePath);
+      console.warn('[Speckit] handleOpenFileLink called with path:', filePath);
 
       if (!filePath) {
-        console.warn('[MD4H] No path provided for file link');
+        console.warn('[Speckit] No path provided for file link');
         return;
       }
 
@@ -3178,14 +3199,14 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       const normalizedFilePath = filePath.startsWith('./') ? filePath.slice(2) : filePath;
       const absolutePath = path.resolve(basePath, normalizedFilePath);
       let fileUri = vscode.Uri.file(absolutePath);
-      console.warn('[MD4H] Resolved file URI (document-relative):', fileUri.fsPath);
+      console.warn('[Speckit] Resolved file URI (document-relative):', fileUri.fsPath);
 
       // Check if file exists
       let fileExists = false;
       try {
         await vscode.workspace.fs.stat(fileUri);
         fileExists = true;
-        console.warn('[MD4H] File exists (document-relative):', fileUri.fsPath);
+        console.warn('[Speckit] File exists (document-relative):', fileUri.fsPath);
       } catch {
         // File doesn't exist, try to find it in workspace
         const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -3194,15 +3215,15 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           const workspacePath = workspaceFolders[0].uri.fsPath;
           // Use normalized path (already normalized above)
           const workspaceFileUri = vscode.Uri.file(path.resolve(workspacePath, normalizedFilePath));
-          console.warn('[MD4H] Trying workspace-relative path:', workspaceFileUri.fsPath);
+          console.warn('[Speckit] Trying workspace-relative path:', workspaceFileUri.fsPath);
           try {
             await vscode.workspace.fs.stat(workspaceFileUri);
             fileUri = workspaceFileUri;
             fileExists = true;
-            console.warn('[MD4H] File exists (workspace-relative):', fileUri.fsPath);
+            console.warn('[Speckit] File exists (workspace-relative):', fileUri.fsPath);
           } catch {
             // Not found in workspace either
-            console.warn('[MD4H] File not found in workspace-relative path');
+            console.warn('[Speckit] File not found in workspace-relative path');
           }
         }
       }
@@ -3210,7 +3231,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       if (!fileExists) {
         // File not found, show error
         vscode.window.showWarningMessage(`File not found: ${filePath}`);
-        console.warn('[MD4H] File not found:', filePath);
+        console.warn('[Speckit] File not found:', filePath);
         return;
       }
 
@@ -3229,38 +3250,38 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       ];
       const fileExtension = path.extname(fileUri.fsPath).toLowerCase();
       const isImage = imageExtensions.includes(fileExtension);
-      console.warn('[MD4H] File extension:', fileExtension, '| Is image:', isImage);
+      console.warn('[Speckit] File extension:', fileExtension, '| Is image:', isImage);
 
       if (isImage) {
         // For image files, use vscode.open command directly
         // This automatically opens images in VS Code's image preview
-        console.warn('[MD4H] Attempting to open image file with vscode.open command');
+        console.warn('[Speckit] Attempting to open image file with vscode.open command');
         try {
           await vscode.commands.executeCommand('vscode.open', fileUri);
-          console.warn('[MD4H] Successfully opened image file:', fileUri.fsPath);
+          console.warn('[Speckit] Successfully opened image file:', fileUri.fsPath);
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
-          console.error('[MD4H] Failed to open image file:', errorMessage, error);
+          console.error('[Speckit] Failed to open image file:', errorMessage, error);
           vscode.window.showErrorMessage(`Failed to open image file: ${errorMessage}`);
         }
       } else {
         // For text files, use openTextDocument
-        console.warn('[MD4H] Attempting to open text file with openTextDocument');
+        console.warn('[Speckit] Attempting to open text file with openTextDocument');
         try {
           const doc = await vscode.workspace.openTextDocument(fileUri);
           await vscode.window.showTextDocument(doc);
-          console.warn('[MD4H] Successfully opened file link:', fileUri.fsPath);
+          console.warn('[Speckit] Successfully opened file link:', fileUri.fsPath);
         } catch (error) {
           // If it's not a text file, try vscode.open command as fallback
           const errorMessage = error instanceof Error ? error.message : String(error);
-          console.warn('[MD4H] openTextDocument failed, error:', errorMessage);
+          console.warn('[Speckit] openTextDocument failed, error:', errorMessage);
           if (errorMessage.includes('Binary') || errorMessage.includes('binary')) {
-            console.warn('[MD4H] File is binary, trying vscode.open command as fallback');
+            console.warn('[Speckit] File is binary, trying vscode.open command as fallback');
             try {
               await vscode.commands.executeCommand('vscode.open', fileUri);
-              console.warn('[MD4H] Opened binary file using vscode.open command');
+              console.warn('[Speckit] Opened binary file using vscode.open command');
             } catch (fallbackError) {
-              console.error('[MD4H] Failed to open file:', fallbackError);
+              console.error('[Speckit] Failed to open file:', fallbackError);
               vscode.window.showErrorMessage(`Failed to open file: ${errorMessage}`);
             }
           } else {
@@ -3270,7 +3291,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[MD4H] Failed to open file link:', errorMessage, error);
+      console.error('[Speckit] Failed to open file link:', errorMessage, error);
       vscode.window.showErrorMessage(`Failed to open file: ${errorMessage}`);
     }
   }
@@ -3315,7 +3336,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       const payload = await this.speckitIndexStore.getIndex(scope, qualifiers);
       void webview.postMessage({ type: 'speckitIndex', ...payload });
     } catch (error) {
-      console.warn('[MD4H] Spec-kit index push failed:', error);
+      console.warn('[Speckit] Spec-kit index push failed:', error);
     }
   }
 
@@ -3373,7 +3394,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       await vscode.commands.executeCommand('vscode.openWith', target, SPECKIT_EDITOR_VIEW_TYPE);
     } catch (error) {
       // Logged, never surfaced. SC-007 counts dialogs, not log lines.
-      console.warn('[MD4H] Spec-kit definition open failed:', error);
+      console.warn('[Speckit] Spec-kit definition open failed:', error);
     }
   }
 
@@ -3516,7 +3537,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const placeholderId = message.placeholderId as string;
     const targetFolder = (message.targetFolder as string) || 'images';
 
-    console.warn(`[MD4H] Copying local image to workspace: ${absolutePath}`);
+    console.warn(`[Speckit] Copying local image to workspace: ${absolutePath}`);
 
     try {
       // Read the source image
@@ -3597,7 +3618,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         relativePath = './' + relativePath;
       }
 
-      console.warn(`[MD4H] Local image copied successfully. Path: ${relativePath}`);
+      console.warn(`[Speckit] Local image copied successfully. Path: ${relativePath}`);
 
       webview.postMessage({
         type: 'localImageCopied',
@@ -3607,7 +3628,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to copy local image: ${errorMessage}`);
+      console.error(`[Speckit] Failed to copy local image: ${errorMessage}`);
       vscode.window.showErrorMessage(`Failed to copy image: ${errorMessage}`);
       webview.postMessage({
         type: 'localImageCopyError',
@@ -3630,7 +3651,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     try {
       const config = vscode.workspace.getConfiguration();
       await config.update(key, value, vscode.ConfigurationTarget.Global);
-      console.warn(`[MD4H] Setting updated: ${key} = ${value}`);
+      console.warn(`[Speckit] Setting updated: ${key} = ${value}`);
 
       // Immediately notify webview of the setting change
       // This ensures the setting takes effect right away without waiting for next update
@@ -3648,7 +3669,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[MD4H] Failed to update setting: ${errorMessage}`);
+      console.error(`[Speckit] Failed to update setting: ${errorMessage}`);
     }
   }
 
@@ -3729,7 +3750,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     try {
       await document.save();
     } catch (error) {
-      console.error('[MD4H] Autosave document.save() failed:', error);
+      console.error('[Speckit] Autosave document.save() failed:', error);
     }
   }
 
@@ -3758,7 +3779,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       this.autoSaveTimers.delete(docUri);
       if (!document.isDirty) return;
       void document.save().then(undefined, (error: unknown) => {
-        console.error('[MD4H] Auto-save document.save() failed:', error);
+        console.error('[Speckit] Auto-save document.save() failed:', error);
       });
     }, MarkdownEditorProvider.AUTO_SAVE_DEBOUNCE_MS);
     this.autoSaveTimers.set(docUri, timer);
@@ -3779,7 +3800,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       if (autoSave !== 'onWindowChange') return;
       for (const { panel, document } of this.openPanels.values()) {
         void this.flushAndSaveIfDirty(document, panel.webview).catch(error => {
-          console.error('[MD4H] Autosave on window-state change failed:', error);
+          console.error('[Speckit] Autosave on window-state change failed:', error);
         });
       }
     });
@@ -3870,7 +3891,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       if (!success) {
         const errorMsg = 'Failed to save changes. The file may be read-only or locked.';
         vscode.window.showErrorMessage(errorMsg);
-        console.error('[MD4H] applyEdit failed:', { uri: docUri });
+        console.error('[Speckit] applyEdit failed:', { uri: docUri });
       }
       return success;
     } catch (error) {
@@ -3879,7 +3900,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           ? `Failed to save changes: ${error.message}`
           : 'Failed to save changes: Unknown error';
       vscode.window.showErrorMessage(errorMsg);
-      console.error('[MD4H] applyEdit exception:', error);
+      console.error('[Speckit] applyEdit exception:', error);
       return false;
     }
   }
