@@ -2,7 +2,7 @@
   "name": "speckit-for-humans",
   "displayName": "Speckit for Humans: WYSIWYG Editor",
   "description": "A full-featured WYSIWYG Markdown editor with visual table editing, drag-and-drop images, Mermaid diagrams, and distraction-free writing\u2014all inside VS Code.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "publisher": "agenticminds",
   "author": {
     "name": "Agentic Minds",

@@ -10,6 +10,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.5.1] - 2026-08-23
+
+### Fixed
+
+#### Blank editor on the first markdown file you open
+Opening a markdown file for the first time after starting VS Code could show an
+empty editor pane. Closing the tab and reopening the same file worked, which is
+what made it look random. Inherited from upstream Markdown for Humans since the
+first commit.
+
+The extension sent the document to the editor pane twice: once immediately, and
+once when the pane reported it was ready. The first send happens before the
+pane's script has loaded, so it can be dropped. The second send was then skipped
+by a duplicate-content check, because the first send had already recorded the
+text as sent. That left the pane with no content and no way to ask for it again.
+
+The send on ready is now authoritative and bypasses the duplicate check. The
+editor pane also re-requests content if none arrives within 1.5 seconds, and
+shows a readable error instead of an empty pane if it still never comes.
+
+---
+
 ## [0.5.0] - 2026-08-23
 
 ### What's New
@@ -350,7 +372,11 @@ This release includes several under-the-hood improvements that make the extensio
 
 ---
 
-[Unreleased]: https://github.com/agenticminds/speckit-for-humans/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/agenticminds/speckit-for-humans/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/agenticminds/speckit-for-humans/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/agenticminds/speckit-for-humans/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/agenticminds/speckit-for-humans/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/agenticminds/speckit-for-humans/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/agenticminds/speckit-for-humans/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.7...v0.2.0
 [0.1.7]: https://github.com/agenticminds/speckit-for-humans/compare/v0.1.6...v0.1.7
